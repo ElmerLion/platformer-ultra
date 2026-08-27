@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 7a0de2d6067988444b0b3ed60aa422c6
+timeCreated: 1585526544
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43355352406724048
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Prop_Detail_Struts_02_Convex.asset
+  uploadId: 976822

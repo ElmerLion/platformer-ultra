@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 9eaad94394a8eb842b68d1db405ce72c
+timeCreated: 1585530252
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43206638618504516
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Veh_Drone_Repair_01_Convex.asset
+  uploadId: 976822

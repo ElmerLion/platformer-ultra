@@ -1,0 +1,17 @@
+{
+  "name": "PlatformerUltra.Enemies.Runtime",
+  "rootNamespace": "PlatformerUltra.Enemies",
+  "references": [
+    "PlatformerUltra.Combat.Runtime",
+    "PlatformerUltra.Gameplay.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

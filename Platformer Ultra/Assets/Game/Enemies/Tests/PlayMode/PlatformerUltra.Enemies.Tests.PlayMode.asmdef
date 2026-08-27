@@ -1,0 +1,21 @@
+{
+  "name": "PlatformerUltra.Enemies.Tests.PlayMode",
+  "rootNamespace": "PlatformerUltra.Enemies.Tests.PlayMode",
+  "references": [
+    "PlatformerUltra.Combat.Runtime",
+    "PlatformerUltra.Enemies.Runtime",
+    "PlatformerUltra.Gameplay.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

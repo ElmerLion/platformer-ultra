@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: befd4ef4b18e16b43b8362ce38fd6758
+timeCreated: 1585526502
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43298168529681402
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Prop_FoodPacket_01_Convex.asset
+  uploadId: 976822

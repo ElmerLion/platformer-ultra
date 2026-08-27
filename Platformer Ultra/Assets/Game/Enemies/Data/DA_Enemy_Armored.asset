@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80d1514fdf2fa604397b47740f7deb32, type: 3}
+  m_Name: DA_Enemy_Armored
+  m_EditorClassIdentifier: PlatformerUltra.Enemies.Runtime::PlatformerUltra.Enemies.EnemyDefinition
+  _archetype: 2
+  _visualPrefab: {fileID: 1325898780916914, guid: feefc8bdbd5cd3340a37ddc39f079c5a, type: 3}
+  _animatorController: {fileID: 9100000, guid: 48bd35162ad3c324f90901224579b0c9, type: 2}
+  _spawnPrefab: {fileID: 4419919679169521002, guid: e5d9c2fe8cad67d418d0fc239c32482b, type: 3}
+  _projectilePrefab: {fileID: 0}
+  _spawnWeight: 0.55
+  _maximumHealth: 180
+  _machineTravelSpeed: 1.8
+  _playerChaseSpeed: 1.8
+  _acceleration: 9
+  _deceleration: 14
+  _rotationSpeed: 360
+  _hoverHeight: 0
+  _bobAmplitude: 0
+  _bobFrequency: 0
+  _playerAggroDistance: 6
+  _playerDisengageDistance: 10
+  _playerDisengageDelay: 1
+  _machineAttackRange: 2.45
+  _playerAttackRange: 2.45
+  _attackCooldown: 1.8
+  _attackDuration: 2.6666667
+  _impactNormalizedTime: 0.6
+  _playerDamage: 22
+  _machineDamage: 28
+  _telegraphDuration: 0
+  _projectileSpeed: 12
+  _specialChance: 0.225
+  _specialCooldown: 7
+  _minimumLeapDistance: 3
+  _maximumLeapDistance: 7
+  _specialImpactRadius: 2
+  _specialPlayerDamage: 35
+  _specialMachineDamage: 40
+  _specialDuration: 3.7000003
+  _leapHeight: 1.4
+  _deathRemovalDelay: 2

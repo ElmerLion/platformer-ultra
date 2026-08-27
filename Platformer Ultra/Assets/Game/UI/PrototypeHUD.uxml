@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement class="hud-root">
+        <ui:VisualElement class="instruction-card">
+            <ui:Label text="CONVEYOR PROTOTYPE" class="title" />
+            <ui:Label text="WASD  MOVE     SHIFT  SPRINT     SPACE  JUMP" class="instructions" />
+            <ui:Label text="MOUSE  CAMERA     E  INTERACT" class="instructions" />
+            <ui:Label name="prototype-status" text="Find the orange terminal and generate a route." class="status" />
+        </ui:VisualElement>
+        <ui:VisualElement class="crosshair">
+            <ui:VisualElement class="crosshair-horizontal" />
+            <ui:VisualElement class="crosshair-vertical" />
+        </ui:VisualElement>
+        <ui:Label name="interaction-prompt" text="" class="interaction-prompt" />
+        <ui:VisualElement name="timed-interaction-panel" class="timed-interaction-panel">
+            <ui:Label name="timed-interaction-label" text="Working" class="timed-interaction-label" />
+            <ui:ProgressBar name="timed-interaction-progress" low-value="0" high-value="100" value="0" class="timed-interaction-progress" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

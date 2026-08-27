@@ -1,0 +1,19 @@
+{
+  "name": "PlatformerUltra.Enemies.Editor",
+  "rootNamespace": "PlatformerUltra.Enemies.Editor",
+  "references": [
+    "PlatformerUltra.Combat.Runtime",
+    "PlatformerUltra.Enemies.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

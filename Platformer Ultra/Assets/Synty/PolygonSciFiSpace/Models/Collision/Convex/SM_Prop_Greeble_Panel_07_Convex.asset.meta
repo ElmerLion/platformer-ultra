@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6c555c11ec8449e40a0b8535e7f91833
+timeCreated: 1585526469
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43416111109768894
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Prop_Greeble_Panel_07_Convex.asset
+  uploadId: 976822

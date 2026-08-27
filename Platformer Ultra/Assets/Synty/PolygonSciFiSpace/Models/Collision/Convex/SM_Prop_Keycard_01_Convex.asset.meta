@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 56f8ff7e50c4d3e4fa63970af301c7a9
+timeCreated: 1585526534
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43138391993079018
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Prop_Keycard_01_Convex.asset
+  uploadId: 976822

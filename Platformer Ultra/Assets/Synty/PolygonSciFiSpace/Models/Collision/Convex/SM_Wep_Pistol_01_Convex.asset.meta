@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 228bf81ca49ad934aab88b0e66ec0461
+timeCreated: 1585527056
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43890296914359302
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Wep_Pistol_01_Convex.asset
+  uploadId: 976822

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ff5255049ae9c824eb525818d76516ec
+timeCreated: 1585527091
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43152071243558572
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Veh_Part_Wing_03_Convex.asset
+  uploadId: 976822

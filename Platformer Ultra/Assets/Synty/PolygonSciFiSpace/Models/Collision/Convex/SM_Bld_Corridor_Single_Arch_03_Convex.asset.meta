@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 53edd1e2670da8b4cb56f94c12d3ea54
+timeCreated: 1585527193
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43649280073605440
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Bld_Corridor_Single_Arch_03_Convex.asset
+  uploadId: 976822

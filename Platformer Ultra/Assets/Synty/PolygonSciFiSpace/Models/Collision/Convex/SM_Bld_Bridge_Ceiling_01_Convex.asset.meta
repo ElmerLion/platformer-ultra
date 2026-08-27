@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: cc6386c2a0d2a584488382f6082f74b9
+timeCreated: 1585527153
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43535840882008224
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Bld_Bridge_Ceiling_01_Convex.asset
+  uploadId: 976822

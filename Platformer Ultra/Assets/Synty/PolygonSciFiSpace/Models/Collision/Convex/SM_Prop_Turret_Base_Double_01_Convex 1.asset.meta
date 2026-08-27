@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 1d6bf23d2e366d24c91e6e3fae4d03d8
+timeCreated: 1585529149
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43386938622404966
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Prop_Turret_Base_Double_01_Convex
+    1.asset
+  uploadId: 976822

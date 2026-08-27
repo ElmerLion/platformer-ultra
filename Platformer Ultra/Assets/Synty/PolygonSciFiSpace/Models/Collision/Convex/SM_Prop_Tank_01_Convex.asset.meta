@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 23b453ad7a205a34184507d3defdeed0
+timeCreated: 1585526499
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43784847168986728
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Prop_Tank_01_Convex.asset
+  uploadId: 976822

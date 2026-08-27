@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 343e557994db9d1479f027a073894319
+timeCreated: 1585530254
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43498214043782214
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Veh_MissleRack_01_Convex.asset
+  uploadId: 976822

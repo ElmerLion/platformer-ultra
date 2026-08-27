@@ -104,3 +104,33 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# The Unity project lives in a nested directory in this repository. Keep the
+# generated-folder rules effective at any directory depth as well.
+**/[Ll]ibrary/
+**/[Tt]emp/
+**/[Oo]bj/
+**/[Bb]uild/
+**/[Bb]uilds/
+**/[Ll]ogs/
+**/[Uu]ser[Ss]ettings/
+**/[Mm]emoryCaptures/
+**/[Rr]ecordings/
+**/[Ss]erverData/
+**/[Ee]xported[Oo]bj/
+**/.vs/
+**/.gradle/
+**/.idea/
+**/.consulo/
+
+# Unity-generated files that can appear inside Assets.
+**/[Aa]ssets/[Ss]ceneDependencyCache*
+**/[Aa]ssets/[Aa]ddressableAssetsData/*/*.bin*
+**/[Aa]ssets/[Aa]ddressableAssetsData/link.xml*
+**/[Aa]ssets/[Aa]ddressables_Temp*/
+**/[Aa]ssets/Unity.VisualScripting.Generated/
+
+# Operating-system metadata.
+.DS_Store
+Thumbs.db
+Desktop.ini

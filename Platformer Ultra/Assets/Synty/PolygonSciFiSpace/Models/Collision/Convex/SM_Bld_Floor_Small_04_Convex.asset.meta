@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 7ee43658f205af949a6969ba5a22b536
+timeCreated: 1585527196
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43407150948910028
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Bld_Floor_Small_04_Convex.asset
+  uploadId: 976822

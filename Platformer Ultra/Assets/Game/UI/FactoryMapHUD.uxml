@@ -1,0 +1,34 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement class="hud-root">
+        <ui:VisualElement class="instruction-card">
+            <ui:Label text="VERTICAL FACTORY" class="title" />
+            <ui:Label text="WASD  MOVE     SHIFT  SPRINT     SPACE  JUMP" class="instructions" />
+            <ui:Label text="MOUSE  CAMERA     E  INTERACT" class="instructions" />
+            <ui:Label name="prototype-status" text="Activate Mine → Smelter → Upgrade → Generator → Assembler → 3 Cores." class="status" />
+        </ui:VisualElement>
+        <ui:VisualElement class="crosshair">
+            <ui:VisualElement class="crosshair-horizontal" />
+            <ui:VisualElement class="crosshair-vertical" />
+        </ui:VisualElement>
+        <ui:VisualElement class="player-health-panel">
+            <ui:VisualElement class="player-health-heading">
+                <ui:Label text="SUIT INTEGRITY" class="player-health-title" />
+                <ui:Label name="player-health-value" text="100 / 100" class="player-health-value" />
+            </ui:VisualElement>
+            <ui:ProgressBar name="player-health-progress" low-value="0" high-value="100" value="100" class="player-health-progress" />
+        </ui:VisualElement>
+        <ui:Label name="interaction-prompt" text="" class="interaction-prompt" />
+        <ui:VisualElement name="timed-interaction-panel" class="timed-interaction-panel">
+            <ui:Label name="timed-interaction-label" text="Repairing" class="timed-interaction-label" />
+            <ui:ProgressBar name="timed-interaction-progress" low-value="0" high-value="100" value="0" class="timed-interaction-progress" />
+        </ui:VisualElement>
+        <ui:VisualElement name="game-over-panel" class="game-over-panel">
+            <ui:VisualElement class="game-over-card">
+                <ui:Label text="SYSTEM FAILURE" class="game-over-kicker" />
+                <ui:Label text="GAME OVER" class="game-over-title" />
+                <ui:Label text="Factory defense link terminated." class="game-over-message" />
+                <ui:Button name="retry-button" text="RETRY FACTORY" class="retry-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

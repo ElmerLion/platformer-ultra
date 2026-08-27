@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 954865e3ec51af048a5a19c409c079b5
+timeCreated: 1585526598
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43502275385544672
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Prop_Chr_Female_Cryo_01_Convex.asset
+  uploadId: 976822

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 8c30db8086a174841be2817662fb704d
+timeCreated: 1585530354
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43207269430926390
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Prop_CornerSeat_01_Convex
+    1.asset
+  uploadId: 976822

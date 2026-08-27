@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80d1514fdf2fa604397b47740f7deb32, type: 3}
+  m_Name: DA_Enemy_Saboteur
+  m_EditorClassIdentifier: PlatformerUltra.Enemies.Runtime::PlatformerUltra.Enemies.EnemyDefinition
+  _archetype: 1
+  _visualPrefab: {fileID: 1115756086394208, guid: 2cde8179277215b4fafbb51cd3f7fcd0, type: 3}
+  _animatorController: {fileID: 9100000, guid: 395de3939e951684089e70941b4f7ff4, type: 2}
+  _spawnPrefab: {fileID: 7313439747051724613, guid: 58ac450137064cb46a2c9b043a9a07f1, type: 3}
+  _projectilePrefab: {fileID: 0}
+  _spawnWeight: 1.15
+  _maximumHealth: 60
+  _machineTravelSpeed: 2
+  _playerChaseSpeed: 4
+  _acceleration: 14
+  _deceleration: 18
+  _rotationSpeed: 540
+  _hoverHeight: 0
+  _bobAmplitude: 0
+  _bobFrequency: 0
+  _playerAggroDistance: 6
+  _playerDisengageDistance: 10
+  _playerDisengageDelay: 1
+  _machineAttackRange: 2.15
+  _playerAttackRange: 2.15
+  _attackCooldown: 1.1
+  _attackDuration: 2.6333334
+  _impactNormalizedTime: 0.46
+  _playerDamage: 12
+  _machineDamage: 16
+  _telegraphDuration: 0
+  _projectileSpeed: 12
+  _specialChance: 0
+  _specialCooldown: 0
+  _minimumLeapDistance: 0
+  _maximumLeapDistance: 0
+  _specialImpactRadius: 0
+  _specialPlayerDamage: 0
+  _specialMachineDamage: 0
+  _specialDuration: 1
+  _leapHeight: 0
+  _deathRemovalDelay: 1.5

@@ -1,0 +1,202 @@
+.hud-root {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    color: rgb(230, 242, 245);
+}
+
+.instruction-card {
+    position: absolute;
+    left: 24px;
+    top: 24px;
+    width: 470px;
+    padding: 16px 20px;
+    background-color: rgba(8, 15, 19, 0.88);
+    border-left-width: 4px;
+    border-left-color: rgb(255, 116, 25);
+}
+
+.title {
+    font-size: 21px;
+    -unity-font-style: bold;
+    color: rgb(255, 146, 47);
+    margin-bottom: 8px;
+}
+
+.instructions {
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: rgb(175, 196, 202);
+    margin-bottom: 3px;
+}
+
+.status {
+    font-size: 14px;
+    color: rgb(99, 224, 255);
+    margin-top: 10px;
+}
+
+.interaction-prompt {
+    position: absolute;
+    align-self: center;
+    bottom: 82px;
+    padding: 12px 22px;
+    font-size: 18px;
+    -unity-font-style: bold;
+    color: white;
+    background-color: rgba(8, 15, 19, 0.94);
+    border-bottom-width: 3px;
+    border-bottom-color: rgb(255, 125, 30);
+}
+
+.timed-interaction-panel {
+    position: absolute;
+    align-self: center;
+    bottom: 128px;
+    width: 390px;
+    padding: 13px 18px 15px 18px;
+    background-color: rgba(8, 15, 19, 0.96);
+    border-left-width: 4px;
+    border-left-color: rgb(255, 125, 30);
+    display: none;
+}
+
+.timed-interaction-label {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(255, 177, 80);
+    margin-bottom: 8px;
+}
+
+.timed-interaction-progress {
+    height: 18px;
+    background-color: rgb(28, 42, 47);
+    --unity-progress-bar-background-color: rgb(28, 42, 47);
+    --unity-progress-bar-progress-color: rgb(255, 125, 30);
+}
+
+.crosshair {
+    position: absolute;
+    align-self: center;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+}
+
+.crosshair-horizontal {
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 18px;
+    height: 2px;
+    background-color: rgba(225, 245, 250, 0.8);
+}
+
+.crosshair-vertical {
+    position: absolute;
+    left: 8px;
+    top: 0;
+    width: 2px;
+    height: 18px;
+    background-color: rgba(225, 245, 250, 0.8);
+}
+
+.player-health-panel {
+    position: absolute;
+    left: 24px;
+    bottom: 24px;
+    width: 300px;
+    padding: 12px 15px 14px 15px;
+    background-color: rgba(8, 15, 19, 0.92);
+    border-left-width: 4px;
+    border-left-color: rgb(99, 224, 255);
+}
+
+.player-health-heading {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 7px;
+}
+
+.player-health-title {
+    font-size: 13px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+    color: rgb(175, 215, 224);
+}
+
+.player-health-value {
+    font-size: 13px;
+    -unity-font-style: bold;
+    color: rgb(99, 224, 255);
+}
+
+.player-health-progress {
+    height: 17px;
+    background-color: rgb(28, 42, 47);
+    --unity-progress-bar-background-color: rgb(28, 42, 47);
+    --unity-progress-bar-progress-color: rgb(45, 205, 231);
+}
+
+.game-over-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(7, 9, 11, 0.82);
+    display: none;
+}
+
+.game-over-card {
+    width: 460px;
+    padding: 30px 38px 34px 38px;
+    align-items: center;
+    background-color: rgba(10, 17, 21, 0.98);
+    border-top-width: 4px;
+    border-top-color: rgb(255, 76, 31);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(94, 113, 119);
+}
+
+.game-over-kicker {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: rgb(255, 126, 69);
+    margin-bottom: 4px;
+}
+
+.game-over-title {
+    font-size: 38px;
+    -unity-font-style: bold;
+    color: rgb(242, 247, 248);
+    margin-bottom: 10px;
+}
+
+.game-over-message {
+    font-size: 16px;
+    color: rgb(170, 190, 196);
+    margin-bottom: 24px;
+}
+
+.retry-button {
+    width: 220px;
+    height: 46px;
+    font-size: 16px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+    color: rgb(10, 17, 21);
+    background-color: rgb(255, 126, 38);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+}
+
+.retry-button:hover {
+    background-color: rgb(255, 163, 70);
+}

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: df779bbd2c83c5b48ad81000b0d780c1
+timeCreated: 1585526531
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43522537683953650
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Prop_SpaceWalk_Tube_01_Convex.asset
+  uploadId: 976822

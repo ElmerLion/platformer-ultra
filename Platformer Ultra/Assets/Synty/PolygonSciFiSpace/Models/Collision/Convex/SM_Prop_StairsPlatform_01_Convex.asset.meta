@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d04665c69e25ff541b835d6bc9ca0c64
+timeCreated: 1585526573
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43041815762323736
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Prop_StairsPlatform_01_Convex.asset
+  uploadId: 976822

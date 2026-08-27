@@ -1,0 +1,21 @@
+{
+  "name": "PlatformerUltra.Gameplay.Editor",
+  "rootNamespace": "PlatformerUltra.Gameplay.Editor",
+  "references": [
+    "PlatformerUltra.Gameplay.Runtime",
+    "PlatformerUltra.Combat.Runtime",
+    "PlatformerUltra.Conveyors.Runtime",
+    "Unity.InputSystem"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

@@ -1,0 +1,24 @@
+{
+  "name": "PlatformerUltra.FactoryDefense.EditorTests",
+  "rootNamespace": "PlatformerUltra.FactoryDefense.Tests",
+  "references": [
+    "PlatformerUltra.FactoryDefense.Runtime",
+    "PlatformerUltra.Combat.Runtime",
+    "PlatformerUltra.Gameplay.Runtime",
+    "PlatformerUltra.Enemies.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

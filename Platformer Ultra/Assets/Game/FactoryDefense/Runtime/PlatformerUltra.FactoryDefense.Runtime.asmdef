@@ -1,0 +1,18 @@
+{
+  "name": "PlatformerUltra.FactoryDefense.Runtime",
+  "rootNamespace": "PlatformerUltra.FactoryDefense",
+  "references": [
+    "PlatformerUltra.Combat.Runtime",
+    "PlatformerUltra.Gameplay.Runtime",
+    "PlatformerUltra.Enemies.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

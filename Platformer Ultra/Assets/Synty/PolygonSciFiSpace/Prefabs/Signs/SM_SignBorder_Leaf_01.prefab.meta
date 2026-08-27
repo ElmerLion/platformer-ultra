@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5b69a250dc9e5834c8db0b8dd07098b4
+timeCreated: 1549244844
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Prefabs/Signs/SM_SignBorder_Leaf_01.prefab
+  uploadId: 976822

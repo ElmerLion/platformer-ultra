@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 70303f2c63a142a42a544e712a9cdbf1
+timeCreated: 1549340349
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Prefabs/Props/SM_Prop_CornerTable_01.prefab
+  uploadId: 976822

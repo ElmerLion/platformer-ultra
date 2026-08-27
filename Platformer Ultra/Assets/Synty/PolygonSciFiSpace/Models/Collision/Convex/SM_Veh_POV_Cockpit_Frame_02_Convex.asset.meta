@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: fe2d238d10c257442a7d75122f875f3a
+timeCreated: 1585527096
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43228658470419058
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Veh_POV_Cockpit_Frame_02_Convex.asset
+  uploadId: 976822

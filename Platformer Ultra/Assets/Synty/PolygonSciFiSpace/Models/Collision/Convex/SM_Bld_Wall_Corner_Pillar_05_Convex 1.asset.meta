@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 1d12a428e1e82d643b388ec1a2fe8cac
+timeCreated: 1585527939
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43705423804221156
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Bld_Wall_Corner_Pillar_05_Convex
+    1.asset
+  uploadId: 976822

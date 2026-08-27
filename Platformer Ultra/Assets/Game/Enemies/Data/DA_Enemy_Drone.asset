@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80d1514fdf2fa604397b47740f7deb32, type: 3}
+  m_Name: DA_Enemy_Drone
+  m_EditorClassIdentifier: PlatformerUltra.Enemies.Runtime::PlatformerUltra.Enemies.EnemyDefinition
+  _archetype: 0
+  _visualPrefab: {fileID: 1165255073185956, guid: ad7c52a4ec5f9b948bbfc45336f4fa48, type: 3}
+  _animatorController: {fileID: 0}
+  _spawnPrefab: {fileID: 1627163573620959631, guid: 854a13ab8e490a540b84bb84af41a6ed, type: 3}
+  _projectilePrefab: {fileID: 234357295227901052, guid: bf0475f8b96a126418b7bb70738bd7cb, type: 3}
+  _spawnWeight: 1
+  _maximumHealth: 30
+  _machineTravelSpeed: 3.8
+  _playerChaseSpeed: 3.8
+  _acceleration: 7
+  _deceleration: 10
+  _rotationSpeed: 300
+  _hoverHeight: 1.85
+  _bobAmplitude: 0.12
+  _bobFrequency: 1.4
+  _playerAggroDistance: 8
+  _playerDisengageDistance: 12
+  _playerDisengageDelay: 1
+  _machineAttackRange: 7
+  _playerAttackRange: 7
+  _attackCooldown: 1.3
+  _attackDuration: 0.8
+  _impactNormalizedTime: 0.5625
+  _playerDamage: 8
+  _machineDamage: 6
+  _telegraphDuration: 0.45
+  _projectileSpeed: 14
+  _specialChance: 0
+  _specialCooldown: 0
+  _minimumLeapDistance: 0
+  _maximumLeapDistance: 0
+  _specialImpactRadius: 0
+  _specialPlayerDamage: 0
+  _specialMachineDamage: 0
+  _specialDuration: 0.8
+  _leapHeight: 0
+  _deathRemovalDelay: 1.5

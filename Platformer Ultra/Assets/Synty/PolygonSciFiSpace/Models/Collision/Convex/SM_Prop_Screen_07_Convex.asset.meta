@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 239616cb9268bb442897e3cf7e45f0b1
+timeCreated: 1585526500
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43305915622450242
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Prop_Screen_07_Convex.asset
+  uploadId: 976822

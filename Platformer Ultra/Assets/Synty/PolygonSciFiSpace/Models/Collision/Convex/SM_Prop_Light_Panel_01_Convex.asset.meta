@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 9b2e832eb43e2d64095c2529a7cb91bf
+timeCreated: 1585526496
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43431131111436480
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Prop_Light_Panel_01_Convex.asset
+  uploadId: 976822

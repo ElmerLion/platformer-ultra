@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b82e3f57edb27354798a1ca226a2cdaf
+timeCreated: 1585527208
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43878621131310444
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Bld_Roof_Exterior_03_Convex.asset
+  uploadId: 976822

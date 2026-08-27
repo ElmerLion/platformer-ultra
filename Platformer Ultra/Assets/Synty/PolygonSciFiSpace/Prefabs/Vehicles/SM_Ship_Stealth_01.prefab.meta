@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 36cd240067870fd4ea6904e547353dc4
+timeCreated: 1547516722
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Prefabs/Vehicles/SM_Ship_Stealth_01.prefab
+  uploadId: 976822

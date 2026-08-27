@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 70db9ce6ca5ed4a4fb29f3c98acbefc8
+timeCreated: 1585526564
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 43801103758283872
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 138857
+  packageName: POLYGON - Sci-Fi Space Pack - Art by Synty
+  packageVersion: 1.14.1
+  assetPath: Assets/Synty/PolygonSciFiSpace/Models/Collision/Convex/SM_Prop_Detail_Wire_01_Convex.asset
+  uploadId: 976822
