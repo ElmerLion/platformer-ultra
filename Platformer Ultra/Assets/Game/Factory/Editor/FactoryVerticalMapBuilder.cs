@@ -357,7 +357,7 @@ namespace PlatformerUltra.Factory.Editor
 
             GameObject mine = PlacePrefab(MinePrefabPath, new Vector3(-13f, 0f, -11f), Quaternion.Euler(0f, 180f, 0f), machinery.transform, "Mine Extractor");
             GameObject smelter = PlacePrefab(SmelterPrefabPath, new Vector3(-12.02f, 5.2f, -0.6f), Quaternion.identity, machinery.transform, "Smelter");
-            GameObject upgradeStation = PlacePrefab(UpgradePrefabPath, new Vector3(-5.5f, 5.2f, 5.2f), Quaternion.Euler(0f, 180f, 0f), objectives.transform, "Double Jump Upgrade Station");
+            GameObject upgradeStation = PlacePrefab(UpgradePrefabPath, new Vector3(-2.92f, 3.74f, 14.34f), Quaternion.Euler(0f, 180f, 0f), objectives.transform, "Double Jump Upgrade Station");
             GameObject crusher = PlacePrefab(CrusherPrefabPath, new Vector3(2.8f, 4.8f, -2.8f), Quaternion.identity, machinery.transform, "Piston Crusher");
             GameObject generator = PlacePrefab(GeneratorPrefabPath, new Vector3(13f, 8f, 0.5f), Quaternion.Euler(0f, -90f, 0f), machinery.transform, "Main Generator");
             GameObject assembler = PlacePrefab(AssemblerPrefabPath, new Vector3(12.5f, 13.2f, 11f), Quaternion.Euler(0f, 90f, 0f), machinery.transform, "Assembler");
@@ -389,6 +389,7 @@ namespace PlatformerUltra.Factory.Editor
                 new Vector3(8.7f, 8.12f, 1.8f),
                 new Vector3(11.6f, 8.12f, 0.8f),
                 ConveyorOperatingState.Offline);
+            generatorBelt.SetGeneratedGeometryEnabled(false);
             ProductionConveyorRoute assemblerToPortalRoute = CreateProductionConveyorRoute(
                 "Assembler to Portal Production Route",
                 conveyors.transform,
@@ -539,9 +540,9 @@ namespace PlatformerUltra.Factory.Editor
         {
             Vector3[] positions =
             {
-                new Vector3(2.73f, 9.34f, -3.53f),
-                new Vector3(-10.08f, 9.04f, 7.865f),
-                new Vector3(7.547f, 15.54f, 13.753f)
+                new Vector3(2.829f, 9.34f, -2.865f),
+                new Vector3(-13.12f, 9.04f, 7.045f),
+                new Vector3(6.165f, 15.54f, 12.73f)
             };
 
             for (int index = 0; index < positions.Length; index++)
@@ -712,7 +713,6 @@ namespace PlatformerUltra.Factory.Editor
         private static void BuildMiddleRoute(Transform parent, MapMaterials materials)
         {
             CreateIndustrialDeck("Double Jump Gate - Freight Lift Roof", parent, new Vector3(-1.7f, 5.1f), new Vector2(2.6f, 3f), 7.55f, 0f, materials, true, false);
-            CreatePipeRackPlatform(parent, new Vector3(1.35f, 4.2f), new Vector2(2.5f, 2.3f), 7.8f, materials);
             CreateIndustrialDeck("Crusher Service Ledge", parent, new Vector3(4.45f, 3f), new Vector2(2.9f, 2.5f), 8f, 4.8f, materials, true, false);
             CreateIndustrialDeck("Generator Belt Catwalk", parent, new Vector3(7.7f, 1.8f), new Vector2(3.3f, 2.4f), 8f, 4.8f, materials, true, false);
             CreateIndustrialDeck("Crusher Machine Deck", parent, new Vector3(2.8f, -2.8f), new Vector2(7.2f, 6.3f), 4.8f, 0f, materials, true, false);
@@ -722,8 +722,21 @@ namespace PlatformerUltra.Factory.Editor
             AddSafetyRail(parent, new Vector3(17.8f, 8.8f, 0.5f), 8f, false, materials);
             AddSafetyRail(parent, new Vector3(13f, 8.8f, -3.8f), 8.8f, true, materials);
 
-            CreateIndustrialDeck("Assembler Feeder Conveyor Housing", parent, new Vector3(11.5f, 9f), new Vector2(3f, 2.3f), 13.2f, 8f, materials, true, false);
-            CreateIndustrialDeck("Northeast Assembler Deck", parent, new Vector3(12.5f, 11.5f), new Vector2(9f, 8f), 13.2f, 8f, materials, true, false);
+            GameObject assemblerFeeder = CreateIndustrialDeck("Assembler Feeder Conveyor Housing", parent, new Vector3(11.5f, 9f), new Vector2(3f, 2.3f), 13.2f, 8f, materials, true, false);
+            RemoveSupportPostAt(assemblerFeeder.transform, new Vector3(10.28f, 10.375f, 9.87f));
+            RemoveSupportPostAt(assemblerFeeder.transform, new Vector3(12.72f, 10.375f, 9.87f));
+            AddSupportPost("Support Post (1)", assemblerFeeder.transform, new Vector3(10.28f, 5.73f, 8.13f), new Vector3(0.32f, 4.75f, 0.32f), materials);
+            AddSupportPost("Support Post (2)", assemblerFeeder.transform, new Vector3(12.72f, 5.73f, 8.13f), new Vector3(0.32f, 4.75f, 0.32f), materials);
+            AddSupportPost("Support Post (3)", assemblerFeeder.transform, new Vector3(10.28f, 1.1f, 8.13f), new Vector3(0.32f, 4.75f, 0.32f), materials);
+            AddSupportPost("Support Post (4)", assemblerFeeder.transform, new Vector3(12.72f, 1.1f, 8.13f), new Vector3(0.32f, 4.75f, 0.32f), materials);
+
+            GameObject northeastDeck = CreateIndustrialDeck("Northeast Assembler Deck", parent, new Vector3(12.5f, 11.5f), new Vector2(9f, 8f), 13.2f, 8f, materials, true, false);
+            AddSupportPost("Support Post (1)", northeastDeck.transform, new Vector3(8.28f, 5.76f, 15.22f), new Vector3(0.32f, 4.75f, 0.32f), materials);
+            AddSupportPost("Support Post (2)", northeastDeck.transform, new Vector3(8.28f, 1.22f, 15.22f), new Vector3(0.32f, 4.75f, 0.32f), materials);
+            AddSupportPost("Support Post (3)", northeastDeck.transform, new Vector3(8.28f, 5.73f, 7.78f), new Vector3(0.32f, 4.75f, 0.32f), materials);
+            AddSupportPost("Support Post (4)", northeastDeck.transform, new Vector3(16.72f, 5.73f, 7.78f), new Vector3(0.32f, 4.75f, 0.32f), materials);
+            AddSupportPost("Support Post (5)", northeastDeck.transform, new Vector3(8.28f, 1.1f, 7.78f), new Vector3(0.32f, 4.75f, 0.32f), materials);
+            AddSupportPost("Support Post (6)", northeastDeck.transform, new Vector3(16.72f, 1.1f, 7.78f), new Vector3(0.32f, 4.75f, 0.32f), materials);
             AddSafetyRail(parent, new Vector3(16.8f, 14f, 11.5f), 7.5f, false, materials);
             AddSafetyRail(parent, new Vector3(12.5f, 14f, 15.3f), 8.5f, true, materials);
         }
@@ -731,21 +744,38 @@ namespace PlatformerUltra.Factory.Editor
         private static void BuildUpperRoute(Transform parent, MapMaterials materials)
         {
             GameObject craneTransferPlate = CreateIndustrialDeck("Crane Transfer Plate", parent, new Vector3(0.8f, 12.8f), new Vector2(3.1f, 2.4f), 15.25f, 9f, materials, true, false);
+            AddSupportTier(craneTransferPlate.transform, 6.15f, 5.8f, 1, new[] { -0.47f, 2.07f }, new[] { 11.88f, 13.72f }, materials);
+            AddSupportTier(craneTransferPlate.transform, 0.58f, 5.8f, 5, new[] { -0.47f, 2.07f }, new[] { 11.88f, 13.72f }, materials);
             craneTransferPlate.transform.position = new Vector3(-4.87f, -1.78f, -3.75f);
             GameObject westGantry = CreateIndustrialDeck("West Gantry", parent, new Vector3(-5f, 13f), new Vector2(9f, 2.2f), 15.5f, 9f, materials, true, false);
+            AddSupportTier(westGantry.transform, 6.14f, 6.05f, 1, new[] { -9.22f, -0.78f }, new[] { 12.18f, 13.82f }, materials);
+            AddSupportTier(westGantry.transform, 0.19f, 6.05f, 5, new[] { -9.22f, -0.78f }, new[] { 12.18f, 13.82f }, materials);
             westGantry.transform.position = new Vector3(-7.89f, 0f, 0f);
             GameObject northCatwalk = CreateIndustrialDeck("North Perimeter Catwalk", parent, new Vector3(0f, 12f), new Vector2(22f, 2f), 15.5f, 9f, materials, true, false);
+            AddSupportPost("Support Post (5)", northCatwalk.transform, new Vector3(-10.72f, 6.14f, 11.28f), new Vector3(0.32f, 6.05f, 0.32f), materials);
+            AddSupportPost("Support Post (6)", northCatwalk.transform, new Vector3(-10.72f, 6.14f, 12.72f), new Vector3(0.32f, 6.05f, 0.32f), materials);
+            AddSupportPost("Support Post (7)", northCatwalk.transform, new Vector3(10.72f, 6.14f, 12.72f), new Vector3(0.32f, 6.05f, 0.32f), materials);
+            AddSupportPost("Support Post (9)", northCatwalk.transform, new Vector3(-10.72f, 0.19f, 11.28f), new Vector3(0.32f, 6.05f, 0.32f), materials);
+            AddSupportPost("Support Post (10)", northCatwalk.transform, new Vector3(-10.72f, 0.19f, 12.72f), new Vector3(0.32f, 6.05f, 0.32f), materials);
+            AddSupportPost("Support Post (11)", northCatwalk.transform, new Vector3(10.72f, 0.19f, 12.72f), new Vector3(0.32f, 6.05f, 0.32f), materials);
             northCatwalk.transform.position = new Vector3(-7.89f, 0f, 0f);
             GameObject eastCoreBalcony = CreateIndustrialDeck("East Core Balcony", parent, new Vector3(13.2f, 14f), new Vector2(5.6f, 3.5f), 15.5f, 9f, materials, true, false);
+            AddSupportTier(eastCoreBalcony.transform, 6.14f, 6.05f, 8, new[] { 10.68f, 15.72f }, new[] { 12.53f, 15.47f }, materials);
+            AddSupportTier(eastCoreBalcony.transform, 0.19f, 6.05f, 12, new[] { 10.68f, 15.72f }, new[] { 12.53f, 15.47f }, materials);
             eastCoreBalcony.transform.position = new Vector3(-7.89f, 0f, -1.25f);
-            CreateIndustrialDeck("Portal Deck", parent, new Vector3(0f, 18.4f), new Vector2(10f, 4f), 16.4f, 9f, materials, true, false);
+            GameObject portalDeck = CreateIndustrialDeck("Portal Deck", parent, new Vector3(0f, 18.4f), new Vector2(10f, 4f), 16.4f, 9f, materials, true, false);
+            AddSupportTier(portalDeck.transform, 5.6f, 6.95f, 1, new[] { -4.72f, 4.72f }, new[] { 16.68f, 20.12f }, materials);
+            AddSupportTier(portalDeck.transform, -1.14f, 6.95f, 5, new[] { -4.72f, 4.72f }, new[] { 16.68f, 20.12f }, materials);
 
             AddSafetyRail(parent, new Vector3(5.31f, 16.3f, 15.6f), 5f, true, materials);
             AddSafetyRail(parent, new Vector3(-4.8f, 17.2f, 18.4f), 3.5f, false, materials);
             AddSafetyRail(parent, new Vector3(4.8f, 17.2f, 18.4f), 3.5f, false, materials);
 
-            CreateIndustrialDeck("Central Fall Recovery Deck", parent, new Vector3(0f, 9f), new Vector2(10f, 6f), 3.8f, 0f, materials, true, false);
-            CreateIndustrialDeck("West Fall Recovery Balcony", parent, new Vector3(-11f, 9f), new Vector2(8f, 5f), 9f, 3.8f, materials, true, false);
+            GameObject centralFallRecovery = CreateIndustrialDeck("Central Fall Recovery Deck", parent, new Vector3(0f, 9f), new Vector2(10f, 6f), 3.8f, 0f, materials, true, false);
+            centralFallRecovery.transform.position = new Vector3(-2.69f, 0f, 4.56f);
+            GameObject westFallRecovery = CreateIndustrialDeck("West Fall Recovery Balcony", parent, new Vector3(-11f, 9f), new Vector2(8f, 5f), 9f, 3.8f, materials, true, false);
+            AddSupportTier(westFallRecovery.transform, 1.55f, 4.75f, 1, new[] { -14.72f, -7.28f }, new[] { 6.78f, 11.22f }, materials);
+            westFallRecovery.transform.position = new Vector3(-3.04f, 0f, -0.82f);
             GameObject eastFallRecovery = CreateIndustrialDeck("East Fall Recovery Balcony", parent, new Vector3(11f, 9f), new Vector2(8f, 5f), 9f, 3.8f, materials, true, false);
             eastFallRecovery.transform.position = new Vector3(0f, -4.04f, 0f);
             AddSafetyRail(parent, new Vector3(-11f, 9.8f, 11.3f), 7f, true, materials);
@@ -1714,6 +1744,61 @@ namespace PlatformerUltra.Factory.Editor
             }
 
             return root;
+        }
+
+        private static void AddSupportTier(
+            Transform parent,
+            float y,
+            float height,
+            int firstSuffix,
+            float[] xPositions,
+            float[] zPositions,
+            MapMaterials materials)
+        {
+            int suffix = firstSuffix;
+            foreach (float x in xPositions)
+            {
+                foreach (float z in zPositions)
+                {
+                    AddSupportPost(
+                        "Support Post (" + suffix + ")",
+                        parent,
+                        new Vector3(x, y, z),
+                        new Vector3(0.32f, height, 0.32f),
+                        materials);
+                    suffix++;
+                }
+            }
+        }
+
+        private static void AddSupportPost(
+            string name,
+            Transform parent,
+            Vector3 localPosition,
+            Vector3 localScale,
+            MapMaterials materials)
+        {
+            CreateBox(name, parent, localPosition, localScale, materials.Frame, true);
+        }
+
+        private static void RemoveSupportPostAt(Transform parent, Vector3 localPosition)
+        {
+            const float positionTolerance = 0.0001f;
+            for (int index = parent.childCount - 1; index >= 0; index--)
+            {
+                Transform child = parent.GetChild(index);
+                if (!child.name.StartsWith("Support Post", StringComparison.Ordinal) ||
+                    (child.localPosition - localPosition).sqrMagnitude > positionTolerance * positionTolerance)
+                {
+                    continue;
+                }
+
+                UnityEngine.Object.DestroyImmediate(child.gameObject);
+                return;
+            }
+
+            throw new InvalidOperationException(
+                "Could not remove the generated support post at " + localPosition + " from " + parent.name + ".");
         }
 
         private static void AddSafetyRail(Transform parent, Vector3 center, float length, bool alongX, MapMaterials materials)

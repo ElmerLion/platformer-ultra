@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using PlatformerUltra.Combat;
 using PlatformerUltra.Enemies.Editor;
+using PlatformerUltra.Factory.Conveyors;
 using PlatformerUltra.Gameplay;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -149,6 +150,101 @@ namespace PlatformerUltra.Enemies.Tests
             }
         }
 
+        [Test]
+        public void UserAuthoredPlatformSupports_ArePersistedInAuthoritativeScene()
+        {
+            WithFactoryScene(scene =>
+            {
+                Transform root = GetFactoryRoot(scene);
+                Transform feeder = RequirePath(root, "03 Middle Route - Double Jump/Assembler Feeder Conveyor Housing");
+                AssertSupportCount(feeder, 6);
+                AssertSupport(feeder, new Vector3(10.28f, 5.73f, 8.13f), 4.75f);
+                AssertSupport(feeder, new Vector3(12.72f, 5.73f, 8.13f), 4.75f);
+                AssertSupport(feeder, new Vector3(10.28f, 1.1f, 8.13f), 4.75f);
+                AssertSupport(feeder, new Vector3(12.72f, 1.1f, 8.13f), 4.75f);
+                Assert.That(FindSupport(feeder, new Vector3(10.28f, 10.375f, 9.87f)), Is.Null);
+                Assert.That(FindSupport(feeder, new Vector3(12.72f, 10.375f, 9.87f)), Is.Null);
+
+                Transform northeast = RequirePath(root, "03 Middle Route - Double Jump/Northeast Assembler Deck");
+                AssertSupportCount(northeast, 10);
+                AssertSupport(northeast, new Vector3(8.28f, 5.76f, 15.22f), 4.75f);
+                AssertSupport(northeast, new Vector3(8.28f, 1.22f, 15.22f), 4.75f);
+                AssertSupportTier(northeast, 5.73f, 4.75f, new[] { 8.28f, 16.72f }, new[] { 7.78f });
+                AssertSupportTier(northeast, 1.1f, 4.75f, new[] { 8.28f, 16.72f }, new[] { 7.78f });
+
+                Transform crane = RequirePath(root, "04 Upper Route and Recovery/Crane Transfer Plate");
+                AssertSupportCount(crane, 12);
+                AssertSupportTier(crane, 6.15f, 5.8f, new[] { -0.47f, 2.07f }, new[] { 11.88f, 13.72f });
+                AssertSupportTier(crane, 0.58f, 5.8f, new[] { -0.47f, 2.07f }, new[] { 11.88f, 13.72f });
+
+                Transform eastCore = RequirePath(root, "04 Upper Route and Recovery/East Core Balcony");
+                AssertSupportCount(eastCore, 12);
+                AssertSupportTier(eastCore, 6.14f, 6.05f, new[] { 10.68f, 15.72f }, new[] { 12.53f, 15.47f });
+                AssertSupportTier(eastCore, 0.19f, 6.05f, new[] { 10.68f, 15.72f }, new[] { 12.53f, 15.47f });
+
+                Transform north = RequirePath(root, "04 Upper Route and Recovery/North Perimeter Catwalk");
+                AssertSupportCount(north, 10);
+                AssertSupport(north, new Vector3(-10.72f, 6.14f, 11.28f), 6.05f);
+                AssertSupport(north, new Vector3(-10.72f, 6.14f, 12.72f), 6.05f);
+                AssertSupport(north, new Vector3(10.72f, 6.14f, 12.72f), 6.05f);
+                AssertSupport(north, new Vector3(-10.72f, 0.19f, 11.28f), 6.05f);
+                AssertSupport(north, new Vector3(-10.72f, 0.19f, 12.72f), 6.05f);
+                AssertSupport(north, new Vector3(10.72f, 0.19f, 12.72f), 6.05f);
+
+                Transform portal = RequirePath(root, "04 Upper Route and Recovery/Portal Deck");
+                AssertSupportCount(portal, 12);
+                AssertSupportTier(portal, 5.6f, 6.95f, new[] { -4.72f, 4.72f }, new[] { 16.68f, 20.12f });
+                AssertSupportTier(portal, -1.14f, 6.95f, new[] { -4.72f, 4.72f }, new[] { 16.68f, 20.12f });
+
+                Transform westRecovery = RequirePath(root, "04 Upper Route and Recovery/West Fall Recovery Balcony");
+                AssertSupportCount(westRecovery, 8);
+                AssertSupportTier(westRecovery, 1.55f, 4.75f, new[] { -14.72f, -7.28f }, new[] { 6.78f, 11.22f });
+
+                Transform westGantry = RequirePath(root, "04 Upper Route and Recovery/West Gantry");
+                AssertSupportCount(westGantry, 12);
+                AssertSupportTier(westGantry, 6.14f, 6.05f, new[] { -9.22f, -0.78f }, new[] { 12.18f, 13.82f });
+                AssertSupportTier(westGantry, 0.19f, 6.05f, new[] { -9.22f, -0.78f }, new[] { 12.18f, 13.82f });
+
+                int totalSupportCount = root.GetComponentsInChildren<Transform>(true)
+                    .Count(transform => transform.name.StartsWith("Support Post", StringComparison.Ordinal));
+                Assert.That(totalSupportCount, Is.EqualTo(138));
+            });
+        }
+
+        [Test]
+        public void RemovedMapParts_StayRemovedWhileGeneratorFeedEndpointsRemain()
+        {
+            WithFactoryScene(scene =>
+            {
+                Transform root = GetFactoryRoot(scene);
+                Assert.That(root.Find("03 Middle Route - Double Jump/Pipe Rack Step 7.80"), Is.Null);
+
+                Transform generatorFeed = RequirePath(root, "06 Conveyor Network/Generator Feed Conveyor");
+                ConveyorBelt belt = generatorFeed.GetComponent<ConveyorBelt>();
+                Assert.That(belt, Is.Not.Null);
+                Assert.That(belt.GeneratedGeometryEnabled, Is.False);
+                Assert.That(belt.StartEndpoint, Is.Not.Null);
+                Assert.That(belt.EndEndpoint, Is.Not.Null);
+                Transform generatedRoot = RequirePath(generatorFeed, "Generated Conveyor");
+                Assert.That(generatedRoot.childCount, Is.Zero);
+            });
+        }
+
+        [Test]
+        public void MovedBalconiesUpgradeAndTurretSpots_UseAuthoritativeTransforms()
+        {
+            WithFactoryScene(scene =>
+            {
+                Transform root = GetFactoryRoot(scene);
+                AssertVector(RequirePath(root, "04 Upper Route and Recovery/Central Fall Recovery Deck").localPosition, new Vector3(-2.69f, 0f, 4.56f));
+                AssertVector(RequirePath(root, "04 Upper Route and Recovery/West Fall Recovery Balcony").localPosition, new Vector3(-3.04f, 0f, -0.82f));
+                AssertVector(RequirePath(root, "07 Objectives and Activation/Double Jump Upgrade Station").position, new Vector3(-2.92f, 3.74f, 14.34f));
+                AssertVector(RequirePath(root, "Turret Spots/TurretSpot").position, new Vector3(2.829f, 9.34f, -2.865f));
+                AssertVector(RequirePath(root, "Turret Spots/TurretSpot (1)").position, new Vector3(-13.12f, 9.04f, 7.045f));
+                AssertVector(RequirePath(root, "Turret Spots/TurretSpot (2)").position, new Vector3(6.165f, 15.54f, 12.73f));
+            });
+        }
+
         private static void WithFactoryScene(Action<Scene> assertion)
         {
             Scene scene = SceneManager.GetSceneByPath(ScenePath);
@@ -191,6 +287,46 @@ namespace PlatformerUltra.Enemies.Tests
         {
             Assert.That(Vector3.Distance(actual, expected), Is.LessThanOrEqualTo(tolerance),
                 "Expected " + expected.ToString("F4") + " but found " + actual.ToString("F4") + ".");
+        }
+
+        private static void AssertSupportCount(Transform parent, int expectedCount)
+        {
+            int count = Enumerable.Range(0, parent.childCount)
+                .Select(parent.GetChild)
+                .Count(child => child.name.StartsWith("Support Post", StringComparison.Ordinal));
+            Assert.That(count, Is.EqualTo(expectedCount), parent.name);
+        }
+
+        private static void AssertSupportTier(
+            Transform parent,
+            float y,
+            float height,
+            float[] xPositions,
+            float[] zPositions)
+        {
+            foreach (float x in xPositions)
+            {
+                foreach (float z in zPositions)
+                {
+                    AssertSupport(parent, new Vector3(x, y, z), height);
+                }
+            }
+        }
+
+        private static void AssertSupport(Transform parent, Vector3 localPosition, float expectedHeight)
+        {
+            Transform support = FindSupport(parent, localPosition);
+            Assert.That(support, Is.Not.Null, parent.name + " is missing a support at " + localPosition.ToString("F3") + ".");
+            AssertVector(support.localScale, new Vector3(0.32f, expectedHeight, 0.32f));
+        }
+
+        private static Transform FindSupport(Transform parent, Vector3 localPosition)
+        {
+            return Enumerable.Range(0, parent.childCount)
+                .Select(parent.GetChild)
+                .FirstOrDefault(child =>
+                    child.name.StartsWith("Support Post", StringComparison.Ordinal) &&
+                    Vector3.Distance(child.localPosition, localPosition) <= 0.0001f);
         }
     }
 }

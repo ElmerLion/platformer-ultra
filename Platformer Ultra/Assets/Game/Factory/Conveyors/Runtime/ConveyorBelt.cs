@@ -16,6 +16,7 @@ namespace PlatformerUltra.Factory.Conveyors
         [SerializeField] private ConveyorEndpoint _startEndpoint;
         [SerializeField] private ConveyorEndpoint _endEndpoint;
         [SerializeField] private bool _autoRebuild = true;
+        [SerializeField] private bool _generatedGeometryEnabled = true;
 
         [Header("Operation")]
         [SerializeField] private ConveyorOperatingState _operatingState = ConveyorOperatingState.Online;
@@ -59,6 +60,7 @@ namespace PlatformerUltra.Factory.Conveyors
         public Vector3 StartPosition => _startEndpoint != null ? _startEndpoint.transform.position : transform.position;
         public Vector3 EndPosition => _endEndpoint != null ? _endEndpoint.transform.position : transform.position;
         public bool HasValidEndpoints => _startEndpoint != null && _endEndpoint != null && _startEndpoint != _endEndpoint;
+        public bool GeneratedGeometryEnabled => _generatedGeometryEnabled;
         public bool IsMoving => _operatingState == ConveyorOperatingState.Online && _speed > 0f;
         public float SignedSpeed => IsMoving ? (_reverseDirection ? -_speed : _speed) : 0f;
         public Vector3 SurfaceVelocity => _direction * SignedSpeed;
@@ -69,7 +71,7 @@ namespace PlatformerUltra.Factory.Conveyors
             RefreshDerivedValues();
             CacheMovingSlats();
 
-            if (Application.isPlaying && _generatedRoot == null && HasValidEndpoints)
+            if (Application.isPlaying && _generatedGeometryEnabled && _generatedRoot == null && HasValidEndpoints)
             {
                 RebuildNow();
             }
@@ -89,7 +91,7 @@ namespace PlatformerUltra.Factory.Conveyors
                 return;
             }
 
-            if (!_autoRebuild || !HasValidEndpoints)
+            if (!_autoRebuild || !_generatedGeometryEnabled || !HasValidEndpoints)
             {
                 return;
             }
@@ -144,6 +146,19 @@ namespace PlatformerUltra.Factory.Conveyors
             _reverseDirection = reversed;
         }
 
+        public void SetGeneratedGeometryEnabled(bool enabled)
+        {
+            _generatedGeometryEnabled = enabled;
+            if (_generatedGeometryEnabled)
+            {
+                RebuildNow();
+                return;
+            }
+
+            EnsureGeneratedRoot();
+            ClearGeneratedGeometry();
+        }
+
         public Vector3 GetPathPosition(float normalizedPosition, float surfaceOffset = 0f)
         {
             float clampedPosition = Mathf.Clamp01(normalizedPosition);
@@ -154,6 +169,13 @@ namespace PlatformerUltra.Factory.Conveyors
         {
             ClampValues();
             RefreshDerivedValues();
+
+            if (!_generatedGeometryEnabled)
+            {
+                EnsureGeneratedRoot();
+                ClearGeneratedGeometry();
+                return;
+            }
 
             if (!HasValidEndpoints || _spanLength < MinimumSpanLength)
             {
