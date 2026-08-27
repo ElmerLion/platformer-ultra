@@ -9,6 +9,8 @@ namespace PlatformerUltra.Enemies
         [SerializeField, Min(0.02f)] private float _impactDistance = 0.22f;
         [SerializeField, Min(0f)] private float _spinSpeed = 420f;
         [SerializeField] private LayerMask _collisionMask = ~0;
+        [SerializeField] private GameObject _impactEffectPrefab;
+        [SerializeField, Min(0.1f)] private float _impactEffectScale = 1f;
 
         private readonly RaycastHit[] _castHits = new RaycastHit[8];
         private GameObject _source;
@@ -21,6 +23,12 @@ namespace PlatformerUltra.Enemies
         private bool _resolved;
 
         public bool IsResolved => _resolved;
+
+        public void ConfigureImpactEffect(GameObject impactEffectPrefab, float scale = 1f)
+        {
+            _impactEffectPrefab = impactEffectPrefab;
+            _impactEffectScale = Mathf.Max(0.1f, scale);
+        }
 
         public void Initialize(
             GameObject source,
@@ -170,13 +178,27 @@ namespace PlatformerUltra.Enemies
                 damageable.TakeDamage(new DamageInfo(_damage, _source, Faction.Enemy, transform.position));
             }
 
+            SpawnImpactEffect();
             RemoveProjectile();
         }
 
         private void ResolveWithoutDamage()
         {
             _resolved = true;
+            SpawnImpactEffect();
             RemoveProjectile();
+        }
+
+        private void SpawnImpactEffect()
+        {
+            if (_impactEffectPrefab == null || !Application.isPlaying)
+            {
+                return;
+            }
+
+            GameObject instance = Instantiate(_impactEffectPrefab, transform.position, Quaternion.identity);
+            instance.transform.localScale = Vector3.one * _impactEffectScale;
+            instance.GetComponent<GameplayEffect>()?.Play();
         }
 
         private void RemoveProjectile()

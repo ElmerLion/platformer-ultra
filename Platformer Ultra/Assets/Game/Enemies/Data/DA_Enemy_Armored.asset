@@ -30,8 +30,8 @@ MonoBehaviour:
   _playerAggroDistance: 6
   _playerDisengageDistance: 10
   _playerDisengageDelay: 1
-  _machineAttackRange: 2.45
-  _playerAttackRange: 2.45
+  _machineAttackRange: 3.4
+  _playerAttackRange: 3.4
   _attackCooldown: 1.8
   _attackDuration: 2.6666667
   _impactNormalizedTime: 0.6
@@ -43,7 +43,7 @@ MonoBehaviour:
   _specialCooldown: 7
   _minimumLeapDistance: 3
   _maximumLeapDistance: 7
-  _specialImpactRadius: 2
+  _specialImpactRadius: 3
   _specialPlayerDamage: 35
   _specialMachineDamage: 40
   _specialDuration: 3.7000003

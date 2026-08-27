@@ -63,6 +63,7 @@ GameObject:
   - component: {fileID: 7506466304521211122}
   - component: {fileID: 5226169731503007824}
   - component: {fileID: 3987413303546221821}
+  - component: {fileID: 9100863806974870983}
   m_Layer: 8
   m_Name: PF_Enemy_Saboteur
   m_TagString: Untagged
@@ -264,6 +265,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: PlatformerUltra.Enemies.Runtime::PlatformerUltra.Enemies.NavMeshEnemyMotor
   _agent: {fileID: 0}
   _definition: {fileID: 11400000, guid: b59e4bd4f94cffc4ca884f870bef081e, type: 2}
+--- !u!114 &9100863806974870983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7313439747051724613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc115d1858ddc714393fe05c6e0ff79f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PlatformerUltra.Enemies.Runtime::PlatformerUltra.Enemies.EnemyAttackPresentation
+  _attackController: {fileID: 5652857537634410722}
+  _normalImpactEffectPrefab: {fileID: 4229485575980179259, guid: a0ec262955569144db33c7f3746e63d0, type: 3}
+  _specialImpactEffectPrefab: {fileID: 0}
+  _specialLaunchEffectPrefab: {fileID: 0}
+  _cameraShake: {fileID: 0}
+  _normalEffectScale: 1
+  _specialEffectScale: 1
+  _normalShakeAmplitude: 0.065
+  _specialShakeAmplitude: 0
+  _shakeMaximumDistance: 18
 --- !u!1001 &2401051707461281995
 PrefabInstance:
   m_ObjectHideFlags: 0

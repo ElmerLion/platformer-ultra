@@ -52,6 +52,8 @@ MonoBehaviour:
   _collisionMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  _impactEffectPrefab: {fileID: 7187746584587983011, guid: 1dcbe23a3c7e67b4c93462fa57a62f2f, type: 3}
+  _impactEffectScale: 0.85
 --- !u!96 &7010264179520066182
 TrailRenderer:
   serializedVersion: 4

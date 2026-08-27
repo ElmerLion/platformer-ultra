@@ -62,6 +62,7 @@ GameObject:
   - component: {fileID: 1654842176819206172}
   - component: {fileID: 645956223078808891}
   - component: {fileID: 1272706242510173211}
+  - component: {fileID: 2923709298432118433}
   m_Layer: 8
   m_Name: PF_Enemy_Drone
   m_TagString: Untagged
@@ -248,6 +249,28 @@ MonoBehaviour:
   _collisionSkin: 0.04
   _avoidanceAngle: 55
   _maximumBankAngle: 14
+--- !u!114 &2923709298432118433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1627163573620959631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc115d1858ddc714393fe05c6e0ff79f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PlatformerUltra.Enemies.Runtime::PlatformerUltra.Enemies.EnemyAttackPresentation
+  _attackController: {fileID: 1654842176819206172}
+  _normalImpactEffectPrefab: {fileID: 7187746584587983011, guid: 1dcbe23a3c7e67b4c93462fa57a62f2f, type: 3}
+  _specialImpactEffectPrefab: {fileID: 0}
+  _specialLaunchEffectPrefab: {fileID: 0}
+  _cameraShake: {fileID: 0}
+  _normalEffectScale: 0.72
+  _specialEffectScale: 1
+  _normalShakeAmplitude: 0.065
+  _specialShakeAmplitude: 0
+  _shakeMaximumDistance: 18
 --- !u!1 &2464277389645619989
 GameObject:
   m_ObjectHideFlags: 0

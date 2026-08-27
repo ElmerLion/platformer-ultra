@@ -16,6 +16,14 @@ namespace PlatformerUltra.Enemies.Editor
         public const string ArmoredPrefabPath = "Assets/Game/Enemies/Prefabs/PF_Enemy_Armored.prefab";
         public const string DroneProjectilePrefabPath = "Assets/Game/Enemies/Prefabs/PF_Enemy_DroneBolt.prefab";
         public const string DeathExplosionPrefabPath = "Assets/Game/Combat/VFX/PF_MechanicalDeathExplosion.prefab";
+        public const string MeleeImpactEffectPath = "Assets/Game/Combat/VFX/PF_VFX_MeleeImpact.prefab";
+        public const string ArmoredSlamEffectPath = "Assets/Game/Combat/VFX/PF_VFX_ArmoredSlam.prefab";
+        public const string DroneImpactEffectPath = "Assets/Game/Combat/VFX/PF_VFX_DroneImpact.prefab";
+        public const string PlayerJumpEffectPath = "Assets/Game/Combat/VFX/PF_VFX_PlayerJump.prefab";
+        public const string DoubleJumpEffectPath = "Assets/Game/Combat/VFX/PF_VFX_DoubleJump.prefab";
+        public const string PlayerHitEffectPath = "Assets/Game/Combat/VFX/PF_VFX_PlayerHit.prefab";
+        public const string MachineBreakEffectPath = "Assets/Game/Combat/VFX/PF_VFX_MachineBreak.prefab";
+        public const string RepairLoopEffectPath = "Assets/Game/Combat/VFX/PF_VFX_RepairLoop.prefab";
 
         public const string DroneDefinitionPath = "Assets/Game/Enemies/Data/DA_Enemy_Drone.asset";
         public const string SaboteurDefinitionPath = "Assets/Game/Enemies/Data/DA_Enemy_Saboteur.asset";
@@ -33,6 +41,8 @@ namespace PlatformerUltra.Enemies.Editor
         private const string DeathGlowMaterialPath = DeathVfxFolder + "/M_DeathExplosion_Glow.mat";
         private const string DeathSmokeMaterialPath = DeathVfxFolder + "/M_DeathExplosion_Smoke.mat";
         private const string DeathParticleTexturePath = DeathVfxFolder + "/T_DeathExplosion_SoftDisc.asset";
+        private const string GameplayGlowMaterialPath = DeathVfxFolder + "/M_GameplayVfx_Glow.mat";
+        private const string GameplaySmokeMaterialPath = DeathVfxFolder + "/M_GameplayVfx_Smoke.mat";
 
         private const string DroneVisualPath = "Assets/Synty/PolygonSciFiSpace/Prefabs/Vehicles/SM_Veh_Drone_Attach_01.prefab";
         private const string SaboteurVisualPath = "Assets/Synty/PolygonSciFiSpace/Prefabs/Characters/SM_Chr_RobotFemale_01.prefab";
@@ -94,7 +104,11 @@ namespace PlatformerUltra.Enemies.Editor
                 new Color(1f, 0.38f, 0.04f, 1f),
                 new Color(4.5f, 0.7f, 0.03f, 1f));
             GameObject deathExplosionPrefab = BuildDeathExplosionPrefab();
-            GameObject projectilePrefab = BuildDroneProjectilePrefab(enemyLayer, boltMaterial);
+            GameplayEffectAssets effectAssets = BuildGameplayEffectAssets();
+            GameObject projectilePrefab = BuildDroneProjectilePrefab(
+                enemyLayer,
+                boltMaterial,
+                effectAssets.DroneImpact);
 
             GameObject droneVisual = RequireAsset<GameObject>(DroneVisualPath);
             GameObject saboteurVisual = RequireAsset<GameObject>(SaboteurVisualPath);
@@ -119,7 +133,7 @@ namespace PlatformerUltra.Enemies.Editor
                 null,
                 EnemyArchetype.Drone,
                 enemyLayer,
-                telegraphMaterial), deathExplosionPrefab);
+                telegraphMaterial), deathExplosionPrefab, effectAssets.DroneImpact, null, null);
             GameObject saboteurPrefab = BuildEnemyPrefab(new EnemyPrefabSpec(
                 "PF_Enemy_Saboteur",
                 SaboteurPrefabPath,
@@ -128,7 +142,7 @@ namespace PlatformerUltra.Enemies.Editor
                 saboteurController,
                 EnemyArchetype.Saboteur,
                 enemyLayer,
-                null), deathExplosionPrefab);
+                null), deathExplosionPrefab, effectAssets.MeleeImpact, null, null);
             GameObject armoredPrefab = BuildEnemyPrefab(new EnemyPrefabSpec(
                 "PF_Enemy_Armored",
                 ArmoredPrefabPath,
@@ -137,7 +151,7 @@ namespace PlatformerUltra.Enemies.Editor
                 armoredController,
                 EnemyArchetype.Armored,
                 enemyLayer,
-                null), deathExplosionPrefab);
+                null), deathExplosionPrefab, effectAssets.MeleeImpact, effectAssets.ArmoredSlam, effectAssets.PlayerJump);
 
             droneDefinition.SetSpawnPrefab(dronePrefab);
             saboteurDefinition.SetSpawnPrefab(saboteurPrefab);
@@ -629,7 +643,7 @@ namespace PlatformerUltra.Enemies.Editor
                 null,
                 0.55f);
             definition.ConfigureMovement(180, 1.8f, 1.8f, 9f, 14f, 360f, 0f, 0f, 0f);
-            definition.ConfigureTargeting(6f, 10f, 1f, 2.45f, 2.45f);
+            definition.ConfigureTargeting(6f, 10f, 1f, 3.4f, 3.4f);
             definition.ConfigureRegularAttack(
                 1.8f,
                 Mathf.Max(0.05f, swipeClipLength),
@@ -645,7 +659,7 @@ namespace PlatformerUltra.Enemies.Editor
                 7f,
                 3f,
                 7f,
-                2f,
+                3f,
                 35,
                 40,
                 Mathf.Max(0.05f, jumpAttackClipLength),
@@ -678,7 +692,12 @@ namespace PlatformerUltra.Enemies.Editor
             }
         }
 
-        private static GameObject BuildEnemyPrefab(EnemyPrefabSpec spec, GameObject deathExplosionPrefab)
+        private static GameObject BuildEnemyPrefab(
+            EnemyPrefabSpec spec,
+            GameObject deathExplosionPrefab,
+            GameObject normalImpactEffectPrefab,
+            GameObject specialImpactEffectPrefab,
+            GameObject specialLaunchEffectPrefab)
         {
             GameObject root = new GameObject(spec.Name);
             try
@@ -711,7 +730,9 @@ namespace PlatformerUltra.Enemies.Editor
 
                 visual.name = "Visual";
                 visual.transform.SetLocalPositionAndRotation(GetVisualOffset(spec.Archetype), Quaternion.identity);
-                visual.transform.localScale = Vector3.one;
+                visual.transform.localScale = spec.Archetype == EnemyArchetype.Armored
+                    ? Vector3.one * 2f
+                    : Vector3.one;
                 SetLayerRecursively(visual, spec.EnemyLayer);
                 DisableVisualColliders(visual);
 
@@ -762,6 +783,18 @@ namespace PlatformerUltra.Enemies.Editor
                     muzzle,
                     telegraph,
                     ~(1 << spec.EnemyLayer));
+                EnemyAttackPresentation attackPresentation = root.AddComponent<EnemyAttackPresentation>();
+                bool armored = spec.Archetype == EnemyArchetype.Armored;
+                attackPresentation.Configure(
+                    attackController,
+                    normalImpactEffectPrefab,
+                    specialImpactEffectPrefab,
+                    specialLaunchEffectPrefab,
+                    armored ? 1.8f : (spec.Archetype == EnemyArchetype.Drone ? 0.72f : 1f),
+                    armored ? 2f : 1f,
+                    armored ? 0.12f : 0.065f,
+                    armored ? 0.38f : 0f,
+                    armored ? 26f : 18f);
                 brain.Configure(spec.Definition, enemyHealth, attackController, motorBehaviour, animatorDriver);
 
                 SetLayerRecursively(root, spec.EnemyLayer);
@@ -795,9 +828,9 @@ namespace PlatformerUltra.Enemies.Editor
             capsule.direction = 1;
             if (archetype == EnemyArchetype.Armored)
             {
-                capsule.center = new Vector3(0f, 1.05f, 0f);
-                capsule.height = 2.1f;
-                capsule.radius = 0.65f;
+                capsule.center = new Vector3(0f, 2.1f, 0f);
+                capsule.height = 4.2f;
+                capsule.radius = 1.05f;
             }
             else
             {
@@ -816,8 +849,8 @@ namespace PlatformerUltra.Enemies.Editor
         {
             agent.agentTypeID = 0;
             agent.baseOffset = 0f;
-            agent.height = archetype == EnemyArchetype.Armored ? 2.1f : 1.8f;
-            agent.radius = archetype == EnemyArchetype.Armored ? 0.65f : 0.42f;
+            agent.height = archetype == EnemyArchetype.Armored ? 4.2f : 1.8f;
+            agent.radius = archetype == EnemyArchetype.Armored ? 1.05f : 0.42f;
             agent.speed = definition.MachineTravelSpeed;
             agent.acceleration = definition.Acceleration;
             agent.angularSpeed = definition.RotationSpeed;
@@ -845,7 +878,7 @@ namespace PlatformerUltra.Enemies.Editor
                 case EnemyArchetype.Drone:
                     return new Vector3(0f, 0.8f, 0f);
                 case EnemyArchetype.Armored:
-                    return new Vector3(0f, 1.55f, 0f);
+                    return new Vector3(0f, 3.1f, 0f);
                 default:
                     return new Vector3(0f, 1.35f, 0f);
             }
@@ -917,13 +950,17 @@ namespace PlatformerUltra.Enemies.Editor
             }
         }
 
-        private static GameObject BuildDroneProjectilePrefab(int enemyLayer, Material material)
+        private static GameObject BuildDroneProjectilePrefab(
+            int enemyLayer,
+            Material material,
+            GameObject impactEffectPrefab)
         {
             GameObject root = new GameObject("PF_Enemy_DroneBolt");
             try
             {
                 root.layer = enemyLayer;
-                root.AddComponent<EnemyProjectile>();
+                EnemyProjectile projectile = root.AddComponent<EnemyProjectile>();
+                projectile.ConfigureImpactEffect(impactEffectPrefab, 0.85f);
 
                 GameObject bolt = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 bolt.name = "Electrical Bolt Visual";
@@ -964,6 +1001,365 @@ namespace PlatformerUltra.Enemies.Editor
             {
                 UnityEngine.Object.DestroyImmediate(root);
             }
+        }
+
+        private static GameplayEffectAssets BuildGameplayEffectAssets()
+        {
+            Texture2D softDisc = CreateOrUpdateSoftDiscTexture();
+            Material glowMaterial = CreateOrUpdateParticleMaterial(
+                GameplayGlowMaterialPath,
+                softDisc,
+                Color.white,
+                true);
+            Material smokeMaterial = CreateOrUpdateParticleMaterial(
+                GameplaySmokeMaterialPath,
+                softDisc,
+                Color.white,
+                false);
+
+            return new GameplayEffectAssets
+            {
+                MeleeImpact = BuildLayeredGameplayEffect(
+                    MeleeImpactEffectPath,
+                    "PF_VFX_MeleeImpact",
+                    glowMaterial,
+                    smokeMaterial,
+                    new Color(1f, 0.34f, 0.045f, 1f),
+                    5,
+                    18,
+                    5,
+                    0.18f,
+                    0.85f,
+                    false,
+                    2.4f),
+                ArmoredSlam = BuildLayeredGameplayEffect(
+                    ArmoredSlamEffectPath,
+                    "PF_VFX_ArmoredSlam",
+                    glowMaterial,
+                    smokeMaterial,
+                    new Color(1f, 0.43f, 0.055f, 1f),
+                    12,
+                    36,
+                    22,
+                    0.52f,
+                    1.55f,
+                    true,
+                    6.5f),
+                DroneImpact = BuildLayeredGameplayEffect(
+                    DroneImpactEffectPath,
+                    "PF_VFX_DroneImpact",
+                    glowMaterial,
+                    smokeMaterial,
+                    new Color(0.08f, 0.78f, 1f, 1f),
+                    7,
+                    22,
+                    3,
+                    0.16f,
+                    0.75f,
+                    false,
+                    3.8f),
+                PlayerJump = BuildLayeredGameplayEffect(
+                    PlayerJumpEffectPath,
+                    "PF_VFX_PlayerJump",
+                    glowMaterial,
+                    smokeMaterial,
+                    new Color(1f, 0.54f, 0.12f, 1f),
+                    3,
+                    8,
+                    10,
+                    0.24f,
+                    0.8f,
+                    true,
+                    0f),
+                DoubleJump = BuildLayeredGameplayEffect(
+                    DoubleJumpEffectPath,
+                    "PF_VFX_DoubleJump",
+                    glowMaterial,
+                    smokeMaterial,
+                    new Color(0.08f, 0.82f, 1f, 1f),
+                    7,
+                    20,
+                    4,
+                    0.22f,
+                    1f,
+                    true,
+                    3.2f),
+                PlayerHit = BuildLayeredGameplayEffect(
+                    PlayerHitEffectPath,
+                    "PF_VFX_PlayerHit",
+                    glowMaterial,
+                    smokeMaterial,
+                    new Color(1f, 0.1f, 0.025f, 1f),
+                    5,
+                    15,
+                    3,
+                    0.14f,
+                    0.7f,
+                    false,
+                    2.8f),
+                MachineBreak = BuildLayeredGameplayEffect(
+                    MachineBreakEffectPath,
+                    "PF_VFX_MachineBreak",
+                    glowMaterial,
+                    smokeMaterial,
+                    new Color(1f, 0.3f, 0.035f, 1f),
+                    14,
+                    42,
+                    18,
+                    0.58f,
+                    1.8f,
+                    false,
+                    7.5f),
+                RepairLoop = BuildRepairLoopEffect(glowMaterial, smokeMaterial)
+            };
+        }
+
+        private static GameObject BuildLayeredGameplayEffect(
+            string path,
+            string name,
+            Material glowMaterial,
+            Material smokeMaterial,
+            Color color,
+            short coreCount,
+            short sparkCount,
+            short dustCount,
+            float radius,
+            float lifetime,
+            bool addShockwave,
+            float lightIntensity)
+        {
+            GameObject root = new GameObject(name);
+            try
+            {
+                List<ParticleSystem> layers = new List<ParticleSystem>();
+                layers.Add(CreateGameplayParticleSystem(
+                    "Impact Core",
+                    root.transform,
+                    glowMaterial,
+                    color,
+                    coreCount,
+                    new ParticleSystem.MinMaxCurve(0.12f, 0.28f),
+                    new ParticleSystem.MinMaxCurve(0.6f, 2.2f),
+                    new ParticleSystem.MinMaxCurve(0.28f, 0.62f),
+                    radius,
+                    0f,
+                    false,
+                    false));
+                layers.Add(CreateGameplayParticleSystem(
+                    "Directional Sparks",
+                    root.transform,
+                    glowMaterial,
+                    color,
+                    sparkCount,
+                    new ParticleSystem.MinMaxCurve(0.22f, 0.68f),
+                    new ParticleSystem.MinMaxCurve(3.5f, addShockwave ? 10f : 7f),
+                    new ParticleSystem.MinMaxCurve(0.035f, 0.085f),
+                    radius,
+                    addShockwave ? 1.25f : 0.8f,
+                    false,
+                    true));
+                if (dustCount > 0)
+                {
+                    layers.Add(CreateGameplayParticleSystem(
+                        "Dust Volume",
+                        root.transform,
+                        smokeMaterial,
+                        new Color(0.3f, 0.33f, 0.34f, 0.58f),
+                        dustCount,
+                        new ParticleSystem.MinMaxCurve(0.55f, lifetime),
+                        new ParticleSystem.MinMaxCurve(0.25f, 1.8f),
+                        new ParticleSystem.MinMaxCurve(0.3f, addShockwave ? 1.1f : 0.72f),
+                        radius * 1.2f,
+                        -0.08f,
+                        false,
+                        false));
+                }
+
+                if (addShockwave)
+                {
+                    layers.Add(CreateGameplayParticleSystem(
+                        "Expanding Shock Ring",
+                        root.transform,
+                        glowMaterial,
+                        color,
+                        30,
+                        new ParticleSystem.MinMaxCurve(0.28f, 0.46f),
+                        new ParticleSystem.MinMaxCurve(5.5f, 8f),
+                        new ParticleSystem.MinMaxCurve(0.06f, 0.13f),
+                        Mathf.Max(0.18f, radius),
+                        0f,
+                        true,
+                        true));
+                }
+
+                Light burstLight = lightIntensity > 0f
+                    ? CreateGameplayEffectLight(root.transform, color, lightIntensity, addShockwave ? 7f : 4f)
+                    : null;
+                GameplayEffect effect = root.AddComponent<GameplayEffect>();
+                effect.Configure(layers.ToArray(), burstLight, false, lifetime, 0.16f);
+                return PrefabUtility.SaveAsPrefabAsset(root, path);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
+        private static GameObject BuildRepairLoopEffect(Material glowMaterial, Material smokeMaterial)
+        {
+            GameObject root = new GameObject("PF_VFX_RepairLoop");
+            try
+            {
+                ParticleSystem sparks = CreateGameplayParticleSystem(
+                    "Welding Sparks",
+                    root.transform,
+                    glowMaterial,
+                    new Color(1f, 0.48f, 0.07f, 1f),
+                    0,
+                    new ParticleSystem.MinMaxCurve(0.18f, 0.48f),
+                    new ParticleSystem.MinMaxCurve(2.5f, 5.8f),
+                    new ParticleSystem.MinMaxCurve(0.025f, 0.065f),
+                    0.22f,
+                    0.65f,
+                    false,
+                    true,
+                    true,
+                    15f);
+                ParticleSystem smoke = CreateGameplayParticleSystem(
+                    "Repair Haze",
+                    root.transform,
+                    smokeMaterial,
+                    new Color(0.26f, 0.3f, 0.31f, 0.36f),
+                    0,
+                    new ParticleSystem.MinMaxCurve(0.55f, 1.1f),
+                    new ParticleSystem.MinMaxCurve(0.1f, 0.38f),
+                    new ParticleSystem.MinMaxCurve(0.15f, 0.38f),
+                    0.18f,
+                    -0.04f,
+                    false,
+                    false,
+                    true,
+                    2.5f);
+                Light workLight = CreateGameplayEffectLight(
+                    root.transform,
+                    new Color(1f, 0.38f, 0.04f),
+                    1.6f,
+                    2.4f);
+                GameplayEffect effect = root.AddComponent<GameplayEffect>();
+                effect.Configure(new[] { sparks, smoke }, workLight, true, 1f, 0.12f, 0.55f);
+                return PrefabUtility.SaveAsPrefabAsset(root, RepairLoopEffectPath);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
+        private static ParticleSystem CreateGameplayParticleSystem(
+            string name,
+            Transform parent,
+            Material material,
+            Color color,
+            short burstCount,
+            ParticleSystem.MinMaxCurve lifetime,
+            ParticleSystem.MinMaxCurve speed,
+            ParticleSystem.MinMaxCurve size,
+            float radius,
+            float gravity,
+            bool circleShape,
+            bool stretch,
+            bool looping = false,
+            float rateOverTime = 0f)
+        {
+            GameObject target = new GameObject(name);
+            target.transform.SetParent(parent, false);
+            ParticleSystem particleSystem = target.AddComponent<ParticleSystem>();
+            ParticleSystem.MainModule main = particleSystem.main;
+            main.loop = looping;
+            main.playOnAwake = false;
+            main.duration = looping ? 1f : 0.1f;
+            main.startLifetime = lifetime;
+            main.startSpeed = speed;
+            main.startSize = size;
+            main.startColor = color;
+            main.gravityModifier = gravity;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.maxParticles = Mathf.Max(12, burstCount + Mathf.CeilToInt(rateOverTime * 3f));
+
+            ParticleSystem.EmissionModule emission = particleSystem.emission;
+            emission.rateOverTime = looping ? rateOverTime : 0f;
+            if (!looping && burstCount > 0)
+            {
+                emission.SetBursts(new[] { new ParticleSystem.Burst(0f, burstCount) });
+            }
+
+            ParticleSystem.ShapeModule shape = particleSystem.shape;
+            shape.enabled = true;
+            shape.shapeType = circleShape ? ParticleSystemShapeType.Circle : ParticleSystemShapeType.Sphere;
+            shape.radius = radius;
+            shape.radiusThickness = circleShape ? 0f : 1f;
+            if (circleShape)
+            {
+                shape.rotation = new Vector3(90f, 0f, 0f);
+            }
+
+            ParticleSystem.ColorOverLifetimeModule colorOverLifetime = particleSystem.colorOverLifetime;
+            colorOverLifetime.enabled = true;
+            Gradient fade = new Gradient();
+            fade.SetKeys(
+                new[]
+                {
+                    new GradientColorKey(Color.white, 0f),
+                    new GradientColorKey(Color.white, 1f)
+                },
+                new[]
+                {
+                    new GradientAlphaKey(1f, 0f),
+                    new GradientAlphaKey(0.7f, 0.55f),
+                    new GradientAlphaKey(0f, 1f)
+                });
+            colorOverLifetime.color = fade;
+
+            ParticleSystem.SizeOverLifetimeModule sizeOverLifetime = particleSystem.sizeOverLifetime;
+            sizeOverLifetime.enabled = true;
+            sizeOverLifetime.size = new ParticleSystem.MinMaxCurve(
+                1f,
+                new AnimationCurve(
+                    new Keyframe(0f, 0.65f),
+                    new Keyframe(0.18f, 1f),
+                    new Keyframe(1f, 0.15f)));
+
+            ParticleSystemRenderer renderer = target.GetComponent<ParticleSystemRenderer>();
+            renderer.sharedMaterial = material;
+            renderer.renderMode = stretch
+                ? ParticleSystemRenderMode.Stretch
+                : ParticleSystemRenderMode.Billboard;
+            renderer.alignment = ParticleSystemRenderSpace.View;
+            if (stretch)
+            {
+                renderer.lengthScale = 2.8f;
+                renderer.velocityScale = 0.22f;
+            }
+
+            return particleSystem;
+        }
+
+        private static Light CreateGameplayEffectLight(
+            Transform parent,
+            Color color,
+            float intensity,
+            float range)
+        {
+            GameObject lightObject = new GameObject("Burst Light");
+            lightObject.transform.SetParent(parent, false);
+            Light light = lightObject.AddComponent<Light>();
+            light.type = LightType.Point;
+            light.color = color;
+            light.intensity = intensity;
+            light.range = range;
+            light.shadows = LightShadows.None;
+            light.enabled = false;
+            return light;
         }
 
         private static GameObject BuildDeathExplosionPrefab()
@@ -1023,7 +1419,9 @@ namespace PlatformerUltra.Enemies.Editor
                     0.32f);
                 ParticleSystem.VelocityOverLifetimeModule smokeVelocity = smoke.velocityOverLifetime;
                 smokeVelocity.enabled = true;
+                smokeVelocity.x = new ParticleSystem.MinMaxCurve(0f, 0f);
                 smokeVelocity.y = new ParticleSystem.MinMaxCurve(0.65f, 1.25f);
+                smokeVelocity.z = new ParticleSystem.MinMaxCurve(0f, 0f);
 
                 GameObject lightObject = new GameObject("Explosion Light");
                 lightObject.transform.SetParent(root.transform, false);
@@ -1228,7 +1626,7 @@ namespace PlatformerUltra.Enemies.Editor
                 case EnemyArchetype.Drone:
                     return 0.85f;
                 case EnemyArchetype.Armored:
-                    return 1.35f;
+                    return 2.2f;
                 default:
                     return 1f;
             }
@@ -1400,6 +1798,18 @@ namespace PlatformerUltra.Enemies.Editor
             public EnemyArchetype Archetype { get; }
             public int EnemyLayer { get; }
             public Material TelegraphMaterial { get; }
+        }
+
+        private sealed class GameplayEffectAssets
+        {
+            public GameObject MeleeImpact { get; set; }
+            public GameObject ArmoredSlam { get; set; }
+            public GameObject DroneImpact { get; set; }
+            public GameObject PlayerJump { get; set; }
+            public GameObject DoubleJump { get; set; }
+            public GameObject PlayerHit { get; set; }
+            public GameObject MachineBreak { get; set; }
+            public GameObject RepairLoop { get; set; }
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,6 +22,9 @@ namespace PlatformerUltra.Gameplay
 
         public bool IsHoldingInteraction => _timedSession.IsActive;
         public float TimedInteractionProgress => _timedSession.Progress;
+
+        public event Action<ITimedInteractable> TimedInteractionStarted;
+        public event Action<ITimedInteractable, bool> TimedInteractionEnded;
 
         private void Awake()
         {
@@ -89,8 +93,10 @@ namespace PlatformerUltra.Gameplay
                 return;
             }
 
+            ITimedInteractable target = _timedSession.Target;
             _timedSession.Cancel();
             SetInteractionCommitment(false);
+            TimedInteractionEnded?.Invoke(target, false);
         }
 
         public bool TryBeginTimedInteraction(ITimedInteractable interactable)
@@ -108,6 +114,7 @@ namespace PlatformerUltra.Gameplay
             SetInteractionCommitment(true);
             _promptPresenter?.SetPrompt("Release [E] to cancel");
             _promptPresenter?.ShowTimedProgress(interactable.InteractionActionLabel, 0f);
+            TimedInteractionStarted?.Invoke(interactable);
             return true;
         }
 
@@ -115,6 +122,7 @@ namespace PlatformerUltra.Gameplay
         {
             bool held = _interactAction != null && _interactAction.action.IsPressed();
             bool sameTarget = ReferenceEquals(currentInteractable, _timedSession.Target);
+            ITimedInteractable activeTarget = _timedSession.Target;
             TimedInteractionTickResult result = _timedSession.Tick(
                 Time.deltaTime,
                 held && sameTarget && canInteract);
@@ -129,6 +137,9 @@ namespace PlatformerUltra.Gameplay
             }
 
             SetInteractionCommitment(false);
+            TimedInteractionEnded?.Invoke(
+                activeTarget,
+                result == TimedInteractionTickResult.Completed);
             if (result == TimedInteractionTickResult.Completed && currentInteractable != null)
             {
                 PresentFeedback(currentInteractable);

@@ -126,6 +126,16 @@ namespace PlatformerUltra.Gameplay.Tests
 
                 ThirdPersonPlayerController controller = player.AddComponent<ThirdPersonPlayerController>();
                 PlayerInteractor interactor = player.AddComponent<PlayerInteractor>();
+                int startedCount = 0;
+                int cancelledCount = 0;
+                interactor.TimedInteractionStarted += _ => startedCount++;
+                interactor.TimedInteractionEnded += (_, completed) =>
+                {
+                    if (!completed)
+                    {
+                        cancelledCount++;
+                    }
+                };
                 Assert.That(interactor.TryBeginTimedInteraction(terminal), Is.True);
                 Assert.That(controller.LocomotionLocked, Is.True);
 
@@ -135,6 +145,8 @@ namespace PlatformerUltra.Gameplay.Tests
                 Assert.That(fixture.Machine.State, Is.EqualTo(FactoryMachineState.Broken));
                 Assert.That(fixture.Machine.CurrentHealth, Is.Zero);
                 Assert.That(terminal.LastInteractionFeedback, Does.Contain("cancelled"));
+                Assert.That(startedCount, Is.EqualTo(1));
+                Assert.That(cancelledCount, Is.EqualTo(1));
             }
             finally
             {

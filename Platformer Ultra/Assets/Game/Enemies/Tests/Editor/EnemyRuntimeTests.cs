@@ -42,7 +42,9 @@ namespace PlatformerUltra.Enemies.Tests
         {
             EnemyAttackController attack = CreateConfiguredAttackController(12, out Targetable target, out PlayerHealth damageable);
             int damageCallCount = 0;
+            int presentationImpactCount = 0;
             damageable.Damaged += _ => damageCallCount++;
+            attack.AttackImpacted += (_, _) => presentationImpactCount++;
 
             Assert.That(attack.TryBeginAttack(target, false, 0f), Is.True);
             attack.OnAttackImpact();
@@ -50,6 +52,7 @@ namespace PlatformerUltra.Enemies.Tests
 
             Assert.That(attack.ImpactApplied, Is.True);
             Assert.That(damageCallCount, Is.EqualTo(1));
+            Assert.That(presentationImpactCount, Is.EqualTo(1));
             Assert.That(damageable.CurrentHealth, Is.EqualTo(88));
         }
 

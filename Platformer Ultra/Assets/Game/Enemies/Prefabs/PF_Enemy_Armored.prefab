@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 7297664149298720774}
   - component: {fileID: 5690016580550946053}
   - component: {fileID: 3258788893876651645}
+  - component: {fileID: 6367558292030384740}
   m_Layer: 8
   m_Name: PF_Enemy_Armored
   m_TagString: Untagged
@@ -62,10 +63,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.65
-  m_Height: 2.1
+  m_Radius: 1.05
+  m_Height: 4.2
   m_Direction: 1
-  m_Center: {x: 0, y: 1.05, z: 0}
+  m_Center: {x: 0, y: 2.1, z: 0}
 --- !u!114 &4931255254519471989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -183,7 +184,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: PlatformerUltra.Combat.Runtime::PlatformerUltra.Combat.DeathExplosionEmitter
   _effectPrefab: {fileID: 5783905796564715471, guid: 002ae6c806629bc43867e5445d6eb424, type: 3}
   _origin: {fileID: 7133934194833429289}
-  _scale: 1.35
+  _scale: 2.2
 --- !u!195 &5690016580550946053
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -193,16 +194,16 @@ NavMeshAgent:
   m_GameObject: {fileID: 4419919679169521002}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.65
+  m_Radius: 1.05
   m_Speed: 1.8
   m_Acceleration: 9
   avoidancePriority: 40
   m_AngularSpeed: 360
-  m_StoppingDistance: 1.96
+  m_StoppingDistance: 2.72
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 2.1
+  m_Height: 4.2
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
@@ -220,6 +221,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: PlatformerUltra.Enemies.Runtime::PlatformerUltra.Enemies.NavMeshEnemyMotor
   _agent: {fileID: 0}
   _definition: {fileID: 11400000, guid: c351fcb7f462f3d419b584769e1dc714, type: 2}
+--- !u!114 &6367558292030384740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4419919679169521002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc115d1858ddc714393fe05c6e0ff79f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PlatformerUltra.Enemies.Runtime::PlatformerUltra.Enemies.EnemyAttackPresentation
+  _attackController: {fileID: 3641392186395870413}
+  _normalImpactEffectPrefab: {fileID: 4229485575980179259, guid: a0ec262955569144db33c7f3746e63d0, type: 3}
+  _specialImpactEffectPrefab: {fileID: 5693827862361041252, guid: 160053f0aa81758428c15a02cff5e0e9, type: 3}
+  _specialLaunchEffectPrefab: {fileID: 8773715621591535347, guid: 4ac26631245f56b43be297b505d6ed9a, type: 3}
+  _cameraShake: {fileID: 0}
+  _normalEffectScale: 1.8
+  _specialEffectScale: 2
+  _normalShakeAmplitude: 0.12
+  _specialShakeAmplitude: 0.38
+  _shakeMaximumDistance: 26
 --- !u!1 &5219977821375553634
 GameObject:
   m_ObjectHideFlags: 0
@@ -246,7 +269,7 @@ Transform:
   m_GameObject: {fileID: 5219977821375553634}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.55, z: 0}
+  m_LocalPosition: {x: 0, y: 3.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -495,6 +518,18 @@ PrefabInstance:
     - target: {fileID: 1991483796706250, guid: feefc8bdbd5cd3340a37ddc39f079c5a, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4652387889504090, guid: feefc8bdbd5cd3340a37ddc39f079c5a, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4652387889504090, guid: feefc8bdbd5cd3340a37ddc39f079c5a, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4652387889504090, guid: feefc8bdbd5cd3340a37ddc39f079c5a, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4652387889504090, guid: feefc8bdbd5cd3340a37ddc39f079c5a, type: 3}
       propertyPath: m_LocalPosition.x

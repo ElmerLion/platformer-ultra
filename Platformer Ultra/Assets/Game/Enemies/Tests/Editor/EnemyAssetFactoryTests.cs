@@ -50,6 +50,7 @@ namespace PlatformerUltra.Enemies.Tests
             Assert.That(prefab.GetComponent<EnemyHealth>(), Is.Not.Null);
             Assert.That(prefab.GetComponent<EnemyBrain>(), Is.Not.Null);
             Assert.That(prefab.GetComponent<EnemyAttackController>(), Is.Not.Null);
+            Assert.That(prefab.GetComponent<EnemyAttackPresentation>(), Is.Not.Null);
             Assert.That(prefab.transform.Find("Target Point")?.GetComponent<TargetPoint>(), Is.Not.Null);
 
             GameObject visual = prefab.transform.Find("Visual")?.gameObject;
@@ -88,6 +89,17 @@ namespace PlatformerUltra.Enemies.Tests
                 Assert.That(animator.applyRootMotion, Is.False);
                 Assert.That(visual.GetComponent<EnemyAnimatorDriver>(), Is.Not.Null);
                 Assert.That(visual.GetComponent<EnemyAnimationEventRelay>(), Is.Not.Null);
+            }
+
+            if (archetype == EnemyArchetype.Armored)
+            {
+                Assert.That(visual.transform.localScale, Is.EqualTo(Vector3.one * 2f));
+                CapsuleCollider capsule = prefab.GetComponent<CapsuleCollider>();
+                Assert.That(capsule.height, Is.EqualTo(4.2f));
+                Assert.That(capsule.radius, Is.EqualTo(1.05f));
+                Assert.That(prefab.GetComponent<NavMeshAgent>().height, Is.EqualTo(4.2f));
+                Assert.That(prefab.GetComponent<NavMeshAgent>().radius, Is.EqualTo(1.05f));
+                Assert.That(prefab.transform.Find("Target Point").localPosition.y, Is.EqualTo(3.1f));
             }
 
             AssertRequiredReference(prefab.GetComponent<EnemyHealth>(), "_definition");
@@ -142,7 +154,9 @@ namespace PlatformerUltra.Enemies.Tests
             Assert.That(armored.SpecialCooldown, Is.EqualTo(7f));
             Assert.That(armored.MinimumLeapDistance, Is.EqualTo(3f));
             Assert.That(armored.MaximumLeapDistance, Is.EqualTo(7f));
-            Assert.That(armored.SpecialImpactRadius, Is.EqualTo(2f));
+            Assert.That(armored.MachineAttackRange, Is.EqualTo(3.4f));
+            Assert.That(armored.PlayerAttackRange, Is.EqualTo(3.4f));
+            Assert.That(armored.SpecialImpactRadius, Is.EqualTo(3f));
             Assert.That(armored.SpecialPlayerDamage, Is.EqualTo(35));
             Assert.That(armored.SpecialMachineDamage, Is.EqualTo(40));
         }
@@ -196,6 +210,37 @@ namespace PlatformerUltra.Enemies.Tests
             Renderer renderer = projectile.GetComponentInChildren<Renderer>(true);
             Assert.That(renderer, Is.Not.Null);
             Assert.That(renderer.sharedMaterial, Is.Not.Null);
+            AssertRequiredReference(projectile.GetComponent<EnemyProjectile>(), "_impactEffectPrefab");
+        }
+
+        [Test]
+        public void GameplayEffects_AreLayeredAndAssignedToEnemyPresentation()
+        {
+            string[] effectPaths =
+            {
+                EnemyAssetFactory.MeleeImpactEffectPath,
+                EnemyAssetFactory.ArmoredSlamEffectPath,
+                EnemyAssetFactory.DroneImpactEffectPath,
+                EnemyAssetFactory.PlayerJumpEffectPath,
+                EnemyAssetFactory.DoubleJumpEffectPath,
+                EnemyAssetFactory.PlayerHitEffectPath,
+                EnemyAssetFactory.MachineBreakEffectPath,
+                EnemyAssetFactory.RepairLoopEffectPath
+            };
+
+            foreach (string path in effectPaths)
+            {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                Assert.That(prefab, Is.Not.Null, path);
+                GameplayEffect effect = prefab.GetComponent<GameplayEffect>();
+                Assert.That(effect, Is.Not.Null, path);
+                Assert.That(effect.ParticleLayerCount, Is.GreaterThanOrEqualTo(2), path);
+            }
+
+            GameObject armored = AssetDatabase.LoadAssetAtPath<GameObject>(EnemyAssetFactory.ArmoredPrefabPath);
+            EnemyAttackPresentation presentation = armored.GetComponent<EnemyAttackPresentation>();
+            Assert.That(presentation.NormalImpactEffectPrefab, Is.Not.Null);
+            Assert.That(presentation.SpecialImpactEffectPrefab, Is.Not.Null);
         }
 
         [Test]

@@ -1,3 +1,4 @@
+using PlatformerUltra.Combat;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,13 +18,16 @@ namespace PlatformerUltra.Gameplay
         [SerializeField, Min(0f)] private float _positionSmoothTime = 0.055f;
         [SerializeField, Min(0.01f)] private float _collisionRadius = 0.25f;
         [SerializeField] private LayerMask _collisionMask = ~0;
+        [SerializeField] private CameraShakeController _shakeController;
 
         private Vector3 _positionVelocity;
+        private Vector3 _lastShakeWorldOffset;
         private float _yaw;
         private float _pitch = 18f;
 
         private void OnEnable()
         {
+            _shakeController ??= GetComponent<CameraShakeController>();
             _lookAction?.action.Enable();
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
@@ -31,6 +35,8 @@ namespace PlatformerUltra.Gameplay
 
         private void OnDisable()
         {
+            _shakeController?.Clear();
+            _lastShakeWorldOffset = Vector3.zero;
             _lookAction?.action.Disable();
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
@@ -68,22 +74,30 @@ namespace PlatformerUltra.Gameplay
                 desiredPosition = pivot - orbitRotation * Vector3.forward * allowedDistance;
             }
 
-            transform.position = Vector3.SmoothDamp(
-                transform.position,
+            Vector3 basePosition = transform.position - _lastShakeWorldOffset;
+            Vector3 smoothedPosition = Vector3.SmoothDamp(
+                basePosition,
                 desiredPosition,
                 ref _positionVelocity,
                 _positionSmoothTime);
-            transform.rotation = orbitRotation;
+            Vector3 localShakePosition = Vector3.zero;
+            Vector3 localShakeEuler = Vector3.zero;
+            _shakeController?.Sample(Time.unscaledDeltaTime, out localShakePosition, out localShakeEuler);
+            _lastShakeWorldOffset = orbitRotation * localShakePosition;
+            transform.position = smoothedPosition + _lastShakeWorldOffset;
+            transform.rotation = orbitRotation * Quaternion.Euler(localShakeEuler);
         }
 
         public void Configure(
             Transform target,
             InputActionReference lookAction,
-            LayerMask collisionMask)
+            LayerMask collisionMask,
+            CameraShakeController shakeController = null)
         {
             _target = target;
             _lookAction = lookAction;
             _collisionMask = collisionMask;
+            _shakeController = shakeController;
         }
 
         private void UpdateLook()

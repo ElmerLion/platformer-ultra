@@ -59,6 +59,10 @@ namespace PlatformerUltra.Factory.Editor
         private const string HudStylePath = "Assets/Game/UI/PrototypeHUD.uss";
 
         private const string MinerAudioPath = "Assets/Audio/Miner.wav";
+        private const string RubbleCrashAudioPath = "Assets/Audio/freeeverythingxx-rubble-crash-275691.mp3";
+        private const string PlayerJumpAudioPath = "Assets/Audio/sound-effects-v2_Person_performs_a_jump-2.mp3";
+        private const string PlayerHitAudioPath = "Assets/Audio/sound-effects-v2_Person_hit-1.mp3";
+        private const string RepairHammerAudioPath = "Assets/Audio/Hammer Loop_1.wav";
         private const string MusicTrackOnePath = "Assets/Audio/Music/LOOP_Casual Puzzle Solving 1 (live).wav";
         private const string MusicTrackTwoPath = "Assets/Audio/Music/LOOP_Casual Puzzle Solving 2 (live).wav";
         private const string MusicTrackThreePath = "Assets/Audio/Music/LOOP_Casual Puzzle Solving 4.wav";
@@ -510,20 +514,25 @@ namespace PlatformerUltra.Factory.Editor
                 smelterToAssembler,
                 assemblerToPortal,
                 portalGate);
-            Targetable playerTarget = BuildPlayerRig(playerRig.transform);
+            PlayerRigSet player = BuildPlayerRig(playerRig.transform);
+            ConfigureMachineBreakPresentation(mine, player.CameraShake);
+            ConfigureMachineBreakPresentation(smelter, player.CameraShake);
+            ConfigureMachineBreakPresentation(generator, player.CameraShake);
+            ConfigureMachineBreakPresentation(assembler, player.CameraShake);
             enemyBridges.Configure(
                 smelterTerminal,
                 generatorTerminal,
                 assemblerTerminal,
-                playerTarget.GetComponentsInChildren<Collider>(true));
+                player.Targetable.GetComponentsInChildren<Collider>(true));
             BuildEnemySpawnManager(
                 enemySystems.transform,
                 entrances,
-                playerTarget,
+                player.Targetable,
                 machineRegistry,
                 enemyRegistry,
                 generatorTerminal,
-                assemblerTerminal);
+                assemblerTerminal,
+                player.CameraShake);
             BuildTurretSpots(turretSpots.transform, machineRegistry, enemyRegistry);
             BuildMapMarkers(objectives.transform, materials);
             BuildAudio(audio);
@@ -1143,7 +1152,7 @@ namespace PlatformerUltra.Factory.Editor
             core.AddComponent<InteractionTarget>().Configure(pickup);
         }
 
-        private static Targetable BuildPlayerRig(Transform parent)
+        private static PlayerRigSet BuildPlayerRig(Transform parent)
         {
             GameObject playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
             if (playerPrefab == null)
@@ -1173,8 +1182,9 @@ namespace PlatformerUltra.Factory.Editor
             camera.nearClipPlane = 0.08f;
             camera.farClipPlane = 140f;
             cameraObject.AddComponent<AudioListener>();
+            CameraShakeController cameraShake = cameraObject.AddComponent<CameraShakeController>();
             ThirdPersonOrbitCamera orbitCamera = cameraObject.AddComponent<ThirdPersonOrbitCamera>();
-            orbitCamera.Configure(player.transform, look, ~(1 << 2));
+            orbitCamera.Configure(player.transform, look, ~(1 << 2), cameraShake);
 
             GameObject hud = new GameObject("Factory HUD");
             hud.transform.SetParent(parent, false);
@@ -1202,6 +1212,24 @@ namespace PlatformerUltra.Factory.Editor
                 sprint);
             PlayerInteractor playerInteractor = player.GetComponent<PlayerInteractor>();
             playerInteractor.Configure(cameraObject.transform, interact, prompt, ~(1 << 2));
+            AudioSource feedbackSource = player.AddComponent<AudioSource>();
+            AudioSource repairSource = player.AddComponent<AudioSource>();
+            PlayerFeedbackEffects feedbackEffects = GetOrAddComponent<PlayerFeedbackEffects>(player);
+            feedbackEffects.Configure(
+                playerController,
+                playerHealth,
+                playerInteractor,
+                cameraShake,
+                feedbackSource,
+                repairSource,
+                RequireAsset<AudioClip>(PlayerJumpAudioPath),
+                RequireAsset<AudioClip>(PlayerHitAudioPath),
+                RequireAsset<AudioClip>(RepairHammerAudioPath),
+                RequireAsset<GameObject>(EnemyAssetFactory.PlayerJumpEffectPath),
+                RequireAsset<GameObject>(EnemyAssetFactory.DoubleJumpEffectPath),
+                RequireAsset<GameObject>(EnemyAssetFactory.PlayerHitEffectPath),
+                RequireAsset<GameObject>(EnemyAssetFactory.RepairLoopEffectPath),
+                playerTarget.TargetPoint);
             FactoryGameOverController gameOver = hud.AddComponent<FactoryGameOverController>();
             gameOver.Configure(
                 playerHealth,
@@ -1210,7 +1238,32 @@ namespace PlatformerUltra.Factory.Editor
                 playerInteractor,
                 orbitCamera,
                 player.GetComponentsInChildren<Renderer>(true));
-            return playerTarget;
+            return new PlayerRigSet(playerTarget, cameraShake);
+        }
+
+        private static void ConfigureMachineBreakPresentation(
+            GameObject machineObject,
+            CameraShakeController cameraShake)
+        {
+            if (machineObject == null)
+            {
+                return;
+            }
+
+            FactoryMachineHealth machineHealth = machineObject.GetComponent<FactoryMachineHealth>();
+            if (machineHealth == null)
+            {
+                return;
+            }
+
+            AudioSource audioSource = machineObject.AddComponent<AudioSource>();
+            MachineBreakPresentation presentation = GetOrAddComponent<MachineBreakPresentation>(machineObject);
+            presentation.Configure(
+                machineHealth,
+                audioSource,
+                RequireAsset<AudioClip>(RubbleCrashAudioPath),
+                RequireAsset<GameObject>(EnemyAssetFactory.MachineBreakEffectPath),
+                cameraShake);
         }
 
         private static Targetable EnsurePlayerCombat(GameObject player)
@@ -1291,7 +1344,8 @@ namespace PlatformerUltra.Factory.Editor
             MachineTargetRegistry machineRegistry,
             EnemyRuntimeRegistry enemyRegistry,
             FactoryObjectiveTerminal generatorTerminal,
-            FactoryObjectiveTerminal assemblerTerminal)
+            FactoryObjectiveTerminal assemblerTerminal,
+            CameraShakeController cameraShake)
         {
             GameObject dronePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(DroneEnemyPrefabPath);
             GameObject saboteurPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(SaboteurEnemyPrefabPath);
@@ -1324,7 +1378,8 @@ namespace PlatformerUltra.Factory.Editor
                 12f,
                 18f,
                 6,
-                90f);
+                90f,
+                cameraShake);
         }
 
         private static void BuildAndPersistEnemyNavMesh(GameObject navigationRoot)
@@ -2191,6 +2246,29 @@ namespace PlatformerUltra.Factory.Editor
         {
             T component = target.GetComponent<T>();
             return component != null ? component : target.AddComponent<T>();
+        }
+
+        private static T RequireAsset<T>(string path) where T : UnityEngine.Object
+        {
+            T asset = AssetDatabase.LoadAssetAtPath<T>(path);
+            if (asset == null)
+            {
+                throw new InvalidOperationException("Required asset is missing: " + path);
+            }
+
+            return asset;
+        }
+
+        private sealed class PlayerRigSet
+        {
+            public PlayerRigSet(Targetable targetable, CameraShakeController cameraShake)
+            {
+                Targetable = targetable;
+                CameraShake = cameraShake;
+            }
+
+            public Targetable Targetable { get; }
+            public CameraShakeController CameraShake { get; }
         }
 
         private sealed class EnemyEntranceSet

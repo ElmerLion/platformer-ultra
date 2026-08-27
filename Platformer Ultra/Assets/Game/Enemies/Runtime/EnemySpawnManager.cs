@@ -21,6 +21,7 @@ namespace PlatformerUltra.Enemies
         [SerializeField] private EnemyRuntimeRegistry _enemyRegistry;
         [SerializeField] private FactoryObjectiveTerminal _generatorTerminal;
         [SerializeField] private FactoryObjectiveTerminal _assemblerTerminal;
+        [SerializeField] private CameraShakeController _cameraShake;
 
         [Header("Pacing")]
         [SerializeField, Min(0f)] private float _initialDelay = 6f;
@@ -80,7 +81,8 @@ namespace PlatformerUltra.Enemies
             float minimumSpawnInterval,
             float maximumSpawnInterval,
             int activeEnemyCap,
-            float armoredEscalationDelay)
+            float armoredEscalationDelay,
+            CameraShakeController cameraShake = null)
         {
             Unsubscribe();
             _dronePrefab = dronePrefab;
@@ -97,6 +99,7 @@ namespace PlatformerUltra.Enemies
             _maximumSpawnInterval = Mathf.Max(_minimumSpawnInterval, maximumSpawnInterval);
             _activeEnemyCap = Mathf.Max(1, activeEnemyCap);
             _armoredEscalationDelay = Mathf.Max(0f, armoredEscalationDelay);
+            _cameraShake = cameraShake;
             Subscribe();
         }
 
@@ -154,6 +157,7 @@ namespace PlatformerUltra.Enemies
                 }
 
                 brain.InitializeRuntime(_machineRegistry, _player, _enemyRegistry);
+                instance.GetComponent<EnemyAttackPresentation>()?.InitializeRuntime(_cameraShake);
                 _nextSpawnTime = timestamp + Mathf.Lerp(
                     _minimumSpawnInterval,
                     _maximumSpawnInterval,

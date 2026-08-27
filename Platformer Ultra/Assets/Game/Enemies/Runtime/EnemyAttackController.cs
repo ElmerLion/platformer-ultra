@@ -40,6 +40,7 @@ namespace PlatformerUltra.Enemies
         public float LastSpecialAttackTime => _lastSpecialAttackTime;
 
         public event Action<bool> AttackStarted;
+        public event Action<bool, Vector3> AttackImpacted;
         public event Action AttackCompleted;
 
         private void Awake()
@@ -217,6 +218,7 @@ namespace PlatformerUltra.Enemies
             }
 
             ApplySpecialAreaDamage();
+            AttackImpacted?.Invoke(true, _leapLanding);
         }
 
         public void CancelAttack()
@@ -281,6 +283,8 @@ namespace PlatformerUltra.Enemies
 
             _impactApplied = true;
             SetTelegraphVisible(false);
+            Vector3 origin = _muzzle != null ? _muzzle.position : transform.position + transform.forward;
+            AttackImpacted?.Invoke(false, origin);
             if (_capturedTarget == null || !_capturedTarget.IsTargetable || _capturedDamageable == null || !_capturedDamageable.IsAlive)
             {
                 return;
@@ -293,7 +297,6 @@ namespace PlatformerUltra.Enemies
                 return;
             }
 
-            Vector3 origin = _muzzle != null ? _muzzle.position : transform.position + transform.forward;
             GameObject projectileObject = Instantiate(_definition.ProjectilePrefab, origin, transform.rotation);
             EnemyProjectile projectile = projectileObject.GetComponent<EnemyProjectile>();
             if (projectile == null)
@@ -325,11 +328,13 @@ namespace PlatformerUltra.Enemies
             }
 
             int damage = GetDamage(_capturedFaction, special);
+            Vector3 impactPosition = _capturedTarget.TargetPoint.position;
             _capturedDamageable.TakeDamage(new DamageInfo(
                 damage,
                 gameObject,
                 Faction.Enemy,
-                _capturedTarget.TargetPoint.position));
+                impactPosition));
+            AttackImpacted?.Invoke(special, impactPosition);
         }
 
         private void ApplySpecialAreaDamage()

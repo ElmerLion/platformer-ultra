@@ -1,3 +1,4 @@
+using System;
 using PlatformerUltra.Factory.Conveyors;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -37,6 +38,8 @@ namespace PlatformerUltra.Gameplay
         public bool DoubleJumpUnlocked => _doubleJumpUnlocked;
         public bool LocomotionLocked { get; private set; }
         public Vector3 Velocity => _planarVelocity + Vector3.up * _verticalVelocity;
+
+        public event Action<bool> Jumped;
 
         private void Awake()
         {
@@ -241,6 +244,8 @@ namespace PlatformerUltra.Gameplay
                     {
                         _airJumpsUsed++;
                     }
+
+                    Jumped?.Invoke(canAirJump);
                 }
             }
 

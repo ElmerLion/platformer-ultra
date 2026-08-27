@@ -151,6 +151,58 @@ namespace PlatformerUltra.Enemies.Tests
         }
 
         [Test]
+        public void FactoryCombatFeedback_WiresAudioEffectsAndCameraShakeExplicitly()
+        {
+            WithFactoryScene(scene =>
+            {
+                Transform root = GetFactoryRoot(scene);
+                Transform player = RequirePath(root, "10 Player Rig/Player");
+                Transform camera = RequirePath(root, "10 Player Rig/Main Camera");
+                CameraShakeController shake = camera.GetComponent<CameraShakeController>();
+                Assert.That(shake, Is.Not.Null);
+
+                PlayerFeedbackEffects playerFeedback = player.GetComponent<PlayerFeedbackEffects>();
+                Assert.That(playerFeedback, Is.Not.Null);
+                AssertSerializedReference(
+                    playerFeedback,
+                    "_jumpClip",
+                    AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/sound-effects-v2_Person_performs_a_jump-2.mp3"));
+                AssertSerializedReference(
+                    playerFeedback,
+                    "_playerHitClip",
+                    AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/sound-effects-v2_Person_hit-1.mp3"));
+                AssertSerializedReference(
+                    playerFeedback,
+                    "_repairLoopClip",
+                    AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/Hammer Loop_1.wav"));
+                AssertSerializedReference(playerFeedback, "_cameraShake", shake);
+
+                string[] machinePaths =
+                {
+                    "05 Factory Machinery/Mine Extractor",
+                    "05 Factory Machinery/Smelter",
+                    "05 Factory Machinery/Main Generator",
+                    "05 Factory Machinery/Assembler"
+                };
+                AudioClip rubbleClip = AssetDatabase.LoadAssetAtPath<AudioClip>(
+                    "Assets/Audio/freeeverythingxx-rubble-crash-275691.mp3");
+                foreach (string path in machinePaths)
+                {
+                    MachineBreakPresentation presentation = RequirePath(root, path)
+                        .GetComponent<MachineBreakPresentation>();
+                    Assert.That(presentation, Is.Not.Null, path);
+                    Assert.That(presentation.RubbleCrashClip, Is.SameAs(rubbleClip), path);
+                    Assert.That(presentation.BreakEffectPrefab, Is.Not.Null, path);
+                    AssertSerializedReference(presentation, "_cameraShake", shake);
+                }
+
+                EnemySpawnManager spawnManager = root.GetComponentInChildren<EnemySpawnManager>(true);
+                Assert.That(spawnManager, Is.Not.Null);
+                AssertSerializedReference(spawnManager, "_cameraShake", shake);
+            });
+        }
+
+        [Test]
         public void UserAuthoredPlatformSupports_ArePersistedInAuthoritativeScene()
         {
             WithFactoryScene(scene =>
@@ -327,6 +379,16 @@ namespace PlatformerUltra.Enemies.Tests
                 .FirstOrDefault(child =>
                     child.name.StartsWith("Support Post", StringComparison.Ordinal) &&
                     Vector3.Distance(child.localPosition, localPosition) <= 0.0001f);
+        }
+
+        private static void AssertSerializedReference(
+            Component component,
+            string propertyName,
+            UnityEngine.Object expected)
+        {
+            SerializedProperty property = new SerializedObject(component).FindProperty(propertyName);
+            Assert.That(property, Is.Not.Null, component.GetType().Name + "." + propertyName);
+            Assert.That(property.objectReferenceValue, Is.SameAs(expected), propertyName);
         }
     }
 }
