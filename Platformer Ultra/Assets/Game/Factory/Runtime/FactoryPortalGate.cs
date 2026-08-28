@@ -26,6 +26,8 @@ namespace PlatformerUltra.Factory
         public int DeliveredCount => _collectedCount;
         public int RequiredCount => _requiredCoreCount;
 
+        public event Action<int, int> ProgressChanged;
+
         private void Awake()
         {
             ResetGate();
@@ -54,6 +56,7 @@ namespace PlatformerUltra.Factory
             _collectedSockets[socketIndex] = true;
             _collectedCount++;
             UpdateSocketIndicators();
+            ProgressChanged?.Invoke(_collectedCount, _requiredCoreCount);
 
             if (_collectedCount < _requiredCoreCount)
             {
@@ -94,6 +97,7 @@ namespace PlatformerUltra.Factory
 
             _portalVisual?.SetState(FactoryPortalState.Inactive);
             UpdateSocketIndicators();
+            ProgressChanged?.Invoke(_collectedCount, _requiredCoreCount);
         }
 
         private void EnsureSocketState()

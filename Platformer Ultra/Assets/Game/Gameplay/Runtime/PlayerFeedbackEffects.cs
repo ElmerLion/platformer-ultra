@@ -17,12 +17,15 @@ namespace PlatformerUltra.Gameplay
         [Header("Audio")]
         [SerializeField] private AudioClip _playerHitClip;
         [SerializeField] private AudioClip _repairLoopClip;
+        [SerializeField] private AudioClip _dashClip;
         [SerializeField, Range(0f, 1f)] private float _hitVolume = 0.8f;
         [SerializeField, Range(0f, 1f)] private float _repairVolume = 0.32f;
+        [SerializeField, Range(0f, 1f)] private float _dashVolume = 0.48f;
 
         [Header("Visual Effects")]
         [SerializeField] private GameObject _jumpEffectPrefab;
         [SerializeField] private GameObject _doubleJumpEffectPrefab;
+        [SerializeField] private GameObject _dashEffectPrefab;
         [SerializeField] private GameObject _hitEffectPrefab;
         [SerializeField] private GameObject _repairEffectPrefab;
         [SerializeField] private Transform _effectOrigin;
@@ -31,6 +34,7 @@ namespace PlatformerUltra.Gameplay
         private bool _subscribed;
 
         public int JumpFeedbackCount { get; private set; }
+        public int DashFeedbackCount { get; private set; }
         public int HitFeedbackCount { get; private set; }
         public bool IsRepairFeedbackActive =>
             (_repairLoopSource != null && _repairLoopSource.isPlaying) || _activeRepairEffect != null;
@@ -61,8 +65,10 @@ namespace PlatformerUltra.Gameplay
             AudioSource repairLoopSource,
             AudioClip playerHitClip,
             AudioClip repairLoopClip,
+            AudioClip dashClip,
             GameObject jumpEffectPrefab,
             GameObject doubleJumpEffectPrefab,
+            GameObject dashEffectPrefab,
             GameObject hitEffectPrefab,
             GameObject repairEffectPrefab,
             Transform effectOrigin)
@@ -76,8 +82,10 @@ namespace PlatformerUltra.Gameplay
             _repairLoopSource = repairLoopSource;
             _playerHitClip = playerHitClip;
             _repairLoopClip = repairLoopClip;
+            _dashClip = dashClip;
             _jumpEffectPrefab = jumpEffectPrefab;
             _doubleJumpEffectPrefab = doubleJumpEffectPrefab;
+            _dashEffectPrefab = dashEffectPrefab;
             _hitEffectPrefab = hitEffectPrefab;
             _repairEffectPrefab = repairEffectPrefab;
             _effectOrigin = effectOrigin;
@@ -86,6 +94,17 @@ namespace PlatformerUltra.Gameplay
             {
                 Subscribe();
             }
+        }
+
+        private void HandleDashed(Vector3 direction, bool airborne)
+        {
+            DashFeedbackCount++;
+            PlayOneShot(_dashClip, _dashVolume, 1.08f, 1.18f);
+            Quaternion rotation = direction.sqrMagnitude > 0.0001f
+                ? Quaternion.LookRotation(direction.normalized, Vector3.up)
+                : transform.rotation;
+            SpawnEffect(_dashEffectPrefab, GetEffectOriginPosition(), airborne ? 0.95f : 1.08f, rotation);
+            _cameraShake?.Play(0.07f, 0.11f, 32f);
         }
 
         private void HandleJumped(bool airJump)
@@ -165,14 +184,18 @@ namespace PlatformerUltra.Gameplay
             _oneShotSource.PlayOneShot(clip, volume);
         }
 
-        private GameObject SpawnEffect(GameObject prefab, Vector3 position, float scale)
+        private GameObject SpawnEffect(
+            GameObject prefab,
+            Vector3 position,
+            float scale,
+            Quaternion? rotation = null)
         {
             if (prefab == null || !Application.isPlaying)
             {
                 return null;
             }
 
-            GameObject instance = Instantiate(prefab, position, Quaternion.identity);
+            GameObject instance = Instantiate(prefab, position, rotation ?? Quaternion.identity);
             instance.transform.localScale = Vector3.one * Mathf.Max(0.1f, scale);
             GameplayEffect effect = instance.GetComponent<GameplayEffect>();
             effect?.Play();
@@ -224,6 +247,7 @@ namespace PlatformerUltra.Gameplay
             if (_playerController != null)
             {
                 _playerController.Jumped += HandleJumped;
+                _playerController.Dashed += HandleDashed;
             }
 
             if (_playerHealth != null)
@@ -250,6 +274,7 @@ namespace PlatformerUltra.Gameplay
             if (_playerController != null)
             {
                 _playerController.Jumped -= HandleJumped;
+                _playerController.Dashed -= HandleDashed;
             }
 
             if (_playerHealth != null)

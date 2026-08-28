@@ -7,35 +7,93 @@
     color: rgb(230, 242, 245);
 }
 
-.instruction-card {
+.objective-card {
     position: absolute;
     left: 24px;
     top: 24px;
-    width: 470px;
-    padding: 16px 20px;
+    width: 360px;
+    padding: 15px 18px 17px 18px;
     background-color: rgba(8, 15, 19, 0.88);
     border-left-width: 4px;
     border-left-color: rgb(255, 116, 25);
 }
 
-.title {
-    font-size: 21px;
+.hud-kicker,
+.portal-core-title,
+.repair-kicker {
+    font-size: 11px;
+    letter-spacing: 2px;
     -unity-font-style: bold;
     color: rgb(255, 146, 47);
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
-.instructions {
-    font-size: 13px;
-    letter-spacing: 1px;
-    color: rgb(175, 196, 202);
-    margin-bottom: 3px;
+.objective-text {
+    font-size: 18px;
+    -unity-font-style: bold;
+    color: rgb(235, 245, 248);
+    white-space: normal;
 }
 
-.status {
+.broken-machines-panel {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top-width: 1px;
+    border-top-color: rgba(255, 92, 48, 0.55);
+    display: none;
+}
+
+.repair-kicker {
+    color: rgb(255, 103, 67);
+}
+
+.broken-machines-text {
     font-size: 14px;
+    -unity-font-style: bold;
+    color: rgb(255, 161, 128);
+    white-space: normal;
+}
+
+.portal-core-card {
+    position: absolute;
+    right: 24px;
+    top: 24px;
+    min-width: 150px;
+    padding: 12px 16px 13px 16px;
+    align-items: flex-end;
+    background-color: rgba(8, 15, 19, 0.88);
+    border-right-width: 4px;
+    border-right-color: rgb(99, 224, 255);
+}
+
+.portal-core-title {
+    color: rgb(150, 211, 224);
+}
+
+.portal-core-progress {
+    font-size: 24px;
+    -unity-font-style: bold;
     color: rgb(99, 224, 255);
-    margin-top: 10px;
+}
+
+.tutorial-tip {
+    position: absolute;
+    align-self: center;
+    top: 70px;
+    max-width: 560px;
+    padding: 12px 22px;
+    background-color: rgba(8, 15, 19, 0.94);
+    border-bottom-width: 3px;
+    border-bottom-color: rgb(99, 224, 255);
+    display: none;
+}
+
+.tutorial-tip-text {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(230, 242, 245);
+    white-space: normal;
+    -unity-text-align: middle-center;
 }
 
 .interaction-prompt {

@@ -22,7 +22,9 @@ namespace PlatformerUltra.Gameplay
         private VisualElement _victoryPanel;
         private Button _victoryRetryButton;
         private VisualElement _crosshair;
-        private VisualElement _instructionCard;
+        private VisualElement _objectiveCard;
+        private VisualElement _portalCoreCard;
+        private VisualElement _tutorialTip;
         private VisualElement _healthPanel;
         private VisualElement _interactionPrompt;
         private VisualElement _timedInteractionPanel;
@@ -251,7 +253,9 @@ namespace PlatformerUltra.Gameplay
             _victoryPanel = root.Q<VisualElement>("victory-panel");
             _victoryRetryButton = root.Q<Button>("victory-retry-button");
             _crosshair = root.Q<VisualElement>(className: "crosshair");
-            _instructionCard = root.Q<VisualElement>(className: "instruction-card");
+            _objectiveCard = root.Q<VisualElement>("objective-card");
+            _portalCoreCard = root.Q<VisualElement>("portal-core-card");
+            _tutorialTip = root.Q<VisualElement>("tutorial-tip");
             _healthPanel = root.Q<VisualElement>(className: "player-health-panel");
             _interactionPrompt = root.Q<VisualElement>("interaction-prompt");
             _timedInteractionPanel = root.Q<VisualElement>("timed-interaction-panel");
@@ -335,9 +339,14 @@ namespace PlatformerUltra.Gameplay
 
         private void SetGameplayElementDisplay(DisplayStyle displayStyle)
         {
-            if (_instructionCard != null)
+            if (_objectiveCard != null)
             {
-                _instructionCard.style.display = displayStyle;
+                _objectiveCard.style.display = displayStyle;
+            }
+
+            if (_portalCoreCard != null)
+            {
+                _portalCoreCard.style.display = displayStyle;
             }
 
             if (_healthPanel != null)
@@ -353,6 +362,11 @@ namespace PlatformerUltra.Gameplay
             if (_timedInteractionPanel != null && displayStyle == DisplayStyle.None)
             {
                 _timedInteractionPanel.style.display = DisplayStyle.None;
+            }
+
+            if (_tutorialTip != null && displayStyle == DisplayStyle.None)
+            {
+                _tutorialTip.style.display = DisplayStyle.None;
             }
         }
     }

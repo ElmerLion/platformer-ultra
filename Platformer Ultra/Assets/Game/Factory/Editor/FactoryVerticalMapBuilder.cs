@@ -56,6 +56,7 @@ namespace PlatformerUltra.Factory.Editor
         private const string LookReferencePath = "Assets/Game/Input/IAR_Look.asset";
         private const string JumpReferencePath = "Assets/Game/Input/IAR_Jump.asset";
         private const string SprintReferencePath = "Assets/Game/Input/IAR_Sprint.asset";
+        private const string DashReferencePath = "Assets/Game/Input/IAR_Dash.asset";
         private const string InteractReferencePath = "Assets/Game/Input/IAR_Interact.asset";
         private const string PauseReferencePath = "Assets/Game/Input/IAR_Pause.asset";
         private const string InputActionsPath = "Assets/Game/Input/IA_Gameplay.asset";
@@ -68,6 +69,7 @@ namespace PlatformerUltra.Factory.Editor
         private const string CrusherAmbienceAudioPath = "Assets/Audio/Crusher.mp3";
         private const string RubbleCrashAudioPath = "Assets/Audio/freeeverythingxx-rubble-crash-275691.mp3";
         private const string PlayerHitAudioPath = "Assets/Audio/sound-effects-v2_Person_hit-1.mp3";
+        private const string PlayerDashAudioPath = "Assets/Audio/sound-effects-v2_Person_performs_a_jump-2.mp3";
         private const string RepairHammerAudioPath = "Assets/Audio/Hammer Loop_1.wav";
         private const string MusicTrackOnePath = "Assets/Audio/Music/LOOP_Casual Puzzle Solving 1 (live).wav";
         private const string MusicTrackTwoPath = "Assets/Audio/Music/LOOP_Casual Puzzle Solving 2 (live).wav";
@@ -565,6 +567,14 @@ namespace PlatformerUltra.Factory.Editor
                 assemblerToPortal,
                 portalGate);
             PlayerRigSet player = BuildPlayerRig(playerRig.transform);
+            FactoryHudPresenter factoryHud = player.Hud.AddComponent<FactoryHudPresenter>();
+            factoryHud.Configure(
+                player.Hud.GetComponent<UIDocument>(),
+                AssetDatabase.LoadAssetAtPath<StyleSheet>(HudStylePath),
+                player.Hud.GetComponent<InteractionPromptPresenter>(),
+                new[] { mineTerminal, smelterTerminal, generatorTerminal, assemblerTerminal },
+                upgradeStation.GetComponent<DoubleJumpUpgradeStation>(),
+                portalGate);
             ConfigureMachineBreakPresentation(mine, player.CameraShake);
             ConfigureMachineBreakPresentation(smelter, player.CameraShake);
             ConfigureMachineBreakPresentation(generator, player.CameraShake);
@@ -1245,7 +1255,7 @@ namespace PlatformerUltra.Factory.Editor
 
             FactoryPortalVisual portalVisual = portal != null ? portal.GetComponent<FactoryPortalVisual>() : null;
             FactoryPortalGate gate = (portal != null ? portal : CreateGroup("Portal Gate Logic", parent)).AddComponent<FactoryPortalGate>();
-            gate.Configure(portalVisual, bridge, sockets, 1);
+            gate.Configure(portalVisual, bridge, sockets, 3);
 
             gate.ResetGate();
             return gate;
@@ -1351,6 +1361,7 @@ namespace PlatformerUltra.Factory.Editor
             InputActionReference look = AssetDatabase.LoadAssetAtPath<InputActionReference>(LookReferencePath);
             InputActionReference jump = AssetDatabase.LoadAssetAtPath<InputActionReference>(JumpReferencePath);
             InputActionReference sprint = AssetDatabase.LoadAssetAtPath<InputActionReference>(SprintReferencePath);
+            InputActionReference dash = AssetDatabase.LoadAssetAtPath<InputActionReference>(DashReferencePath);
             InputActionReference interact = AssetDatabase.LoadAssetAtPath<InputActionReference>(InteractReferencePath);
             InputActionReference pause = AssetDatabase.LoadAssetAtPath<InputActionReference>(PauseReferencePath);
             PlayerMovementSettings settings = AssetDatabase.LoadAssetAtPath<PlayerMovementSettings>(MovementSettingsPath);
@@ -1395,7 +1406,8 @@ namespace PlatformerUltra.Factory.Editor
                 settings,
                 move,
                 jump,
-                sprint);
+                sprint,
+                dash);
             PlayerInteractor playerInteractor = player.GetComponent<PlayerInteractor>();
             playerInteractor.Configure(cameraObject.transform, interact, prompt, ~(1 << 2));
             AudioSource feedbackSource = player.AddComponent<AudioSource>();
@@ -1410,8 +1422,10 @@ namespace PlatformerUltra.Factory.Editor
                 repairSource,
                 RequireAsset<AudioClip>(PlayerHitAudioPath),
                 RequireAsset<AudioClip>(RepairHammerAudioPath),
+                RequireAsset<AudioClip>(PlayerDashAudioPath),
                 RequireAsset<GameObject>(EnemyAssetFactory.PlayerJumpEffectPath),
                 RequireAsset<GameObject>(EnemyAssetFactory.DoubleJumpEffectPath),
+                RequireAsset<GameObject>(EnemyAssetFactory.PlayerDashEffectPath),
                 RequireAsset<GameObject>(EnemyAssetFactory.PlayerHitEffectPath),
                 RequireAsset<GameObject>(EnemyAssetFactory.RepairLoopEffectPath),
                 playerTarget.TargetPoint);

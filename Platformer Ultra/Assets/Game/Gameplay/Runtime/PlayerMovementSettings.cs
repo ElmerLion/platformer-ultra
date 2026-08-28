@@ -21,6 +21,13 @@ namespace PlatformerUltra.Gameplay
         [SerializeField, Min(0f)] private float _jumpBufferTime = 0.15f;
         [SerializeField] private bool _doubleJumpUnlockedForTesting;
 
+        [Header("Dashing")]
+        [SerializeField, Min(0.1f)] private float _dashDistance = 2.4f;
+        [SerializeField, Min(0.05f)] private float _dashDuration = 0.2f;
+        [SerializeField, Min(0f)] private float _dashCooldown = 1.5f;
+        [SerializeField, Min(0f)] private float _dashInputBufferTime = 0.12f;
+        [SerializeField, Min(0f)] private float _dashExitSpeed = 3.525f;
+
         public float MovementSpeed => _movementSpeed;
         public float SprintSpeed => _sprintSpeed;
         public float GroundAcceleration => _groundAcceleration;
@@ -33,5 +40,11 @@ namespace PlatformerUltra.Gameplay
         public float CoyoteTime => _coyoteTime;
         public float JumpBufferTime => _jumpBufferTime;
         public bool DoubleJumpUnlockedForTesting => _doubleJumpUnlockedForTesting;
+        public float DashDistance => _dashDistance;
+        public float DashDuration => _dashDuration;
+        public float DashCooldown => _dashCooldown;
+        public float DashInputBufferTime => _dashInputBufferTime;
+        public float DashExitSpeed => _dashExitSpeed;
+        public float DashSpeed => _dashDistance / Mathf.Max(0.05f, _dashDuration);
     }
 }

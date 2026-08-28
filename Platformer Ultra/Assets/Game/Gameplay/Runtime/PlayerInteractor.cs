@@ -69,7 +69,7 @@ namespace PlatformerUltra.Gameplay
             }
 
             _promptPresenter?.SetPrompt(canInteract
-                ? $"[E] {interactable.InteractionPrompt}"
+                ? FormatControlPrompt(interactable.InteractionPrompt)
                 : string.Empty);
 
             if (canInteract && _interactAction != null && _interactAction.action.WasPressedThisFrame())
@@ -179,6 +179,18 @@ namespace PlatformerUltra.Gameplay
             _interactAction = interactAction;
             _promptPresenter = promptPresenter;
             _interactionMask = interactionMask;
+        }
+
+        public static string FormatControlPrompt(string interactionPrompt)
+        {
+            if (string.IsNullOrWhiteSpace(interactionPrompt))
+            {
+                return string.Empty;
+            }
+
+            return interactionPrompt.Contains("[E]", StringComparison.OrdinalIgnoreCase)
+                ? interactionPrompt
+                : "[E] " + interactionPrompt;
         }
 
         private void RefreshTarget()

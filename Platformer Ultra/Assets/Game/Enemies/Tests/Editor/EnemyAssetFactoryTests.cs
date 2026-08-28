@@ -235,6 +235,7 @@ namespace PlatformerUltra.Enemies.Tests
                 EnemyAssetFactory.DroneImpactEffectPath,
                 EnemyAssetFactory.PlayerJumpEffectPath,
                 EnemyAssetFactory.DoubleJumpEffectPath,
+                EnemyAssetFactory.PlayerDashEffectPath,
                 EnemyAssetFactory.PlayerHitEffectPath,
                 EnemyAssetFactory.MachineBreakEffectPath,
                 EnemyAssetFactory.RepairLoopEffectPath

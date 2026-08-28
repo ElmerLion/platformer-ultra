@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,6 +17,8 @@ namespace PlatformerUltra.Gameplay
         private Label _timedActionLabel;
         private ProgressBar _timedProgress;
         private VisualElement _styledRoot;
+        private VisualElement _statusPanel;
+        private Coroutine _statusRoutine;
 
         private void Awake()
         {
@@ -31,7 +34,17 @@ namespace PlatformerUltra.Gameplay
         {
             ResolveElements();
             SetPrompt(string.Empty);
+            HideStatus();
             HideTimedProgress();
+        }
+
+        private void OnDisable()
+        {
+            if (_statusRoutine != null)
+            {
+                StopCoroutine(_statusRoutine);
+                _statusRoutine = null;
+            }
         }
 
         public void Configure(UIDocument document, StyleSheet styleSheet)
@@ -59,16 +72,48 @@ namespace PlatformerUltra.Gameplay
                 : DisplayStyle.Flex;
         }
 
-        public void SetStatus(string status)
+        public void SetStatus(string status, float duration = 3f)
         {
             if (_statusLabel == null)
             {
                 ResolveElements();
             }
 
-            if (_statusLabel != null)
+            if (_statusLabel == null || _statusPanel == null)
             {
-                _statusLabel.text = status;
+                return;
+            }
+
+            if (_statusRoutine != null)
+            {
+                StopCoroutine(_statusRoutine);
+            }
+
+            _statusLabel.text = status;
+            _statusPanel.style.display = string.IsNullOrWhiteSpace(status)
+                ? DisplayStyle.None
+                : DisplayStyle.Flex;
+            _statusRoutine = string.IsNullOrWhiteSpace(status) || duration <= 0f
+                ? null
+                : StartCoroutine(HideStatusAfterDelay(duration));
+        }
+
+        public void HideStatus()
+        {
+            if (_statusRoutine != null)
+            {
+                StopCoroutine(_statusRoutine);
+                _statusRoutine = null;
+            }
+
+            if (_statusPanel == null)
+            {
+                ResolveElements();
+            }
+
+            if (_statusPanel != null)
+            {
+                _statusPanel.style.display = DisplayStyle.None;
             }
         }
 
@@ -122,10 +167,21 @@ namespace PlatformerUltra.Gameplay
             }
 
             _promptLabel = root.Q<Label>("interaction-prompt");
-            _statusLabel = root.Q<Label>("prototype-status");
+            _statusPanel = root.Q<VisualElement>("tutorial-tip");
+            _statusLabel = root.Q<Label>("tutorial-tip-text");
             _timedPanel = root.Q<VisualElement>("timed-interaction-panel");
             _timedActionLabel = root.Q<Label>("timed-interaction-label");
             _timedProgress = root.Q<ProgressBar>("timed-interaction-progress");
+        }
+
+        private IEnumerator HideStatusAfterDelay(float duration)
+        {
+            yield return new WaitForSecondsRealtime(duration);
+            _statusRoutine = null;
+            if (_statusPanel != null)
+            {
+                _statusPanel.style.display = DisplayStyle.None;
+            }
         }
     }
 }

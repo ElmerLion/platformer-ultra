@@ -52,7 +52,7 @@ namespace PlatformerUltra.Gameplay
                 return;
             }
 
-            float planarSpeed = Vector3.ProjectOnPlane(_controller.Velocity, Vector3.up).magnitude;
+            float planarSpeed = _controller.AnimationPlanarSpeed;
             bool isSprinting = _controller.IsSprinting && planarSpeed > 0.05f;
             float locomotionRate = CalculateLocomotionPlaybackRate(
                 planarSpeed,

@@ -69,5 +69,56 @@ namespace PlatformerUltra.Gameplay.Tests
                 Object.DestroyImmediate(machineObject);
             }
         }
+
+        [Test]
+        public void PlayerDash_EmitsFeedbackAndSubtleCameraImpulse()
+        {
+            GameObject player = new GameObject("Player");
+            GameObject cameraObject = new GameObject("Camera");
+            PlayerMovementSettings settings = ScriptableObject.CreateInstance<PlayerMovementSettings>();
+            try
+            {
+                CharacterController characterController = player.AddComponent<CharacterController>();
+                ThirdPersonPlayerController controller = player.AddComponent<ThirdPersonPlayerController>();
+                controller.Configure(
+                    characterController,
+                    cameraObject.transform,
+                    null,
+                    settings,
+                    null,
+                    null,
+                    null,
+                    null);
+                CameraShakeController shake = cameraObject.AddComponent<CameraShakeController>();
+                PlayerFeedbackEffects feedback = player.AddComponent<PlayerFeedbackEffects>();
+                feedback.Configure(
+                    controller,
+                    null,
+                    null,
+                    shake,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    player.transform);
+
+                Assert.That(controller.TryStartDash(Vector3.forward), Is.True);
+                Assert.That(controller.IsDashing, Is.True);
+                Assert.That(feedback.DashFeedbackCount, Is.EqualTo(1));
+                Assert.That(shake.ImpulseCount, Is.EqualTo(1));
+            }
+            finally
+            {
+                Object.DestroyImmediate(settings);
+                Object.DestroyImmediate(cameraObject);
+                Object.DestroyImmediate(player);
+            }
+        }
     }
 }

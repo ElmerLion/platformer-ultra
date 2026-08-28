@@ -49,6 +49,14 @@ MonoBehaviour:
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
+    - m_Name: Dash
+      m_Type: 1
+      m_ExpectedControlType: 
+      m_Id: 7604faca-5e8b-4094-9fc6-bffd4884866e
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
     - m_Name: Interact
       m_Type: 1
       m_ExpectedControlType: 
@@ -161,6 +169,22 @@ MonoBehaviour:
       m_Processors: 
       m_Groups: 
       m_Action: Sprint
+      m_Flags: 0
+    - m_Name: 
+      m_Id: ab8fa85a-c29d-4bd7-86d1-54083d45bec6
+      m_Path: <Keyboard>/leftCtrl
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Dash
+      m_Flags: 0
+    - m_Name: 
+      m_Id: c8b764ec-c4a4-4590-b9af-f68ce67dc2b2
+      m_Path: <Gamepad>/buttonEast
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Dash
       m_Flags: 0
     - m_Name: 
       m_Id: b14d315a-cadb-49a4-a17f-7ebdbb732bb5

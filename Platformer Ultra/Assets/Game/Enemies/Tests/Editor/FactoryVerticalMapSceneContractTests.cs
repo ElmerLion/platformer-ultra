@@ -299,6 +299,15 @@ namespace PlatformerUltra.Enemies.Tests
                     playerFeedback,
                     "_repairLoopClip",
                     AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/Hammer Loop_1.wav"));
+                AssertSerializedReference(
+                    playerFeedback,
+                    "_dashClip",
+                    AssetDatabase.LoadAssetAtPath<AudioClip>(
+                        "Assets/Audio/sound-effects-v2_Person_performs_a_jump-2.mp3"));
+                AssertSerializedReference(
+                    playerFeedback,
+                    "_dashEffectPrefab",
+                    AssetDatabase.LoadAssetAtPath<GameObject>(EnemyAssetFactory.PlayerDashEffectPath));
                 AssertSerializedReference(playerFeedback, "_cameraShake", shake);
 
                 TurretBuildSpot[] buildSpots = root.GetComponentsInChildren<TurretBuildSpot>(true);
@@ -506,7 +515,16 @@ namespace PlatformerUltra.Enemies.Tests
                 Transform hud = RequirePath(root, "10 Player Rig/Factory HUD");
                 Assert.That(hud.GetComponent<FactoryPauseController>(), Is.Not.Null);
                 Assert.That(hud.GetComponent<FactoryVictoryController>(), Is.Not.Null);
+                FactoryHudPresenter factoryHud = hud.GetComponent<FactoryHudPresenter>();
+                Assert.That(factoryHud, Is.Not.Null);
                 Transform portal = RequirePath(root, "05 Factory Machinery/Factory Exit Portal");
+                Component portalGate = portal.GetComponent(
+                    Type.GetType("PlatformerUltra.Factory.FactoryPortalGate, Assembly-CSharp", true));
+                Assert.That(portalGate, Is.Not.Null);
+                Assert.That(
+                    new SerializedObject(portalGate).FindProperty("_requiredCoreCount").intValue,
+                    Is.EqualTo(3));
+                AssertSerializedReference(factoryHud, "_portalReceiverBehaviour", portalGate);
                 Assert.That(
                     portal.GetComponentInChildren(
                         Type.GetType("PlatformerUltra.Factory.FactoryPortalCompletionTrigger, Assembly-CSharp"), true),

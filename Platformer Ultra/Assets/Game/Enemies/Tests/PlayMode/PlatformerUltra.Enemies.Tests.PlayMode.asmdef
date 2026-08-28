@@ -4,7 +4,9 @@
   "references": [
     "PlatformerUltra.Combat.Runtime",
     "PlatformerUltra.Enemies.Runtime",
-    "PlatformerUltra.Gameplay.Runtime"
+    "PlatformerUltra.Gameplay.Runtime",
+    "PlatformerUltra.Conveyors.Runtime",
+    "Unity.InputSystem"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

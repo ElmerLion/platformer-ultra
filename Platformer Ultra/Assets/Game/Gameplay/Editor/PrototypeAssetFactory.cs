@@ -30,6 +30,7 @@ namespace PlatformerUltra.Gameplay.Editor
         private const string LookReferencePath = InputFolder + "/IAR_Look.asset";
         private const string JumpReferencePath = InputFolder + "/IAR_Jump.asset";
         private const string SprintReferencePath = InputFolder + "/IAR_Sprint.asset";
+        private const string DashReferencePath = InputFolder + "/IAR_Dash.asset";
         private const string InteractReferencePath = InputFolder + "/IAR_Interact.asset";
         private const string PauseReferencePath = InputFolder + "/IAR_Pause.asset";
         private const string PanelSettingsPath = UiFolder + "/PS_PrototypeHUD.asset";
@@ -64,6 +65,7 @@ namespace PlatformerUltra.Gameplay.Editor
             LookReferencePath,
             JumpReferencePath,
             SprintReferencePath,
+            DashReferencePath,
             InteractReferencePath,
             PauseReferencePath,
             InputActionsPath,
@@ -147,6 +149,11 @@ namespace PlatformerUltra.Gameplay.Editor
             serializedSettings.FindProperty("_groundAcceleration").floatValue = 18f;
             serializedSettings.FindProperty("_groundDeceleration").floatValue = 24f;
             serializedSettings.FindProperty("_airAcceleration").floatValue = 7f;
+            serializedSettings.FindProperty("_dashDistance").floatValue = 2.4f;
+            serializedSettings.FindProperty("_dashDuration").floatValue = 0.2f;
+            serializedSettings.FindProperty("_dashCooldown").floatValue = 1.5f;
+            serializedSettings.FindProperty("_dashInputBufferTime").floatValue = 0.12f;
+            serializedSettings.FindProperty("_dashExitSpeed").floatValue = 3.525f;
             serializedSettings.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(settings);
             return settings;
@@ -186,6 +193,10 @@ namespace PlatformerUltra.Gameplay.Editor
             sprint.AddBinding("<Keyboard>/leftShift");
             sprint.AddBinding("<Gamepad>/leftStickPress");
 
+            InputAction dash = gameplay.AddAction("Dash", InputActionType.Button);
+            dash.AddBinding("<Keyboard>/leftCtrl");
+            dash.AddBinding("<Gamepad>/buttonEast");
+
             InputAction interact = gameplay.AddAction("Interact", InputActionType.Button);
             interact.AddBinding("<Keyboard>/e");
             interact.AddBinding("<Gamepad>/buttonWest");
@@ -201,6 +212,7 @@ namespace PlatformerUltra.Gameplay.Editor
                 Look = SaveActionReference(look, LookReferencePath),
                 Jump = SaveActionReference(jump, JumpReferencePath),
                 Sprint = SaveActionReference(sprint, SprintReferencePath),
+                Dash = SaveActionReference(dash, DashReferencePath),
                 Interact = SaveActionReference(interact, InteractReferencePath),
                 Pause = SaveActionReference(pause, PauseReferencePath)
             };
@@ -598,7 +610,8 @@ namespace PlatformerUltra.Gameplay.Editor
                     settings,
                     input.Move,
                     input.Jump,
-                    input.Sprint);
+                    input.Sprint,
+                    input.Dash);
 
                 SetLayerRecursively(root, 2);
                 PrefabUtility.SaveAsPrefabAsset(root, PlayerPrefabPath);
@@ -889,7 +902,8 @@ namespace PlatformerUltra.Gameplay.Editor
                 movementSettings,
                 input.Move,
                 input.Jump,
-                input.Sprint);
+                input.Sprint,
+                input.Dash);
             player.GetComponent<PlayerInteractor>().Configure(cameraObject.transform, input.Interact, prompt, ~(1 << 2));
 
             EditorSceneManager.MarkSceneDirty(scene);
@@ -1091,6 +1105,7 @@ namespace PlatformerUltra.Gameplay.Editor
             public InputActionReference Look;
             public InputActionReference Jump;
             public InputActionReference Sprint;
+            public InputActionReference Dash;
             public InputActionReference Interact;
             public InputActionReference Pause;
         }

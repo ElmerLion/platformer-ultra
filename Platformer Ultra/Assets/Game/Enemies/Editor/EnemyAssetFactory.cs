@@ -21,6 +21,7 @@ namespace PlatformerUltra.Enemies.Editor
         public const string DroneImpactEffectPath = "Assets/Game/Combat/VFX/PF_VFX_DroneImpact.prefab";
         public const string PlayerJumpEffectPath = "Assets/Game/Combat/VFX/PF_VFX_PlayerJump.prefab";
         public const string DoubleJumpEffectPath = "Assets/Game/Combat/VFX/PF_VFX_DoubleJump.prefab";
+        public const string PlayerDashEffectPath = "Assets/Game/Combat/VFX/PF_VFX_PlayerDash.prefab";
         public const string PlayerHitEffectPath = "Assets/Game/Combat/VFX/PF_VFX_PlayerHit.prefab";
         public const string MachineBreakEffectPath = "Assets/Game/Combat/VFX/PF_VFX_MachineBreak.prefab";
         public const string RepairLoopEffectPath = "Assets/Game/Combat/VFX/PF_VFX_RepairLoop.prefab";
@@ -173,6 +174,27 @@ namespace PlatformerUltra.Enemies.Editor
             AssetDatabase.Refresh();
             Selection.activeObject = dronePrefab;
             Debug.Log("Enemy assets built or refreshed without replacing existing asset files.");
+        }
+
+        [MenuItem("Tools/Factory/Build Player Dash Effect")]
+        public static void BuildPlayerDashEffectOnly()
+        {
+            EnsureFolder(DeathVfxFolder);
+            Texture2D softDisc = CreateOrUpdateSoftDiscTexture();
+            Material glowMaterial = CreateOrUpdateParticleMaterial(
+                GameplayGlowMaterialPath,
+                softDisc,
+                Color.white,
+                true);
+            Material smokeMaterial = CreateOrUpdateParticleMaterial(
+                GameplaySmokeMaterialPath,
+                softDisc,
+                Color.white,
+                false);
+            BuildDashGameplayEffect(glowMaterial, smokeMaterial);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("Player dash effect rebuilt.");
         }
 
         private static void ConfigureAnimationImports()
@@ -1112,6 +1134,7 @@ namespace PlatformerUltra.Enemies.Editor
                     1f,
                     true,
                     3.2f),
+                PlayerDash = BuildDashGameplayEffect(glowMaterial, smokeMaterial),
                 PlayerHit = BuildLayeredGameplayEffect(
                     PlayerHitEffectPath,
                     "PF_VFX_PlayerHit",
@@ -1140,6 +1163,81 @@ namespace PlatformerUltra.Enemies.Editor
                     7.5f),
                 RepairLoop = BuildRepairLoopEffect(glowMaterial, smokeMaterial)
             };
+        }
+
+        private static GameObject BuildDashGameplayEffect(Material glowMaterial, Material smokeMaterial)
+        {
+            GameObject root = new GameObject("PF_VFX_PlayerDash");
+            try
+            {
+                Color dashColor = new Color(0.06f, 0.86f, 1f, 1f);
+                ParticleSystem core = CreateGameplayParticleSystem(
+                    "Dash Core",
+                    root.transform,
+                    glowMaterial,
+                    dashColor,
+                    7,
+                    new ParticleSystem.MinMaxCurve(0.1f, 0.24f),
+                    new ParticleSystem.MinMaxCurve(0.35f, 1.6f),
+                    new ParticleSystem.MinMaxCurve(0.22f, 0.5f),
+                    0.3f,
+                    0f,
+                    false,
+                    false);
+                ParticleSystem streaks = CreateGameplayParticleSystem(
+                    "Reverse Energy Streaks",
+                    root.transform,
+                    glowMaterial,
+                    dashColor,
+                    24,
+                    new ParticleSystem.MinMaxCurve(0.16f, 0.38f),
+                    new ParticleSystem.MinMaxCurve(4.5f, 8.5f),
+                    new ParticleSystem.MinMaxCurve(0.025f, 0.065f),
+                    0.32f,
+                    0f,
+                    false,
+                    true);
+                ConfigureDashCone(streaks, 11f, 0.32f, 0.42f);
+
+                ParticleSystem wake = CreateGameplayParticleSystem(
+                    "Ion Wake",
+                    root.transform,
+                    smokeMaterial,
+                    new Color(0.08f, 0.68f, 0.82f, 0.34f),
+                    10,
+                    new ParticleSystem.MinMaxCurve(0.28f, 0.58f),
+                    new ParticleSystem.MinMaxCurve(1.2f, 3.2f),
+                    new ParticleSystem.MinMaxCurve(0.16f, 0.42f),
+                    0.38f,
+                    -0.03f,
+                    false,
+                    false);
+                ConfigureDashCone(wake, 19f, 0.38f, 0.5f);
+
+                Light burstLight = CreateGameplayEffectLight(root.transform, dashColor, 3.1f, 3.8f);
+                GameplayEffect effect = root.AddComponent<GameplayEffect>();
+                effect.Configure(new[] { core, streaks, wake }, burstLight, false, 0.7f, 0.11f);
+                return PrefabUtility.SaveAsPrefabAsset(root, PlayerDashEffectPath);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
+        private static void ConfigureDashCone(
+            ParticleSystem particleSystem,
+            float angle,
+            float radius,
+            float length)
+        {
+            particleSystem.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            ParticleSystem.ShapeModule shape = particleSystem.shape;
+            shape.shapeType = ParticleSystemShapeType.Cone;
+            shape.angle = angle;
+            shape.radius = radius;
+            shape.length = length;
+            shape.radiusThickness = 1f;
         }
 
         private static GameObject BuildLayeredGameplayEffect(
@@ -1835,6 +1933,7 @@ namespace PlatformerUltra.Enemies.Editor
             public GameObject DroneImpact { get; set; }
             public GameObject PlayerJump { get; set; }
             public GameObject DoubleJump { get; set; }
+            public GameObject PlayerDash { get; set; }
             public GameObject PlayerHit { get; set; }
             public GameObject MachineBreak { get; set; }
             public GameObject RepairLoop { get; set; }

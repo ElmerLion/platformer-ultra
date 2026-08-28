@@ -1,10 +1,19 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:VisualElement class="hud-root">
-        <ui:VisualElement class="instruction-card">
-            <ui:Label text="VERTICAL FACTORY" class="title" />
-            <ui:Label text="WASD  MOVE     SHIFT  SPRINT     SPACE  JUMP" class="instructions" />
-            <ui:Label text="MOUSE  CAMERA     E  INTERACT" class="instructions" />
-            <ui:Label name="prototype-status" text="Activate Mine → Smelter → Upgrade → Generator → Assembler → 3 Cores." class="status" />
+        <ui:VisualElement name="objective-card" class="objective-card">
+            <ui:Label text="CURRENT OBJECTIVE" class="hud-kicker" />
+            <ui:Label name="current-objective" text="Activate the Mine" class="objective-text" />
+            <ui:VisualElement name="broken-machines-panel" class="broken-machines-panel">
+                <ui:Label text="REPAIRS NEEDED" class="repair-kicker" />
+                <ui:Label name="broken-machines" text="" class="broken-machines-text" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="portal-core-card" class="portal-core-card">
+            <ui:Label text="PORTAL CORES" class="portal-core-title" />
+            <ui:Label name="portal-core-progress" text="0/3" class="portal-core-progress" />
+        </ui:VisualElement>
+        <ui:VisualElement name="tutorial-tip" class="tutorial-tip">
+            <ui:Label name="tutorial-tip-text" text="" class="tutorial-tip-text" />
         </ui:VisualElement>
         <ui:VisualElement class="crosshair">
             <ui:VisualElement class="crosshair-horizontal" />

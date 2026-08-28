@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace PlatformerUltra.Gameplay
@@ -19,6 +20,8 @@ namespace PlatformerUltra.Gameplay
 
         public bool IsInstalled => _installed;
         public string InteractionPrompt => _installed ? "Double Jump Online" : _prompt;
+
+        public event Action Installed;
 
         private void Awake()
         {
@@ -51,6 +54,7 @@ namespace PlatformerUltra.Gameplay
             controller.UnlockDoubleJump();
             _installed = true;
             UpdateIndicator();
+            Installed?.Invoke();
         }
 
         private void UpdateIndicator()

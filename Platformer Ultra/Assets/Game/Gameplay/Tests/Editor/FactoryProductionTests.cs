@@ -165,12 +165,15 @@ namespace PlatformerUltra.Gameplay.Tests
 
     public sealed class ProductionReceiverStub : MonoBehaviour, IFactoryProductionReceiver
     {
+        public event System.Action<int, int> ProgressChanged;
+
         public int DeliveredCount { get; private set; }
         public int RequiredCount => 3;
 
         public void ReceivePortalComponent()
         {
             DeliveredCount++;
+            ProgressChanged?.Invoke(DeliveredCount, RequiredCount);
         }
     }
 }

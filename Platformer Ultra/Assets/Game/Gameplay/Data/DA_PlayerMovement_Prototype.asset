@@ -24,3 +24,8 @@ MonoBehaviour:
   _coyoteTime: 0.15
   _jumpBufferTime: 0.15
   _doubleJumpUnlockedForTesting: 0
+  _dashDistance: 2.4
+  _dashDuration: 0.2
+  _dashCooldown: 1.5
+  _dashInputBufferTime: 0.12
+  _dashExitSpeed: 3.525

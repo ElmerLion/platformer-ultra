@@ -208,6 +208,7 @@ MonoBehaviour:
   _moveAction: {fileID: 11400000, guid: 316c1e740a65a2f4a8559c80438e7d7b, type: 2}
   _jumpAction: {fileID: 11400000, guid: 6ab5e9df834849b4c9fa77da9477aa3d, type: 2}
   _sprintAction: {fileID: 11400000, guid: ae26bb827841eda4fb87ddd26c480c3a, type: 2}
+  _dashAction: {fileID: 11400000, guid: 81d791bee26c46fcaa848e3acb0cff9d, type: 2}
   _animationGroundedGraceTime: 0.12
 --- !u!114 &8560358717373196630
 MonoBehaviour:

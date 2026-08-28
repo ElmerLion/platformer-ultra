@@ -29,6 +29,7 @@ namespace PlatformerUltra.Gameplay
         private string _lastInteractionFeedback = string.Empty;
 
         public bool IsActivated => _activated;
+        public string StationName => _stationName;
         public bool IsOperational => _activated && MachineState == FactoryMachineState.Online;
         public FactoryMachineState MachineState => !_activated
             ? FactoryMachineState.Offline

@@ -4,11 +4,22 @@ using PlatformerUltra.Factory.Conveyors;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace PlatformerUltra.Gameplay.Tests
 {
     public sealed class GameplayPrototypeTests
     {
+        [TestCase("Activate Mine", "[E] Activate Mine")]
+        [TestCase("Hold [E] to Repair Mine", "Hold [E] to Repair Mine")]
+        [TestCase("", "")]
+        public void InteractionPrompt_AddsControlOnlyWhenPromptDoesNotAlreadyContainIt(
+            string source,
+            string expected)
+        {
+            Assert.That(PlayerInteractor.FormatControlPrompt(source), Is.EqualTo(expected));
+        }
+
         [Test]
         public void MovementSettings_DefaultsSupportForgivingPlatforming()
         {
@@ -21,6 +32,9 @@ namespace PlatformerUltra.Gameplay.Tests
                 Assert.That(settings.JumpHeight, Is.GreaterThan(0f));
                 Assert.That(settings.Gravity, Is.LessThan(0f));
                 Assert.That(settings.CoyoteTime, Is.GreaterThan(0f));
+                Assert.That(settings.DashDistance, Is.EqualTo(2.4f).Within(0.0001f));
+                Assert.That(settings.DashDuration, Is.EqualTo(0.2f).Within(0.0001f));
+                Assert.That(settings.DashCooldown, Is.EqualTo(1.5f).Within(0.0001f));
                 Assert.That(settings.JumpBufferTime, Is.GreaterThan(0f));
             }
             finally
@@ -37,6 +51,50 @@ namespace PlatformerUltra.Gameplay.Tests
 
             Assert.That(settings, Is.Not.Null);
             Assert.That(settings.SprintSpeed, Is.EqualTo(3.525f).Within(0.0001f));
+            Assert.That(settings.DashDistance, Is.EqualTo(2.4f).Within(0.0001f));
+            Assert.That(settings.DashExitSpeed, Is.EqualTo(settings.SprintSpeed).Within(0.0001f));
+        }
+
+        [Test]
+        public void DashInput_IsBoundForKeyboardAndGamepad()
+        {
+            InputActionReference dash = AssetDatabase.LoadAssetAtPath<InputActionReference>(
+                "Assets/Game/Input/IAR_Dash.asset");
+
+            Assert.That(dash, Is.Not.Null);
+            Assert.That(dash.action, Is.Not.Null);
+            Assert.That(dash.action.name, Is.EqualTo("Dash"));
+            Assert.That(dash.action.bindings, Has.Some.Matches<InputBinding>(binding =>
+                binding.path == "<Keyboard>/leftCtrl"));
+            Assert.That(dash.action.bindings, Has.Some.Matches<InputBinding>(binding =>
+                binding.path == "<Gamepad>/buttonEast"));
+        }
+
+        [Test]
+        public void DashDirection_PrefersInputThenMomentumThenFacing()
+        {
+            Vector3 fromInput = ThirdPersonPlayerController.ResolveDashDirection(
+                Vector2.right,
+                Vector3.forward,
+                Vector3.right,
+                Vector3.back,
+                Vector3.left);
+            Vector3 fromMomentum = ThirdPersonPlayerController.ResolveDashDirection(
+                Vector2.zero,
+                Vector3.forward,
+                Vector3.right,
+                Vector3.left * 2f,
+                Vector3.back);
+            Vector3 fromFacing = ThirdPersonPlayerController.ResolveDashDirection(
+                Vector2.zero,
+                Vector3.forward,
+                Vector3.right,
+                Vector3.zero,
+                Vector3.back);
+
+            Assert.That(Vector3.Distance(fromInput, Vector3.right), Is.LessThan(0.0001f));
+            Assert.That(Vector3.Distance(fromMomentum, Vector3.left), Is.LessThan(0.0001f));
+            Assert.That(Vector3.Distance(fromFacing, Vector3.back), Is.LessThan(0.0001f));
         }
 
         [Test]
