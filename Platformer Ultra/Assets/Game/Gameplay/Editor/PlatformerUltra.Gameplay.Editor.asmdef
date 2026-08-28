@@ -2,6 +2,7 @@
   "name": "PlatformerUltra.Gameplay.Editor",
   "rootNamespace": "PlatformerUltra.Gameplay.Editor",
   "references": [
+    "PlatformerUltra.CharacterArt.Editor",
     "PlatformerUltra.Gameplay.Runtime",
     "PlatformerUltra.Combat.Runtime",
     "PlatformerUltra.Conveyors.Runtime",

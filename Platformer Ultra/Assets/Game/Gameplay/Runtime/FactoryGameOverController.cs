@@ -23,6 +23,7 @@ namespace PlatformerUltra.Gameplay
 
         private void OnEnable()
         {
+            RefreshPlayerRenderers();
             Bind();
         }
 
@@ -46,6 +47,7 @@ namespace PlatformerUltra.Gameplay
             _playerInteractor = playerInteractor;
             _orbitCamera = orbitCamera;
             _playerRenderers = playerRenderers ?? Array.Empty<Renderer>();
+            RefreshPlayerRenderers();
             Bind();
         }
 
@@ -62,6 +64,7 @@ namespace PlatformerUltra.Gameplay
             }
 
             IsGameOver = true;
+            RefreshPlayerRenderers();
             if (_playerInteractor != null)
             {
                 _playerInteractor.enabled = false;
@@ -148,6 +151,14 @@ namespace PlatformerUltra.Gameplay
             }
 
             _bound = false;
+        }
+
+        private void RefreshPlayerRenderers()
+        {
+            if (_playerController != null)
+            {
+                _playerRenderers = _playerController.GetComponentsInChildren<Renderer>(true);
+            }
         }
     }
 }

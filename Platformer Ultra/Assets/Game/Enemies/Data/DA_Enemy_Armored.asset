@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: DA_Enemy_Armored
   m_EditorClassIdentifier: PlatformerUltra.Enemies.Runtime::PlatformerUltra.Enemies.EnemyDefinition
   _archetype: 2
-  _visualPrefab: {fileID: 1325898780916914, guid: feefc8bdbd5cd3340a37ddc39f079c5a, type: 3}
-  _animatorController: {fileID: 9100000, guid: 48bd35162ad3c324f90901224579b0c9, type: 2}
+  _visualPrefab: {fileID: 5316317315479127248, guid: b6ee6a7964ae370458847c9751611d58, type: 3}
+  _animatorController: {fileID: 0}
   _spawnPrefab: {fileID: 4419919679169521002, guid: e5d9c2fe8cad67d418d0fc239c32482b, type: 3}
   _projectilePrefab: {fileID: 0}
   _spawnWeight: 0.55
@@ -33,8 +33,8 @@ MonoBehaviour:
   _machineAttackRange: 3.4
   _playerAttackRange: 3.4
   _attackCooldown: 1.8
-  _attackDuration: 2.6666667
-  _impactNormalizedTime: 0.6
+  _attackDuration: 1.35
+  _impactNormalizedTime: 0.58
   _playerDamage: 22
   _machineDamage: 28
   _telegraphDuration: 0
@@ -46,6 +46,6 @@ MonoBehaviour:
   _specialImpactRadius: 3
   _specialPlayerDamage: 35
   _specialMachineDamage: 40
-  _specialDuration: 3.7000003
+  _specialDuration: 1.75
   _leapHeight: 1.4
-  _deathRemovalDelay: 4.7333336
+  _deathRemovalDelay: 2.25

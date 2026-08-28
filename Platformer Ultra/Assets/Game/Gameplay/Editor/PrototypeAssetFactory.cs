@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using PlatformerUltra.CharacterArt.Editor;
 using PlatformerUltra.Combat;
 using PlatformerUltra.Factory.Conveyors;
 using UnityEditor;
@@ -53,7 +54,6 @@ namespace PlatformerUltra.Gameplay.Editor
         private const string JumpAirborneClipName = "Jump Airborne";
 
         private const string ConveyorPrefabPath = "Assets/Game/Factory/Conveyors/Prefabs/PF_Conveyor_PointToPoint.prefab";
-        private const string BuilderVisualPath = "Assets/Synty/PolygonConstruction/Prefabs/Characters/SM_Chr_Builder_Overalls_01.prefab";
         private const string ConsoleVisualPath = "Assets/Synty/PolygonSciFiSpace/Prefabs/Props/SM_Prop_ControlPanel_04.prefab";
         private const string GeneratorVisualPath = "Assets/Synty/PolygonConstruction/Prefabs/Props/SM_Prop_Generator_Large_01.prefab";
         private const string CrateVisualPath = "Assets/Synty/PolygonSciFiSpace/Prefabs/Props/SM_Prop_Crate_02.prefab";
@@ -89,18 +89,17 @@ namespace PlatformerUltra.Gameplay.Editor
             EnsureFolder(SceneFolder);
             EnsureFolder(UiFolder);
 
+            GeometricCharacterAssetFactory.BuildAssets();
+
             PrototypeMaterials materials = BuildMaterials();
             PlayerMovementSettings movementSettings = BuildMovementSettings();
             PrototypeInputReferences input = BuildInputAssets();
             PanelSettings panelSettings = BuildPanelSettings();
-            ConfigureAnimationImports();
-            RuntimeAnimatorController playerAnimatorController = BuildPlayerAnimatorController(movementSettings);
-
             BuildPlatformPrefab(materials.Platform);
             BuildOrePrefab(materials.Ore);
             BuildPortalCorePrefab(materials.PortalCore, materials.Accent);
             BuildTerminalPrefab(materials.Frame, materials.Accent);
-            BuildPlayerPrefab(movementSettings, input, playerAnimatorController);
+            BuildPlayerPrefab(movementSettings, input);
             BuildTestScene(materials, movementSettings, input, panelSettings);
 
             AssetDatabase.SaveAssets();
@@ -108,6 +107,22 @@ namespace PlatformerUltra.Gameplay.Editor
             AddSceneToBuildSettings();
             Selection.activeObject = AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath);
             Debug.Log($"Prototype assets and conveyor test scene built at {ScenePath}.");
+        }
+
+        [MenuItem("Tools/Platformer Ultra/Character Art/Rebuild Player Character")]
+        public static void BuildPlayerCharacterOnly()
+        {
+            EnsureFolder(DataFolder);
+            EnsureFolder(InputFolder);
+            EnsureFolder(PrefabFolder);
+            GeometricCharacterAssetFactory.BuildAssets();
+            PlayerMovementSettings movementSettings = BuildMovementSettings();
+            PrototypeInputReferences input = BuildInputAssets();
+            BuildPlayerPrefab(movementSettings, input);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Selection.activeObject = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
+            Debug.Log("Rebuilt the player with the procedural maintenance-unit visual.");
         }
 
         private static void BuildIfMissing()
@@ -536,8 +551,7 @@ namespace PlatformerUltra.Gameplay.Editor
 
         private static void BuildPlayerPrefab(
             PlayerMovementSettings settings,
-            PrototypeInputReferences input,
-            RuntimeAnimatorController animatorController)
+            PrototypeInputReferences input)
         {
             GameObject root = new GameObject("PF_Player_Prototype");
             try
@@ -567,14 +581,16 @@ namespace PlatformerUltra.Gameplay.Editor
                 PlayerInteractor interactor = root.AddComponent<PlayerInteractor>();
                 interactor.Configure(null, input.Interact, null, ~0);
 
-                GameObject visualPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BuilderVisualPath);
+                GameObject visualPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                    GeometricCharacterAssetFactory.PlayerVisualPrefabPath);
                 if (visualPrefab == null)
                 {
-                    throw new System.InvalidOperationException($"Player visual prefab is missing: {BuilderVisualPath}");
+                    throw new System.InvalidOperationException(
+                        $"Player visual prefab is missing: {GeometricCharacterAssetFactory.PlayerVisualPrefabPath}");
                 }
 
                 GameObject visual = (GameObject)PrefabUtility.InstantiatePrefab(visualPrefab, root.transform);
-                visual.name = "Construction Worker Visual";
+                visual.name = "Maintenance Unit Visual";
                 visual.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
                 SetLayerRecursively(visual, 2);
                 foreach (Collider visualCollider in visual.GetComponentsInChildren<Collider>(true))
@@ -582,27 +598,14 @@ namespace PlatformerUltra.Gameplay.Editor
                     visualCollider.enabled = false;
                 }
 
-                Animator animator = visual.GetComponent<Animator>();
-                if (animator == null)
+                ProceduralPlayerAnimator proceduralAnimator = visual.GetComponent<ProceduralPlayerAnimator>();
+                if (proceduralAnimator == null || !proceduralAnimator.RigConfigured)
                 {
-                    throw new System.InvalidOperationException("The Synty construction worker prefab has no Animator component.");
+                    throw new System.InvalidOperationException(
+                        "The maintenance-unit visual is missing its configured procedural rig.");
                 }
 
-                animator.runtimeAnimatorController = animatorController;
-                animator.applyRootMotion = false;
-                animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-                PlayerAnimationDriver animationDriver = visual.AddComponent<PlayerAnimationDriver>();
-                AnimationClip walkingClip = LoadAnimationClip(WalkingAnimationPath);
-                AnimationClip runningClip = LoadAnimationClip(RunningAnimationPath);
-                float walkingClipLength = walkingClip != null ? walkingClip.length : 1.033f;
-                float runningClipLength = runningClip != null ? runningClip.length : 0.733333f;
-                animationDriver.Configure(
-                    animator,
-                    controller,
-                    1f,
-                    walkingClipLength,
-                    settings.SprintSpeed * runningClipLength,
-                    runningClipLength);
+                proceduralAnimator.BindController(controller);
                 controller.Configure(
                     characterController,
                     null,

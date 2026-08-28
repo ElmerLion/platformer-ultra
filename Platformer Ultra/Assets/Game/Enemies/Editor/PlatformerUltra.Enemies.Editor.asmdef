@@ -2,6 +2,7 @@
   "name": "PlatformerUltra.Enemies.Editor",
   "rootNamespace": "PlatformerUltra.Enemies.Editor",
   "references": [
+    "PlatformerUltra.CharacterArt.Editor",
     "PlatformerUltra.Combat.Runtime",
     "PlatformerUltra.Enemies.Runtime"
   ],

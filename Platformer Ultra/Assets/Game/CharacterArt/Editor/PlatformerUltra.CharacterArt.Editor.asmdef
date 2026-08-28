@@ -1,0 +1,19 @@
+{
+  "name": "PlatformerUltra.CharacterArt.Editor",
+  "rootNamespace": "PlatformerUltra.CharacterArt.Editor",
+  "references": [
+    "PlatformerUltra.Gameplay.Runtime",
+    "PlatformerUltra.Enemies.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

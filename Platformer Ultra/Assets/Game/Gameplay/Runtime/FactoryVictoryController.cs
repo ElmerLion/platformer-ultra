@@ -42,11 +42,13 @@ namespace PlatformerUltra.Gameplay
         private void Awake()
         {
             ResolveSpawnManager();
+            RefreshPlayerRenderers();
         }
 
         private void OnEnable()
         {
             ResolveSpawnManager();
+            RefreshPlayerRenderers();
             BindButton();
         }
 
@@ -96,6 +98,7 @@ namespace PlatformerUltra.Gameplay
             _spawnManagerBehaviour = spawnManagerBehaviour;
             ResolveSpawnManager();
             _playerRenderers = playerRenderers ?? Array.Empty<Renderer>();
+            RefreshPlayerRenderers();
             _cinematicDuration = Mathf.Max(0.25f, cinematicDuration);
             BindButton();
         }
@@ -178,6 +181,7 @@ namespace PlatformerUltra.Gameplay
             }
 
             IsCinematicComplete = true;
+            RefreshPlayerRenderers();
             for (int index = 0; index < _playerRenderers.Length; index++)
             {
                 if (_playerRenderers[index] != null)
@@ -222,6 +226,14 @@ namespace PlatformerUltra.Gameplay
         private void ResolveSpawnManager()
         {
             _spawnManager = _spawnManagerBehaviour as IEnemySpawningController;
+        }
+
+        private void RefreshPlayerRenderers()
+        {
+            if (_playerRoot != null)
+            {
+                _playerRenderers = _playerRoot.GetComponentsInChildren<Renderer>(true);
+            }
         }
 
         private void BindButton()

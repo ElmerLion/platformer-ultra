@@ -54,9 +54,15 @@ namespace PlatformerUltra.Enemies.Tests.PlayMode
                 characterController.enabled = false;
                 player.transform.position = new Vector3(0f, 3f, 0f);
                 characterController.enabled = true;
-                yield return null;
+                // A CharacterController reports the grounding result of its last Move call.
+                // Depending on coroutine/Update ordering, one yielded frame can resume before
+                // ThirdPersonPlayerController has refreshed that cached result after teleporting.
+                for (int frame = 0; frame < 5 && controller.IsGrounded; frame++)
+                {
+                    yield return null;
+                }
 
-                Assert.That(controller.IsGrounded, Is.False);
+                Assert.That(controller.IsGrounded, Is.False, "Player did not refresh to airborne after teleporting.");
                 Assert.That(controller.TryStartDash(Vector3.right), Is.True);
                 Assert.That(wasAirborne, Is.True);
             }

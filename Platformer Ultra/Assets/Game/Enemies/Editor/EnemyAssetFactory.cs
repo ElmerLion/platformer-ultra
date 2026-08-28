@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using PlatformerUltra.CharacterArt.Editor;
 using PlatformerUltra.Combat;
 using UnityEditor;
 using UnityEditor.Animations;
@@ -46,8 +47,8 @@ namespace PlatformerUltra.Enemies.Editor
         private const string GameplaySmokeMaterialPath = DeathVfxFolder + "/M_GameplayVfx_Smoke.mat";
 
         private const string DroneVisualPath = "Assets/Synty/PolygonSciFiSpace/Prefabs/Vehicles/SM_Veh_Drone_Attach_01.prefab";
-        private const string SaboteurVisualPath = "Assets/Synty/PolygonSciFiSpace/Prefabs/Characters/SM_Chr_RobotFemale_01.prefab";
-        private const string ArmoredVisualPath = "Assets/Synty/PolygonSciFiSpace/Prefabs/Characters/SM_Chr_BR_BigAlien_02.prefab";
+        private const string SaboteurVisualPath = GeometricCharacterAssetFactory.SaboteurVisualPrefabPath;
+        private const string ArmoredVisualPath = GeometricCharacterAssetFactory.ArmoredVisualPrefabPath;
 
         private const string IdleAnimationPath = "Assets/Animations/Paladin J Nordstrom@Idle.fbx";
         private const string WalkingAnimationPath = "Assets/Animations/Paladin J Nordstrom@Walking.fbx";
@@ -78,31 +79,9 @@ namespace PlatformerUltra.Enemies.Editor
             EnsureFolder(PrefabFolder);
             EnsureFolder(DeathVfxFolder);
 
+            GeometricCharacterAssetFactory.BuildAssets();
+
             int enemyLayer = EnsureLayer(EnemyLayerName);
-            ConfigureAnimationImports();
-
-            AnimationClip idleClip = RequireAnimationClip(IdleAnimationPath);
-            AnimationClip walkingClip = RequireAnimationClip(WalkingAnimationPath);
-            AnimationClip runningClip = RequireAnimationClip(RunningAnimationPath);
-            AnimationClip zombieAttackClip = RequireAnimationClip(ZombieAttackAnimationPath);
-            AnimationClip zombieDeathClip = RequireAnimationClip(ZombieDeathAnimationPath);
-            AnimationClip mutantSwipeClip = RequireAnimationClip(MutantSwipeAnimationPath);
-            AnimationClip mutantJumpAttackClip = RequireAnimationClip(MutantJumpAttackAnimationPath);
-            AnimationClip dyingClip = RequireAnimationClip(DyingAnimationPath);
-
-            AnimatorController saboteurController = BuildSaboteurController(
-                idleClip,
-                walkingClip,
-                runningClip,
-                zombieAttackClip,
-                zombieDeathClip);
-            AnimatorController armoredController = BuildArmoredController(
-                idleClip,
-                walkingClip,
-                mutantSwipeClip,
-                mutantJumpAttackClip,
-                dyingClip);
-
             Material boltMaterial = CreateOrUpdateEmissionMaterial(
                 DroneBoltMaterialPath,
                 new Color(0.08f, 0.72f, 1f, 1f),
@@ -123,17 +102,8 @@ namespace PlatformerUltra.Enemies.Editor
             GameObject armoredVisual = RequireAsset<GameObject>(ArmoredVisualPath);
 
             EnemyDefinition droneDefinition = BuildDroneDefinition(droneVisual, projectilePrefab);
-            EnemyDefinition saboteurDefinition = BuildSaboteurDefinition(
-                saboteurVisual,
-                saboteurController,
-                zombieAttackClip.length,
-                zombieDeathClip.length);
-            EnemyDefinition armoredDefinition = BuildArmoredDefinition(
-                armoredVisual,
-                armoredController,
-                mutantSwipeClip.length,
-                mutantJumpAttackClip.length,
-                dyingClip.length);
+            EnemyDefinition saboteurDefinition = BuildSaboteurDefinition(saboteurVisual);
+            EnemyDefinition armoredDefinition = BuildArmoredDefinition(armoredVisual);
 
             GameObject dronePrefab = BuildEnemyPrefab(new EnemyPrefabSpec(
                 "PF_Enemy_Drone",
@@ -149,7 +119,7 @@ namespace PlatformerUltra.Enemies.Editor
                 SaboteurPrefabPath,
                 saboteurDefinition,
                 saboteurVisual,
-                saboteurController,
+                null,
                 EnemyArchetype.Saboteur,
                 enemyLayer,
                 null), deathExplosionPrefab, effectAssets.MeleeImpact, null, null);
@@ -158,7 +128,7 @@ namespace PlatformerUltra.Enemies.Editor
                 ArmoredPrefabPath,
                 armoredDefinition,
                 armoredVisual,
-                armoredController,
+                null,
                 EnemyArchetype.Armored,
                 enemyLayer,
                 null), deathExplosionPrefab, effectAssets.MeleeImpact, effectAssets.ArmoredSlam, effectAssets.PlayerJump);
@@ -647,17 +617,13 @@ namespace PlatformerUltra.Enemies.Editor
             return definition;
         }
 
-        private static EnemyDefinition BuildSaboteurDefinition(
-            GameObject visualPrefab,
-            RuntimeAnimatorController controller,
-            float attackClipLength,
-            float deathClipLength)
+        private static EnemyDefinition BuildSaboteurDefinition(GameObject visualPrefab)
         {
             EnemyDefinition definition = LoadOrCreateDefinition(SaboteurDefinitionPath);
             definition.ConfigureIdentity(
                 EnemyArchetype.Saboteur,
                 visualPrefab,
-                controller,
+                null,
                 definition.SpawnPrefab,
                 null,
                 1.15f);
@@ -665,30 +631,25 @@ namespace PlatformerUltra.Enemies.Editor
             definition.ConfigureTargeting(6f, 10f, 1f, 2.15f, 2.15f);
             definition.ConfigureRegularAttack(
                 1.1f,
-                Mathf.Max(0.05f, attackClipLength),
-                ZombieImpactNormalizedTime,
+                0.92f,
+                0.43f,
                 12,
                 16,
                 0f,
                 12f);
             definition.ConfigureSpecial(0f, 0f, 0f, 0f, 0f, 0, 0, 1f, 0f);
-            SetDeathRemovalDelay(definition, Mathf.Max(0f, deathClipLength) + DeathTailDuration);
+            SetDeathRemovalDelay(definition, 1.35f);
             EditorUtility.SetDirty(definition);
             return definition;
         }
 
-        private static EnemyDefinition BuildArmoredDefinition(
-            GameObject visualPrefab,
-            RuntimeAnimatorController controller,
-            float swipeClipLength,
-            float jumpAttackClipLength,
-            float deathClipLength)
+        private static EnemyDefinition BuildArmoredDefinition(GameObject visualPrefab)
         {
             EnemyDefinition definition = LoadOrCreateDefinition(ArmoredDefinitionPath);
             definition.ConfigureIdentity(
                 EnemyArchetype.Armored,
                 visualPrefab,
-                controller,
+                null,
                 definition.SpawnPrefab,
                 null,
                 0.55f);
@@ -696,10 +657,8 @@ namespace PlatformerUltra.Enemies.Editor
             definition.ConfigureTargeting(6f, 10f, 1f, 3.4f, 3.4f);
             definition.ConfigureRegularAttack(
                 1.8f,
-                Mathf.Max(0.05f, swipeClipLength),
-                // The swipe uses its animation event for damage. This shared value also
-                // drives scripted leap displacement, so it must match the jump impact.
-                JumpImpactNormalizedTime,
+                1.35f,
+                0.58f,
                 22,
                 28,
                 0f,
@@ -712,9 +671,9 @@ namespace PlatformerUltra.Enemies.Editor
                 3f,
                 35,
                 40,
-                Mathf.Max(0.05f, jumpAttackClipLength),
+                1.75f,
                 1.4f);
-            SetDeathRemovalDelay(definition, Mathf.Max(0f, deathClipLength) + DeathTailDuration);
+            SetDeathRemovalDelay(definition, 2.25f);
             EditorUtility.SetDirty(definition);
             return definition;
         }
@@ -780,7 +739,8 @@ namespace PlatformerUltra.Enemies.Editor
 
                 visual.name = "Visual";
                 visual.transform.SetLocalPositionAndRotation(GetVisualOffset(spec.Archetype), Quaternion.identity);
-                visual.transform.localScale = spec.Archetype == EnemyArchetype.Armored
+                ProceduralEnemyAnimator proceduralAnimator = visual.GetComponent<ProceduralEnemyAnimator>();
+                visual.transform.localScale = spec.Archetype == EnemyArchetype.Armored && proceduralAnimator == null
                     ? Vector3.one * 2f
                     : Vector3.one;
                 SetLayerRecursively(visual, spec.EnemyLayer);
@@ -808,17 +768,29 @@ namespace PlatformerUltra.Enemies.Editor
                     motor.Configure(spec.Definition);
                     motorBehaviour = motor;
 
-                    Animator animator = visual.GetComponent<Animator>();
-                    if (animator == null)
+                    if (proceduralAnimator != null)
                     {
-                        throw new InvalidOperationException(spec.VisualPrefab.name + " has no root Animator.");
+                        if (!proceduralAnimator.RigConfigured)
+                        {
+                            throw new InvalidOperationException(
+                                spec.VisualPrefab.name + " has an incomplete procedural rig.");
+                        }
                     }
+                    else
+                    {
+                        Animator animator = visual.GetComponent<Animator>();
+                        if (animator == null)
+                        {
+                            throw new InvalidOperationException(
+                                spec.VisualPrefab.name + " has neither a procedural rig nor a root Animator.");
+                        }
 
-                    ConfigureVisualAnimators(visual, animator, spec.AnimatorController);
-                    animatorDriver = visual.AddComponent<EnemyAnimatorDriver>();
-                    EnemyAnimationEventRelay relay = visual.AddComponent<EnemyAnimationEventRelay>();
-                    animatorDriver.Configure(animator, motorBehaviour, spec.Definition, brain);
-                    relay.Configure(attackController);
+                        ConfigureVisualAnimators(visual, animator, spec.AnimatorController);
+                        animatorDriver = visual.AddComponent<EnemyAnimatorDriver>();
+                        EnemyAnimationEventRelay relay = visual.AddComponent<EnemyAnimationEventRelay>();
+                        animatorDriver.Configure(animator, motorBehaviour, spec.Definition, brain);
+                        relay.Configure(attackController);
+                    }
                 }
 
                 health.Configure(spec.Definition.MaximumHealth);
@@ -846,6 +818,15 @@ namespace PlatformerUltra.Enemies.Editor
                     armored ? 0.38f : 0f,
                     armored ? 26f : 18f);
                 brain.Configure(spec.Definition, enemyHealth, attackController, motorBehaviour, animatorDriver);
+                if (proceduralAnimator != null)
+                {
+                    proceduralAnimator.ConfigureRuntime(
+                        spec.Definition,
+                        motorBehaviour,
+                        brain,
+                        attackController,
+                        enemyHealth);
+                }
 
                 SetLayerRecursively(root, spec.EnemyLayer);
                 gameplayCollider.enabled = true;

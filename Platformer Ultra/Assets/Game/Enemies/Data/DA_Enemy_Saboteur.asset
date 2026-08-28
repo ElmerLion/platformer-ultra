@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: DA_Enemy_Saboteur
   m_EditorClassIdentifier: PlatformerUltra.Enemies.Runtime::PlatformerUltra.Enemies.EnemyDefinition
   _archetype: 1
-  _visualPrefab: {fileID: 1115756086394208, guid: 2cde8179277215b4fafbb51cd3f7fcd0, type: 3}
-  _animatorController: {fileID: 9100000, guid: 395de3939e951684089e70941b4f7ff4, type: 2}
+  _visualPrefab: {fileID: 935908627076936431, guid: c7c5d10fd7dd6eb4c801431af88e7757, type: 3}
+  _animatorController: {fileID: 0}
   _spawnPrefab: {fileID: 7313439747051724613, guid: 58ac450137064cb46a2c9b043a9a07f1, type: 3}
   _projectilePrefab: {fileID: 0}
   _spawnWeight: 1.15
@@ -33,8 +33,8 @@ MonoBehaviour:
   _machineAttackRange: 2.15
   _playerAttackRange: 2.15
   _attackCooldown: 1.1
-  _attackDuration: 2.6333334
-  _impactNormalizedTime: 0.46
+  _attackDuration: 0.92
+  _impactNormalizedTime: 0.43
   _playerDamage: 12
   _machineDamage: 16
   _telegraphDuration: 0
@@ -48,4 +48,4 @@ MonoBehaviour:
   _specialMachineDamage: 0
   _specialDuration: 1
   _leapHeight: 0
-  _deathRemovalDelay: 3.366667
+  _deathRemovalDelay: 1.35

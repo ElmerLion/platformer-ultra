@@ -14,8 +14,8 @@ namespace PlatformerUltra.Enemies.Tests
     public sealed class EnemyAssetFactoryTests
     {
         private const string DroneVisualPath = "Assets/Synty/PolygonSciFiSpace/Prefabs/Vehicles/SM_Veh_Drone_Attach_01.prefab";
-        private const string SaboteurVisualPath = "Assets/Synty/PolygonSciFiSpace/Prefabs/Characters/SM_Chr_RobotFemale_01.prefab";
-        private const string ArmoredVisualPath = "Assets/Synty/PolygonSciFiSpace/Prefabs/Characters/SM_Chr_BR_BigAlien_02.prefab";
+        private const string SaboteurVisualPath = "Assets/Game/CharacterArt/Prefabs/PF_Enemy_Saboteur_Cutter_Visual.prefab";
+        private const string ArmoredVisualPath = "Assets/Game/CharacterArt/Prefabs/PF_Enemy_Armored_FoundryBrute_Visual.prefab";
         private const string IdleAnimationPath = "Assets/Animations/Paladin J Nordstrom@Idle.fbx";
         private const string WalkingAnimationPath = "Assets/Animations/Paladin J Nordstrom@Walking.fbx";
         private const string RunningAnimationPath = "Assets/Animations/Paladin J Nordstrom@Standard Run.fbx";
@@ -36,7 +36,7 @@ namespace PlatformerUltra.Enemies.Tests
         [TestCase(EnemyAssetFactory.DronePrefabPath, DroneVisualPath, EnemyArchetype.Drone)]
         [TestCase(EnemyAssetFactory.SaboteurPrefabPath, SaboteurVisualPath, EnemyArchetype.Saboteur)]
         [TestCase(EnemyAssetFactory.ArmoredPrefabPath, ArmoredVisualPath, EnemyArchetype.Armored)]
-        public void EnemyPrefab_IsCompleteAndKeepsItsNestedSyntySource(
+        public void EnemyPrefab_IsCompleteAndKeepsItsAuthoritativeNestedVisual(
             string prefabPath,
             string expectedVisualPath,
             EnemyArchetype archetype)
@@ -85,18 +85,22 @@ namespace PlatformerUltra.Enemies.Tests
             {
                 Assert.That(prefab.GetComponent<NavMeshEnemyMotor>(), Is.Not.Null);
                 Assert.That(prefab.GetComponent<NavMeshAgent>(), Is.Not.Null);
-                Animator animator = visual.GetComponent<Animator>();
-                Assert.That(animator, Is.Not.Null);
-                Assert.That(animator.runtimeAnimatorController, Is.Not.Null);
-                Assert.That(animator.applyRootMotion, Is.False);
-                Assert.That(visual.GetComponent<EnemyAnimatorDriver>(), Is.Not.Null);
-                Assert.That(visual.GetComponent<EnemyAnimationEventRelay>(), Is.Not.Null);
-                AssertRequiredReference(prefab.GetComponent<EnemyHealth>(), "_animatorDriver");
+                Assert.That(visual.GetComponentsInChildren<Animator>(true), Is.Empty);
+                Assert.That(visual.GetComponent<EnemyAnimatorDriver>(), Is.Null);
+                Assert.That(visual.GetComponent<EnemyAnimationEventRelay>(), Is.Null);
+                ProceduralEnemyAnimator proceduralAnimator = visual.GetComponent<ProceduralEnemyAnimator>();
+                Assert.That(proceduralAnimator, Is.Not.Null);
+                Assert.That(proceduralAnimator.RigConfigured, Is.True);
+                Assert.That(visual.GetComponentsInChildren<Renderer>(true).Length, Is.GreaterThanOrEqualTo(30));
+                SerializedProperty animatorReference = new SerializedObject(prefab.GetComponent<EnemyHealth>())
+                    .FindProperty("_animatorDriver");
+                Assert.That(animatorReference, Is.Not.Null);
+                Assert.That(animatorReference.objectReferenceValue, Is.Null);
             }
 
             if (archetype == EnemyArchetype.Armored)
             {
-                Assert.That(visual.transform.localScale, Is.EqualTo(Vector3.one * 2f));
+                Assert.That(visual.transform.localScale, Is.EqualTo(Vector3.one));
                 CapsuleCollider capsule = prefab.GetComponent<CapsuleCollider>();
                 Assert.That(capsule.height, Is.EqualTo(4.2f));
                 Assert.That(capsule.radius, Is.EqualTo(1.05f));
@@ -120,16 +124,11 @@ namespace PlatformerUltra.Enemies.Tests
         }
 
         [Test]
-        public void Definitions_UseRequiredTuningAndActualAttackClipLengths()
+        public void Definitions_UseRequiredTuningAndProceduralAttackTimings()
         {
             EnemyDefinition drone = AssetDatabase.LoadAssetAtPath<EnemyDefinition>(EnemyAssetFactory.DroneDefinitionPath);
             EnemyDefinition saboteur = AssetDatabase.LoadAssetAtPath<EnemyDefinition>(EnemyAssetFactory.SaboteurDefinitionPath);
             EnemyDefinition armored = AssetDatabase.LoadAssetAtPath<EnemyDefinition>(EnemyAssetFactory.ArmoredDefinitionPath);
-            AnimationClip zombie = LoadAnimationClip(ZombieAttackAnimationPath);
-            AnimationClip zombieDeath = LoadAnimationClip(ZombieDeathAnimationPath);
-            AnimationClip swipe = LoadAnimationClip(MutantSwipeAnimationPath);
-            AnimationClip jump = LoadAnimationClip(MutantJumpAttackAnimationPath);
-            AnimationClip dying = LoadAnimationClip(DyingAnimationPath);
 
             Assert.That(drone, Is.Not.Null);
             Assert.That(drone.MaximumHealth, Is.EqualTo(30));
@@ -146,16 +145,21 @@ namespace PlatformerUltra.Enemies.Tests
             Assert.That(saboteur.PlayerChaseSpeed, Is.EqualTo(4f));
             Assert.That(saboteur.PlayerDamage, Is.EqualTo(12));
             Assert.That(saboteur.MachineDamage, Is.EqualTo(16));
-            Assert.That(saboteur.AttackDuration, Is.EqualTo(zombie.length).Within(0.001f));
-            Assert.That(saboteur.DeathRemovalDelay, Is.EqualTo(zombieDeath.length + 0.4f).Within(0.001f));
+            Assert.That(saboteur.AnimatorController, Is.Null);
+            Assert.That(AssetDatabase.GetAssetPath(saboteur.VisualPrefab), Is.EqualTo(SaboteurVisualPath));
+            Assert.That(saboteur.AttackDuration, Is.EqualTo(0.92f).Within(0.001f));
+            Assert.That(saboteur.ImpactNormalizedTime, Is.EqualTo(0.43f).Within(0.001f));
+            Assert.That(saboteur.DeathRemovalDelay, Is.EqualTo(1.35f).Within(0.001f));
 
             Assert.That(armored.MaximumHealth, Is.EqualTo(180));
             Assert.That(armored.MachineTravelSpeed, Is.EqualTo(1.8f));
             Assert.That(armored.PlayerChaseSpeed, Is.EqualTo(1.8f));
             Assert.That(armored.PlayerDamage, Is.EqualTo(22));
             Assert.That(armored.MachineDamage, Is.EqualTo(28));
-            Assert.That(armored.AttackDuration, Is.EqualTo(swipe.length).Within(0.001f));
-            Assert.That(armored.SpecialDuration, Is.EqualTo(jump.length).Within(0.001f));
+            Assert.That(armored.AnimatorController, Is.Null);
+            Assert.That(AssetDatabase.GetAssetPath(armored.VisualPrefab), Is.EqualTo(ArmoredVisualPath));
+            Assert.That(armored.AttackDuration, Is.EqualTo(1.35f).Within(0.001f));
+            Assert.That(armored.SpecialDuration, Is.EqualTo(1.75f).Within(0.001f));
             Assert.That(armored.SpecialChance, Is.EqualTo(0.225f).Within(0.0001f));
             Assert.That(armored.SpecialCooldown, Is.EqualTo(7f));
             Assert.That(armored.MinimumLeapDistance, Is.EqualTo(3f));
@@ -165,51 +169,51 @@ namespace PlatformerUltra.Enemies.Tests
             Assert.That(armored.SpecialImpactRadius, Is.EqualTo(3f));
             Assert.That(armored.SpecialPlayerDamage, Is.EqualTo(35));
             Assert.That(armored.SpecialMachineDamage, Is.EqualTo(40));
-            Assert.That(armored.DeathRemovalDelay, Is.EqualTo(dying.length + 0.4f).Within(0.001f));
+            Assert.That(armored.DeathRemovalDelay, Is.EqualTo(2.25f).Within(0.001f));
         }
 
         [Test]
-        public void AnimationImports_AreHumanoidInPlaceAndHaveReproducibleImpactEvents()
+        public void LegacyEnemyAssets_AreBackedUpBeforeReplacement()
         {
-            AssertAnimationImport(IdleAnimationPath, true, null, 0f);
-            AssertAnimationImport(WalkingAnimationPath, true, null, 0f);
-            AssertAnimationImport(RunningAnimationPath, true, null, 0f);
-            AssertAnimationImport(
-                ZombieAttackAnimationPath,
-                false,
-                nameof(EnemyAnimationEventRelay.OnAttackImpact),
-                0.46f);
-            AssertAnimationImport(ZombieDeathAnimationPath, false, null, 0f);
-            AssertAnimationImport(
-                MutantSwipeAnimationPath,
-                false,
-                nameof(EnemyAnimationEventRelay.OnAttackImpact),
-                0.43f);
-            AssertAnimationImport(
-                MutantJumpAttackAnimationPath,
-                false,
-                nameof(EnemyAnimationEventRelay.OnSpecialImpact),
-                0.60f);
-            AssertAnimationImport(DyingAnimationPath, false, null, 0f);
+            const string saboteurPrefabPath =
+                "Assets/Game/CharacterArt/Old/Enemies/PF_Enemy_Saboteur_Old.prefab";
+            const string armoredPrefabPath =
+                "Assets/Game/CharacterArt/Old/Enemies/PF_Enemy_Armored_Old.prefab";
+            GameObject saboteurPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(saboteurPrefabPath);
+            GameObject armoredPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(armoredPrefabPath);
+            EnemyDefinition saboteurDefinition = AssetDatabase.LoadAssetAtPath<EnemyDefinition>(
+                "Assets/Game/CharacterArt/Old/Enemies/DA_Enemy_Saboteur_Old.asset");
+            EnemyDefinition armoredDefinition = AssetDatabase.LoadAssetAtPath<EnemyDefinition>(
+                "Assets/Game/CharacterArt/Old/Enemies/DA_Enemy_Armored_Old.asset");
+
+            Assert.That(saboteurPrefab, Is.Not.Null);
+            Assert.That(armoredPrefab, Is.Not.Null);
+            Assert.That(saboteurDefinition.SpawnPrefab, Is.EqualTo(saboteurPrefab));
+            Assert.That(armoredDefinition.SpawnPrefab, Is.EqualTo(armoredPrefab));
+            Assert.That(AssetDatabase.LoadMainAssetAtPath(
+                "Assets/Game/CharacterArt/Old/Enemies/AC_Enemy_Saboteur_Old.controller"), Is.Not.Null);
+            Assert.That(AssetDatabase.LoadMainAssetAtPath(
+                "Assets/Game/CharacterArt/Old/Enemies/AC_Enemy_Armored_Old.controller"), Is.Not.Null);
+            Assert.That(new SerializedObject(saboteurPrefab.GetComponent<EnemyHealth>())
+                .FindProperty("_definition").objectReferenceValue, Is.EqualTo(saboteurDefinition));
+            Assert.That(new SerializedObject(armoredPrefab.GetComponent<EnemyHealth>())
+                .FindProperty("_definition").objectReferenceValue, Is.EqualTo(armoredDefinition));
         }
 
         [Test]
-        public void AnimatorControllers_ContainRequiredStatesAndParameters()
+        public void ProceduralVisuals_UseProjectOwnedMeshesAndNoImportedAnimation()
         {
-            AnimatorController saboteur = AssetDatabase.LoadAssetAtPath<AnimatorController>(EnemyAssetFactory.SaboteurControllerPath);
-            AnimatorController armored = AssetDatabase.LoadAssetAtPath<AnimatorController>(EnemyAssetFactory.ArmoredControllerPath);
-
-            AssertController(
-                saboteur,
-                new[] { "Idle", "Walk", "Run", "Zombie Attack", "Zombie Death" },
-                includeSpecial: false);
-            AssertController(
-                armored,
-                new[] { "Idle", "Walk", "Mutant Swipe", "Mutant Jump Attack", "Dying" },
-                includeSpecial: true);
-
-            Assert.That(FindState(saboteur, "Zombie Death").transitions, Is.Empty);
-            Assert.That(FindState(armored, "Dying").transitions, Is.Empty);
+            foreach (string path in new[] { SaboteurVisualPath, ArmoredVisualPath })
+            {
+                GameObject visual = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                Assert.That(visual, Is.Not.Null, path);
+                Assert.That(visual.GetComponentsInChildren<Animator>(true), Is.Empty, path);
+                Assert.That(visual.GetComponent<ProceduralEnemyAnimator>(), Is.Not.Null, path);
+                foreach (MeshFilter filter in visual.GetComponentsInChildren<MeshFilter>(true))
+                {
+                    Assert.That(filter.sharedMesh, Is.Not.Null, filter.name);
+                }
+            }
         }
 
         [Test]

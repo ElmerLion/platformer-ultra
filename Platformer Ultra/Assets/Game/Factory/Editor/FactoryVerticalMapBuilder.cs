@@ -7,6 +7,7 @@ using PlatformerUltra.Enemies.Editor;
 using PlatformerUltra.Factory.Conveyors;
 using PlatformerUltra.FactoryDefense;
 using PlatformerUltra.Gameplay;
+using PlatformerUltra.Gameplay.Editor;
 using Unity.AI.Navigation;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -97,6 +98,7 @@ namespace PlatformerUltra.Factory.Editor
 
             EnsurePauseInputAction();
             FactoryMachineAssetFactory.BuildAll();
+            PrototypeAssetFactory.BuildPlayerCharacterOnly();
             EnemyAssetFactory.BuildAll();
             MapMaterials materials = BuildMapMaterials();
             FactoryDefenseAssetFactory.BuildAll();

@@ -295,66 +295,43 @@ namespace PlatformerUltra.Gameplay.Tests
         }
 
         [Test]
-        public void AnimationCadence_ScalesWalkingCycleToPhysicalTravel()
+        public void PlayerPrefab_UsesDetailedProceduralMaintenanceUnit()
         {
-            float normalRate = PlayerAnimationDriver.CalculateLocomotionPlaybackRate(1f, 1f, 1f, 0.25f, 3f);
-            float doubleRate = PlayerAnimationDriver.CalculateLocomotionPlaybackRate(2f, 1f, 1f, 0.25f, 3f);
-            float stoppedRate = PlayerAnimationDriver.CalculateLocomotionPlaybackRate(0f, 1f, 1f, 0.25f, 3f);
-            float runRate = PlayerAnimationDriver.CalculateLocomotionPlaybackRate(
-                3.525f,
-                2.585f,
-                0.733333f,
-                0.25f,
-                4f);
+            const string playerPath = "Assets/Game/Gameplay/Prefabs/PF_Player_Prototype.prefab";
+            const string visualPath =
+                "Assets/Game/CharacterArt/Prefabs/PF_Player_MaintenanceUnit_Visual.prefab";
+            GameObject player = AssetDatabase.LoadAssetAtPath<GameObject>(playerPath);
 
-            Assert.That(normalRate, Is.EqualTo(1f).Within(0.0001f));
-            Assert.That(doubleRate, Is.EqualTo(2f).Within(0.0001f));
-            Assert.That(stoppedRate, Is.EqualTo(1f).Within(0.0001f));
-            Assert.That(runRate, Is.EqualTo(1f).Within(0.0001f));
+            Assert.That(player, Is.Not.Null);
+            Assert.That(player.GetComponent<CharacterController>(), Is.Not.Null);
+            Assert.That(player.GetComponent<ThirdPersonPlayerController>(), Is.Not.Null);
+            GameObject visual = player.transform.Find("Maintenance Unit Visual")?.gameObject;
+            Assert.That(visual, Is.Not.Null);
+            GameObject source = PrefabUtility.GetCorrespondingObjectFromSource(visual);
+            Assert.That(source, Is.Not.Null);
+            Assert.That(AssetDatabase.GetAssetPath(source), Is.EqualTo(visualPath));
+            Assert.That(visual.GetComponentsInChildren<Animator>(true), Is.Empty);
+            ProceduralPlayerAnimator proceduralAnimator = visual.GetComponent<ProceduralPlayerAnimator>();
+            Assert.That(proceduralAnimator, Is.Not.Null);
+            Assert.That(proceduralAnimator.RigConfigured, Is.True);
+            Assert.That(visual.GetComponentsInChildren<Renderer>(true).Length, Is.GreaterThanOrEqualTo(30));
+            Assert.That(visual.GetComponentsInChildren<Collider>(true), Is.Empty);
         }
 
         [Test]
-        public void PlayerAnimator_AirborneStatesLandDirectlyIntoLocomotion()
+        public void LegacyPlayerPrefabAndController_AreBackedUp()
         {
-            AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(
-                "Assets/Game/Gameplay/Animations/AC_Player_Prototype.controller");
+            const string prefabPath = "Assets/Game/CharacterArt/Old/Player/PF_Player_Prototype_Old.prefab";
+            const string controllerPath =
+                "Assets/Game/CharacterArt/Old/Player/AC_Player_Prototype_Old.controller";
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            RuntimeAnimatorController controller = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(
+                controllerPath);
 
+            Assert.That(prefab, Is.Not.Null);
             Assert.That(controller, Is.Not.Null);
-            AnimatorStateMachine stateMachine = controller.layers[0].stateMachine;
-            Assert.That(stateMachine.anyStateTransitions, Is.Empty);
-
-            Assert.That(FindState(stateMachine, "Falling To Roll"), Is.Null);
-            AnimatorState runningState = FindState(stateMachine, "Running");
-            Assert.That(runningState, Is.Not.Null);
-            Assert.That(runningState.motion, Is.TypeOf<AnimationClip>());
-            Assert.That(runningState.motion.name, Is.EqualTo("Standard Run"));
-            Assert.That(runningState.speedParameterActive, Is.True);
-            Assert.That(runningState.speedParameter, Is.EqualTo(PlayerAnimationDriver.LocomotionRateParameter));
-            AssertLandingDestinations(FindState(stateMachine, "Jump"));
-            AssertLandingDestinations(FindState(stateMachine, "Falling Idle"));
-        }
-
-        [Test]
-        public void StandardRunAnimation_IsHumanoidLoopingAndInPlace()
-        {
-            const string runPath = "Assets/Animations/Paladin J Nordstrom@Standard Run.fbx";
-            ModelImporter importer = AssetImporter.GetAtPath(runPath) as ModelImporter;
-
-            Assert.That(importer, Is.Not.Null);
-            Assert.That(importer.animationType, Is.EqualTo(ModelImporterAnimationType.Human));
-
-            ModelImporterClipAnimation[] clips = importer.clipAnimations;
-            if (clips == null || clips.Length == 0)
-            {
-                clips = importer.defaultClipAnimations;
-            }
-
-            Assert.That(clips, Is.Not.Empty);
-            Assert.That(clips[0].loopTime, Is.True);
-            Assert.That(clips[0].loopPose, Is.True);
-            Assert.That(clips[0].lockRootRotation, Is.True);
-            Assert.That(clips[0].lockRootHeightY, Is.True);
-            Assert.That(clips[0].lockRootPositionXZ, Is.True);
+            Assert.That(prefab.GetComponentInChildren<Animator>(true).runtimeAnimatorController,
+                Is.EqualTo(controller));
         }
 
         [Test]
