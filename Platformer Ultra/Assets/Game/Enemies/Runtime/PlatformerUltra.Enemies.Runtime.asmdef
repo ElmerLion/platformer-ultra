@@ -3,7 +3,8 @@
   "rootNamespace": "PlatformerUltra.Enemies",
   "references": [
     "PlatformerUltra.Combat.Runtime",
-    "PlatformerUltra.Gameplay.Runtime"
+    "PlatformerUltra.Gameplay.Runtime",
+    "Unity.AI.Navigation"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

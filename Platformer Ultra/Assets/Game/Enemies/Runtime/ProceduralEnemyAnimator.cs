@@ -1,4 +1,5 @@
 using PlatformerUltra.Combat;
+using PlatformerUltra.Gameplay;
 using UnityEngine;
 
 namespace PlatformerUltra.Enemies
@@ -11,7 +12,7 @@ namespace PlatformerUltra.Enemies
 
     [DefaultExecutionOrder(100)]
     [DisallowMultipleComponent]
-    public sealed class ProceduralEnemyAnimator : MonoBehaviour
+    public sealed class ProceduralEnemyAnimator : MonoBehaviour, ICinematicAttackPerformer
     {
         [Header("Runtime Sources")]
         [SerializeField] private EnemyDefinition _definition;
@@ -66,6 +67,7 @@ namespace PlatformerUltra.Enemies
         private LocalPose _backAssemblyBind;
 
         private IEnemyMotor _motor;
+        private IEnemyTraversalMotor _traversalMotor;
         private float _clock;
         private float _gaitPhase;
         private float _speedWeight;
@@ -130,6 +132,15 @@ namespace PlatformerUltra.Enemies
 
             _impactPulse = Mathf.MoveTowards(_impactPulse, 0f, deltaTime * 4.8f);
             _damagePulse = Mathf.MoveTowards(_damagePulse, 0f, deltaTime * 6.5f);
+
+            if (!_dead && !_attacking && _traversalMotor != null && _traversalMotor.IsTraversing)
+            {
+                SetWeaponTrails(false);
+                ApplyTraversalPose(
+                    _traversalMotor.ActiveTraversalKind,
+                    _traversalMotor.TraversalProgress);
+                return;
+            }
 
             float speed = _motor != null
                 ? Vector3.ProjectOnPlane(_motor.Velocity, Vector3.up).magnitude
@@ -225,6 +236,95 @@ namespace PlatformerUltra.Enemies
             {
                 Subscribe();
             }
+        }
+
+        public void PlayCinematicAttack(float duration)
+        {
+            if (_dead)
+            {
+                return;
+            }
+
+            _attacking = true;
+            _specialAttack = false;
+            _attackElapsed = 0f;
+            _attackDuration = Mathf.Max(0.05f, duration);
+        }
+
+        public void StopCinematicAttack()
+        {
+            _attacking = false;
+            _specialAttack = false;
+            _attackElapsed = 0f;
+            SetWeaponTrails(false);
+        }
+
+        private void ApplyTraversalPose(EnemyTraversalKind kind, float progress)
+        {
+            float normalized = Mathf.Clamp01(progress);
+            bool armored = _rigKind == ProceduralEnemyRigKind.Armored;
+            if (kind == EnemyTraversalKind.Jump)
+            {
+                float arc = Mathf.Sin(normalized * Mathf.PI);
+                float tuck = Mathf.Sin(normalized * Mathf.PI) * (armored ? 0.7f : 1f);
+                Apply(_rigRoot, _rigRootBind, new Vector3(0f, -0.05f * tuck, 0f),
+                    new Vector3(armored ? 9f : 14f, 0f, 0f), Vector3.one);
+                Apply(_pelvis, _pelvisBind, Vector3.zero, new Vector3(-12f * tuck, 0f, 0f), Vector3.one);
+                Apply(_chest, _chestBind, Vector3.zero, new Vector3(18f * arc, 0f, 0f), Vector3.one);
+                Apply(_head, _headBind, Vector3.zero, new Vector3(-10f * arc, 0f, 0f), Vector3.one);
+                Apply(_leftUpperArm, _leftUpperArmBind, Vector3.zero,
+                    new Vector3(-36f * arc, 0f, -22f * arc), Vector3.one);
+                Apply(_rightUpperArm, _rightUpperArmBind, Vector3.zero,
+                    new Vector3(-36f * arc, 0f, 22f * arc), Vector3.one);
+                Apply(_leftForearm, _leftForearmBind, Vector3.zero,
+                    new Vector3(-28f * tuck, 0f, 0f), Vector3.one);
+                Apply(_rightForearm, _rightForearmBind, Vector3.zero,
+                    new Vector3(-28f * tuck, 0f, 0f), Vector3.one);
+                Apply(_leftThigh, _leftThighBind, Vector3.zero,
+                    new Vector3(42f * tuck, 0f, -5f), Vector3.one);
+                Apply(_rightThigh, _rightThighBind, Vector3.zero,
+                    new Vector3(42f * tuck, 0f, 5f), Vector3.one);
+                Apply(_leftShin, _leftShinBind, Vector3.zero,
+                    new Vector3(62f * tuck, 0f, 0f), Vector3.one);
+                Apply(_rightShin, _rightShinBind, Vector3.zero,
+                    new Vector3(62f * tuck, 0f, 0f), Vector3.one);
+                Apply(_leftFoot, _leftFootBind, Vector3.zero, Vector3.zero, Vector3.one);
+                Apply(_rightFoot, _rightFootBind, Vector3.zero, Vector3.zero, Vector3.one);
+            }
+            else
+            {
+                float cycle = Mathf.Sin((_clock * (armored ? 5.4f : 7.2f)) + normalized * Mathf.PI * 4f);
+                float opposite = -cycle;
+                float reach = armored ? 34f : 48f;
+                Apply(_rigRoot, _rigRootBind, new Vector3(0f, Mathf.Abs(cycle) * 0.025f, 0f),
+                    new Vector3(-8f, 0f, cycle * 2f), Vector3.one);
+                Apply(_pelvis, _pelvisBind, Vector3.zero, new Vector3(0f, cycle * 4f, 0f), Vector3.one);
+                Apply(_chest, _chestBind, Vector3.zero, new Vector3(-12f, opposite * 5f, 0f), Vector3.one);
+                Apply(_head, _headBind, Vector3.zero, new Vector3(8f, cycle * 3f, 0f), Vector3.one);
+                Apply(_leftUpperArm, _leftUpperArmBind, Vector3.zero,
+                    new Vector3(-62f + cycle * reach, -8f, -18f), Vector3.one);
+                Apply(_rightUpperArm, _rightUpperArmBind, Vector3.zero,
+                    new Vector3(-62f + opposite * reach, 8f, 18f), Vector3.one);
+                Apply(_leftForearm, _leftForearmBind, Vector3.zero,
+                    new Vector3(-42f - Mathf.Max(0f, cycle) * 24f, 0f, 0f), Vector3.one);
+                Apply(_rightForearm, _rightForearmBind, Vector3.zero,
+                    new Vector3(-42f - Mathf.Max(0f, opposite) * 24f, 0f, 0f), Vector3.one);
+                Apply(_leftThigh, _leftThighBind, Vector3.zero,
+                    new Vector3(opposite * reach * 0.75f, 0f, -3f), Vector3.one);
+                Apply(_rightThigh, _rightThighBind, Vector3.zero,
+                    new Vector3(cycle * reach * 0.75f, 0f, 3f), Vector3.one);
+                Apply(_leftShin, _leftShinBind, Vector3.zero,
+                    new Vector3(24f + Mathf.Max(0f, cycle) * 36f, 0f, 0f), Vector3.one);
+                Apply(_rightShin, _rightShinBind, Vector3.zero,
+                    new Vector3(24f + Mathf.Max(0f, opposite) * 36f, 0f, 0f), Vector3.one);
+                Apply(_leftFoot, _leftFootBind, Vector3.zero, new Vector3(-12f * cycle, 0f, 0f), Vector3.one);
+                Apply(_rightFoot, _rightFootBind, Vector3.zero, new Vector3(-12f * opposite, 0f, 0f), Vector3.one);
+            }
+
+            Apply(_leftWeapon, _leftWeaponBind, Vector3.zero, Vector3.zero, Vector3.one);
+            Apply(_rightWeapon, _rightWeaponBind, Vector3.zero, Vector3.zero, Vector3.one);
+            Apply(_energyCore, _energyCoreBind, Vector3.zero, Vector3.zero, Vector3.one);
+            Apply(_backAssembly, _backAssemblyBind, Vector3.zero, Vector3.zero, Vector3.one);
         }
 
         private void ApplySaboteurPose()
@@ -453,6 +553,7 @@ namespace PlatformerUltra.Enemies
         private void ResolveReferences()
         {
             _motor = _motorBehaviour as IEnemyMotor;
+            _traversalMotor = _motorBehaviour as IEnemyTraversalMotor;
         }
 
         private void SetWeaponTrails(bool emitting)

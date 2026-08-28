@@ -13,6 +13,7 @@ namespace PlatformerUltra.Factory.Conveyors.Editor
         private const string FrameMaterialPath = MaterialFolder + "/M_Conveyor_Frame.mat";
         private const string AccentMaterialPath = MaterialFolder + "/M_Conveyor_Accent.mat";
         private const string ConveyorPrefabPath = PrefabFolder + "/PF_Conveyor_PointToPoint.prefab";
+        private const string TurnPrefabPath = PrefabFolder + "/PF_Conveyor_Turn.prefab";
         private const string EndpointPrefabPath = PrefabFolder + "/PF_Conveyor_Endpoint.prefab";
 
         [InitializeOnLoadMethod]
@@ -47,6 +48,7 @@ namespace PlatformerUltra.Factory.Conveyors.Editor
                 new Color(0.03f, 0.09f, 0.12f));
 
             BuildConveyorPrefab(beltMaterial, frameMaterial, accentMaterial);
+            BuildTurnPrefab(beltMaterial, frameMaterial, accentMaterial);
             BuildEndpointPrefab();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -125,6 +127,7 @@ namespace PlatformerUltra.Factory.Conveyors.Editor
         private static void BuildIfMissing()
         {
             if (AssetDatabase.LoadAssetAtPath<GameObject>(ConveyorPrefabPath) == null ||
+                AssetDatabase.LoadAssetAtPath<GameObject>(TurnPrefabPath) == null ||
                 AssetDatabase.LoadAssetAtPath<GameObject>(EndpointPrefabPath) == null)
             {
                 BuildOrRefreshAssets();
@@ -199,6 +202,27 @@ namespace PlatformerUltra.Factory.Conveyors.Editor
             {
                 root.AddComponent<ConveyorEndpoint>().Configure(ConveyorEndpointKind.Bidirectional);
                 PrefabUtility.SaveAsPrefabAsset(root, EndpointPrefabPath);
+            }
+            finally
+            {
+                Object.DestroyImmediate(root);
+            }
+        }
+
+        private static void BuildTurnPrefab(Material belt, Material frame, Material accent)
+        {
+            GameObject root = new GameObject("PF_Conveyor_Turn");
+            try
+            {
+                ConveyorTurnModule turn = root.AddComponent<ConveyorTurnModule>();
+                turn.Configure(
+                    Vector3.back,
+                    Vector3.zero,
+                    Vector3.right,
+                    belt,
+                    frame,
+                    accent);
+                PrefabUtility.SaveAsPrefabAsset(root, TurnPrefabPath);
             }
             finally
             {

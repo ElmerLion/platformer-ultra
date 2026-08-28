@@ -1,0 +1,36 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement class="intro-root">
+        <ui:VisualElement name="boot-veil" class="boot-veil">
+            <ui:VisualElement class="boot-card">
+                <ui:Label text="EMERGENCY WAKE PROTOCOL" class="boot-kicker" />
+                <ui:Label name="boot-status" text="MAINTENANCE UNIT // INITIALIZING" class="boot-status" />
+                <ui:ProgressBar name="boot-progress" low-value="0" high-value="100" value="0" class="boot-progress" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="core-requirement" class="core-requirement">
+            <ui:Label text="EVACUATION ASSEMBLY" class="core-kicker" />
+            <ui:Label text="PORTAL CORES" class="core-title" />
+            <ui:Label text="0 / 3" class="core-count" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="subtitle-panel" class="subtitle-panel">
+            <ui:Label name="subtitle-speaker" text="FACTORY EMERGENCY SYSTEM" class="subtitle-speaker" />
+            <ui:Label name="subtitle-text" text="" class="subtitle-text" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="skip-panel" class="skip-panel">
+            <ui:Label text="HOLD [E] TO SKIP" class="skip-label" />
+            <ui:ProgressBar name="skip-progress" low-value="0" high-value="100" value="0" class="skip-progress" />
+        </ui:VisualElement>
+
+        <ui:VisualElement class="letterbox letterbox-top" />
+        <ui:VisualElement class="letterbox letterbox-bottom" />
+
+        <ui:VisualElement name="transition-overlay" class="transition-overlay">
+            <ui:VisualElement name="static-band-a" class="static-band static-band-a" />
+            <ui:VisualElement name="static-band-b" class="static-band static-band-b" />
+            <ui:Label name="sync-label" text="SYNCHRONIZING FACTORY SYSTEMS" class="sync-label" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

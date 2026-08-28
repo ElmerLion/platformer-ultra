@@ -17,6 +17,7 @@ namespace PlatformerUltra.Gameplay
         [SerializeField] private MonoBehaviour _portalReceiverBehaviour;
         [SerializeField, Min(1f)] private float _tutorialTipDuration = 4f;
         [SerializeField, Min(0f)] private float _tutorialTipGap = 0.35f;
+        [SerializeField] private bool _deferStartupTutorial;
 
         private Label _objectiveLabel;
         private VisualElement _brokenMachinesPanel;
@@ -49,7 +50,10 @@ namespace PlatformerUltra.Gameplay
             ResolvePortalReceiver();
             BindEvents();
             Refresh();
-            StartTutorialSequence();
+            if (!_deferStartupTutorial)
+            {
+                StartTutorialSequence();
+            }
         }
 
         private void OnDisable()
@@ -82,10 +86,29 @@ namespace PlatformerUltra.Gameplay
             BindEvents();
             Refresh();
 
-            if (isActiveAndEnabled)
+            if (isActiveAndEnabled && !_deferStartupTutorial)
             {
                 StartTutorialSequence();
             }
+        }
+
+        public void SetStartupTutorialDeferred(bool deferred)
+        {
+            _deferStartupTutorial = deferred;
+            if (!deferred || _tutorialRoutine == null)
+            {
+                return;
+            }
+
+            StopCoroutine(_tutorialRoutine);
+            _tutorialRoutine = null;
+            _promptPresenter?.HideStatus();
+        }
+
+        public void BeginStartupTutorial()
+        {
+            _deferStartupTutorial = false;
+            StartTutorialSequence();
         }
 
         public void Refresh()
@@ -195,7 +218,9 @@ namespace PlatformerUltra.Gameplay
                 FactoryObjectiveTerminal terminal = _objectives[index];
                 if (terminal != null && !terminal.IsActivated)
                 {
-                    _objectiveLabel.text = "Activate the " + terminal.StationName;
+                    _objectiveLabel.text = index == 0
+                        ? "Restore production: Activate the " + terminal.StationName
+                        : "Activate the " + terminal.StationName;
                     return;
                 }
 

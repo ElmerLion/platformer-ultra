@@ -16,19 +16,23 @@ namespace PlatformerUltra.Audio
         [SerializeField] private AudioSource _source;
 
         private float _targetVolume;
+        private float _intensity = 1f;
+        private float _pitchOffset;
 
         public void Configure(
             AudioClip clip,
             float volume = 0.12f,
             float minDistance = 2.5f,
             float maxDistance = 14f,
-            float fadeInDuration = 0.45f)
+            float fadeInDuration = 0.45f,
+            bool playOnEnable = true)
         {
             _clip = clip;
             _volume = Mathf.Clamp01(volume);
             _minDistance = Mathf.Max(0.01f, minDistance);
             _maxDistance = Mathf.Max(_minDistance, maxDistance);
             _fadeInDuration = Mathf.Max(0f, fadeInDuration);
+            _playOnEnable = playOnEnable;
             CacheAndConfigureSource();
         }
 
@@ -43,6 +47,16 @@ namespace PlatformerUltra.Audio
 
             _targetVolume = 0f;
             _source.Stop();
+        }
+
+        public void SetIntensity(float normalized)
+        {
+            _intensity = Mathf.Clamp01(normalized);
+            _targetVolume = _volume * _intensity;
+            if (_source != null)
+            {
+                _source.pitch = Mathf.Lerp(0.9f, 1f, _intensity) + _pitchOffset;
+            }
         }
 
         private void Awake()
@@ -104,21 +118,22 @@ namespace PlatformerUltra.Audio
 
         private void StartLoop()
         {
-            if (_source == null || _clip == null)
+            if (_source == null || _clip == null || !_source.isActiveAndEnabled)
             {
                 return;
             }
 
             if (_source.isPlaying)
             {
-                _targetVolume = _volume;
+                _targetVolume = _volume * _intensity;
                 return;
             }
 
             _source.clip = _clip;
-            _source.pitch = 1f + Random.Range(-_pitchVariation, _pitchVariation);
-            _source.volume = _fadeInDuration > 0f ? 0f : _volume;
-            _targetVolume = _volume;
+            _pitchOffset = Random.Range(-_pitchVariation, _pitchVariation);
+            _source.pitch = Mathf.Lerp(0.9f, 1f, _intensity) + _pitchOffset;
+            _source.volume = _fadeInDuration > 0f ? 0f : _volume * _intensity;
+            _targetVolume = _volume * _intensity;
             _source.Play();
         }
 

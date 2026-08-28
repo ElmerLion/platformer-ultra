@@ -7,9 +7,11 @@ using PlatformerUltra.Enemies.Editor;
 using PlatformerUltra.Factory.Conveyors;
 using PlatformerUltra.FactoryDefense;
 using PlatformerUltra.Gameplay;
+using Unity.AI.Navigation;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
 namespace PlatformerUltra.Enemies.Tests
@@ -48,10 +50,14 @@ namespace PlatformerUltra.Enemies.Tests
                 AssertPipeRackPost(pipeRack, new Vector3(-13.956f, 0.95f, -0.95f));
                 AssertPipeRackPost(pipeRack, new Vector3(-13.956f, -0.27f, -0.95f));
 
-                Transform smelterRamp = RequirePath(
+                Transform smelterLadder = RequirePath(
                     root,
-                    "12 Enemy Navigation/Smelter Enemy Bridge/Ground to Smelter Service Ramp");
-                AssertVector(smelterRamp.position, new Vector3(-8.8084f, 2.495f, -7.6273f), 0.0002f);
+                    "12 Enemy Navigation/Smelter Enemy Access Route/Ground to Smelter Ladder");
+                NavMeshLink smelterLink = smelterLadder.GetComponent<NavMeshLink>();
+                Assert.That(smelterLink, Is.Not.Null);
+                Assert.That(smelterLink.width, Is.EqualTo(2.6f).Within(0.0001f));
+                Assert.That(smelterLadder.GetComponent<EnemyTraversalLink>().Kind,
+                    Is.EqualTo(EnemyTraversalKind.Ladder));
 
                 Transform sourceSocket = RequirePath(
                     root,
@@ -61,6 +67,112 @@ namespace PlatformerUltra.Enemies.Tests
                     "06 Conveyor Network/Mine to Smelter Production Route/Destination Socket - Mine → Smelter Conveyor");
                 AssertVector(sourceSocket.position, new Vector3(-11.7f, 0.219f, -8.25f));
                 AssertVector(destinationSocket.position, new Vector3(-13.2f, 5.42f, -3.2f));
+            });
+        }
+
+        [Test]
+        public void EnemyNavigation_UsesThreeGatedRoutesAndKeepsFreightLift()
+        {
+            WithFactoryScene(scene =>
+            {
+                Transform root = GetFactoryRoot(scene);
+                Transform navigation = RequirePath(root, "12 Enemy Navigation");
+                EnemyAccessRoute[] routes = navigation.GetComponentsInChildren<EnemyAccessRoute>(true);
+                Assert.That(routes, Has.Length.EqualTo(3));
+                Assert.That(
+                    routes.Select(route => route.ActivationTerminal != null
+                        ? route.ActivationTerminal.StationName
+                        : string.Empty),
+                    Is.EquivalentTo(new[] { "Smelter", "Generator", "Assembler" }));
+                Assert.That(routes.All(route => route.DeploymentDuration == 1.35f), Is.True);
+
+                EnemyTraversalLink[] links = navigation.GetComponentsInChildren<EnemyTraversalLink>(true);
+                Assert.That(links.Count(link => link.Kind == EnemyTraversalKind.Ladder), Is.EqualTo(4));
+                Assert.That(links.Count(link => link.Kind == EnemyTraversalKind.Jump), Is.EqualTo(6));
+                Assert.That(
+                    links.Where(link => link.Kind == EnemyTraversalKind.Ladder)
+                        .All(link => link.Link != null &&
+                                     link.Link.bidirectional &&
+                                     Mathf.Abs(link.Link.width - 2.6f) <= 0.0001f),
+                    Is.True);
+
+                string[] obsoleteNames = navigation.GetComponentsInChildren<Transform>(true)
+                    .Select(transform => transform.name)
+                    .Where(name => name.Contains("Service Ramp", StringComparison.Ordinal) ||
+                                   name.Contains("Enemy Bridge", StringComparison.Ordinal))
+                    .ToArray();
+                Assert.That(obsoleteNames, Is.Empty);
+                Assert.That(
+                    navigation.GetComponentsInChildren<Component>(true)
+                        .Any(component => component != null &&
+                                          component.GetType().Name == "EnemyNavigationBridge"),
+                    Is.False);
+
+                Transform lift = RequirePath(
+                    root,
+                    "03 Middle Route - Double Jump/Powered Freight Lift Shortcut/Moving Lift Platform");
+                Assert.That(lift.GetComponent<Rigidbody>(), Is.Not.Null);
+                Assert.That(
+                    lift.GetComponents<Component>()
+                        .Any(component => component != null &&
+                                          component.GetType().Name == "FactoryMovingPlatform"),
+                    Is.True);
+                AssertVector(lift.parent.position, new Vector3(16.5f, 8.05f, 6.25f));
+                AssertVector(lift.localPosition, Vector3.zero);
+            });
+        }
+
+        [Test]
+        public void EnemyNavigation_ProgressionStatesConnectEveryEligibleFactoryTarget()
+        {
+            WithFactoryScene(scene =>
+            {
+                Transform root = GetFactoryRoot(scene);
+                EnemyAccessRoute[] routes = root.GetComponentsInChildren<EnemyAccessRoute>(true);
+                NavMeshLink[] links = routes
+                    .SelectMany(route => route.GetComponentsInChildren<NavMeshLink>(true))
+                    .ToArray();
+                bool[] initialStates = links.Select(link => link.enabled).ToArray();
+
+                try
+                {
+                    AssertProgressionPaths(
+                        root,
+                        routes,
+                        new[] { "Smelter" },
+                        new[] { "Mine", "Smelter" },
+                        new[]
+                        {
+                            "Generator", "Assembler", "TurretSpot", "TurretSpot (1)", "TurretSpot (2)"
+                        });
+                    AssertProgressionPaths(
+                        root,
+                        routes,
+                        new[] { "Smelter", "Generator" },
+                        new[] { "Mine", "Smelter", "Generator", "TurretSpot", "TurretSpot (1)" },
+                        new[] { "Assembler", "TurretSpot (2)" });
+                    AssertProgressionPaths(
+                        root,
+                        routes,
+                        new[] { "Smelter", "Generator", "Assembler" },
+                        new[]
+                        {
+                            "Mine", "Smelter", "Generator", "Assembler",
+                            "TurretSpot", "TurretSpot (1)", "TurretSpot (2)"
+                        },
+                        Array.Empty<string>());
+                }
+                finally
+                {
+                    for (int index = 0; index < links.Length; index++)
+                    {
+                        links[index].enabled = initialStates[index];
+                        if (links[index].enabled)
+                        {
+                            links[index].UpdateLink();
+                        }
+                    }
+                }
             });
         }
 
@@ -299,11 +411,10 @@ namespace PlatformerUltra.Enemies.Tests
                     playerFeedback,
                     "_repairLoopClip",
                     AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/Hammer Loop_1.wav"));
-                AssertSerializedReference(
-                    playerFeedback,
-                    "_dashClip",
-                    AssetDatabase.LoadAssetAtPath<AudioClip>(
-                        "Assets/Audio/sound-effects-v2_Person_performs_a_jump-2.mp3"));
+                Assert.That(
+                    new SerializedObject(playerFeedback).FindProperty("_dashClip"),
+                    Is.Null,
+                    "Dash feedback must remain visual-only.");
                 AssertSerializedReference(
                     playerFeedback,
                     "_dashEffectPrefab",
@@ -524,6 +635,24 @@ namespace PlatformerUltra.Enemies.Tests
                 Assert.That(
                     new SerializedObject(portalGate).FindProperty("_requiredCoreCount").intValue,
                     Is.EqualTo(3));
+                SerializedProperty installedCores = new SerializedObject(portalGate)
+                    .FindProperty("_installedCoreVisuals");
+                Assert.That(installedCores, Is.Not.Null);
+                Assert.That(installedCores.arraySize, Is.EqualTo(3));
+                for (int index = 0; index < installedCores.arraySize; index++)
+                {
+                    GameObject core = installedCores.GetArrayElementAtIndex(index).objectReferenceValue as GameObject;
+                    Assert.That(core, Is.Not.Null);
+                    Assert.That(core.name, Does.StartWith("Installed Portal Core"));
+                    Assert.That(core.GetComponentsInChildren<Collider>(true), Has.All.Matches<Collider>(item => !item.enabled));
+                }
+
+                ConveyorTurnModule[] turns = root.GetComponentsInChildren<ConveyorTurnModule>(true);
+                Assert.That(turns.Length, Is.GreaterThanOrEqualTo(3));
+                foreach (ConveyorTurnModule turn in turns)
+                {
+                    Assert.That(turn.transform.Find("Generated Turn"), Is.Not.Null);
+                }
                 AssertSerializedReference(factoryHud, "_portalReceiverBehaviour", portalGate);
                 Assert.That(
                     portal.GetComponentInChildren(
@@ -624,6 +753,77 @@ namespace PlatformerUltra.Enemies.Tests
         {
             Assert.That(Vector3.Distance(actual, expected), Is.LessThanOrEqualTo(tolerance),
                 "Expected " + expected.ToString("F4") + " but found " + actual.ToString("F4") + ".");
+        }
+
+        private static void AssertProgressionPaths(
+            Transform root,
+            EnemyAccessRoute[] routes,
+            string[] enabledStations,
+            string[] expectedReachable,
+            string[] expectedBlocked)
+        {
+            HashSet<string> enabled = new HashSet<string>(enabledStations, StringComparer.Ordinal);
+            foreach (EnemyAccessRoute route in routes)
+            {
+                bool routeEnabled = route.ActivationTerminal != null &&
+                                    enabled.Contains(route.ActivationTerminal.StationName);
+                foreach (NavMeshLink link in route.GetComponentsInChildren<NavMeshLink>(true))
+                {
+                    link.enabled = routeEnabled;
+                    if (routeEnabled)
+                    {
+                        link.UpdateLink();
+                    }
+                }
+            }
+
+            Dictionary<string, Vector3> targetPoints = root
+                .GetComponentsInChildren<FactoryMachineHealth>(true)
+                .ToDictionary(
+                    machine => machine.MachineName,
+                    machine => machine.Targetable.TargetPoint.position,
+                    StringComparer.Ordinal);
+            foreach (TurretBuildSpot spot in root.GetComponentsInChildren<TurretBuildSpot>(true))
+            {
+                targetPoints.Add(spot.name, spot.transform.position);
+            }
+
+            EnemySpawnPoint[] entrances = root.GetComponentsInChildren<EnemySpawnPoint>(true);
+            Assert.That(entrances, Has.Length.EqualTo(2));
+            foreach (EnemySpawnPoint entrance in entrances)
+            {
+                Assert.That(
+                    NavMesh.SamplePosition(entrance.transform.position, out NavMeshHit start, 5f, NavMesh.AllAreas),
+                    Is.True,
+                    entrance.name);
+                foreach (string targetName in expectedReachable)
+                {
+                    Assert.That(
+                        HasCompletePath(start.position, targetPoints[targetName]),
+                        Is.True,
+                        entrance.name + " should reach " + targetName + ".");
+                }
+
+                foreach (string targetName in expectedBlocked)
+                {
+                    Assert.That(
+                        HasCompletePath(start.position, targetPoints[targetName]),
+                        Is.False,
+                        entrance.name + " should not reach " + targetName + " yet.");
+                }
+            }
+        }
+
+        private static bool HasCompletePath(Vector3 start, Vector3 target)
+        {
+            if (!NavMesh.SamplePosition(target, out NavMeshHit end, 5f, NavMesh.AllAreas))
+            {
+                return false;
+            }
+
+            NavMeshPath path = new NavMeshPath();
+            return NavMesh.CalculatePath(start, end.position, NavMesh.AllAreas, path) &&
+                   path.status == NavMeshPathStatus.PathComplete;
         }
 
         private static void AssertDoorLayout(

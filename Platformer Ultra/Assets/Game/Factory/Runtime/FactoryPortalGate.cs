@@ -10,6 +10,7 @@ namespace PlatformerUltra.Factory
         [SerializeField] private FactoryPortalVisual _portalVisual;
         [SerializeField] private GameObject _approachBridge;
         [SerializeField] private Renderer[] _socketIndicators = Array.Empty<Renderer>();
+        [SerializeField] private GameObject[] _installedCoreVisuals = Array.Empty<GameObject>();
         [SerializeField, Min(1)] private int _requiredCoreCount = 3;
 
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
@@ -39,9 +40,20 @@ namespace PlatformerUltra.Factory
             Renderer[] socketIndicators,
             int requiredCoreCount = 3)
         {
+            Configure(portalVisual, approachBridge, socketIndicators, null, requiredCoreCount);
+        }
+
+        public void Configure(
+            FactoryPortalVisual portalVisual,
+            GameObject approachBridge,
+            Renderer[] socketIndicators,
+            GameObject[] installedCoreVisuals,
+            int requiredCoreCount = 3)
+        {
             _portalVisual = portalVisual;
             _approachBridge = approachBridge;
             _socketIndicators = socketIndicators ?? Array.Empty<Renderer>();
+            _installedCoreVisuals = installedCoreVisuals ?? Array.Empty<GameObject>();
             _requiredCoreCount = Mathf.Max(1, requiredCoreCount);
         }
 
@@ -56,6 +68,7 @@ namespace PlatformerUltra.Factory
             _collectedSockets[socketIndex] = true;
             _collectedCount++;
             UpdateSocketIndicators();
+            UpdateInstalledCoreVisuals();
             ProgressChanged?.Invoke(_collectedCount, _requiredCoreCount);
 
             if (_collectedCount < _requiredCoreCount)
@@ -97,6 +110,7 @@ namespace PlatformerUltra.Factory
 
             _portalVisual?.SetState(FactoryPortalState.Inactive);
             UpdateSocketIndicators();
+            UpdateInstalledCoreVisuals();
             ProgressChanged?.Invoke(_collectedCount, _requiredCoreCount);
         }
 
@@ -138,6 +152,23 @@ namespace PlatformerUltra.Factory
                 _propertyBlock.SetColor(ColorId, color);
                 _propertyBlock.SetColor(EmissionColorId, active ? color * 3f : Color.black);
                 indicator.SetPropertyBlock(_propertyBlock);
+            }
+        }
+
+        private void UpdateInstalledCoreVisuals()
+        {
+            if (_installedCoreVisuals == null)
+            {
+                return;
+            }
+
+            for (int index = 0; index < _installedCoreVisuals.Length; index++)
+            {
+                GameObject visual = _installedCoreVisuals[index];
+                if (visual != null)
+                {
+                    visual.SetActive(index < _collectedSockets.Length && _collectedSockets[index]);
+                }
             }
         }
     }

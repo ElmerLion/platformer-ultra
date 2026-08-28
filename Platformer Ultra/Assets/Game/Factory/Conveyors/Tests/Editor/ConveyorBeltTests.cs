@@ -74,6 +74,27 @@ namespace PlatformerUltra.Factory.Conveyors.Tests
             Assert.That(_end.CanFeed(_start), Is.False);
         }
 
+        [Test]
+        public void TurnModule_BuildsContinuousCurvedSectionsAroundCorner()
+        {
+            GameObject turnObject = new GameObject("Test Turn");
+            try
+            {
+                ConveyorTurnModule turn = turnObject.AddComponent<ConveyorTurnModule>();
+                turn.Configure(Vector3.back * 3f, Vector3.zero, Vector3.right * 3f);
+
+                Transform generated = turnObject.transform.Find("Generated Turn");
+                Assert.That(generated, Is.Not.Null);
+                Assert.That(generated.childCount, Is.EqualTo(8));
+                Assert.That(generated.GetComponentsInChildren<BoxCollider>(true), Has.Length.EqualTo(8));
+                Assert.That(turn.Radius, Is.GreaterThanOrEqualTo(0.35f));
+            }
+            finally
+            {
+                Object.DestroyImmediate(turnObject);
+            }
+        }
+
         private ConveyorEndpoint CreateEndpoint(string objectName, Vector3 position, ConveyorEndpointKind kind)
         {
             GameObject endpointObject = new GameObject(objectName);

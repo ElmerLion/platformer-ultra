@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e69894f0f8b3a934bb33a685d22d1b64, type: 3}
   m_Name: DA_PlayerMovement_Prototype
   m_EditorClassIdentifier: PlatformerUltra.Gameplay.Runtime::PlatformerUltra.Gameplay.PlayerMovementSettings
-  _movementSpeed: 1.55
+  _movementSpeed: 3.525
   _sprintSpeed: 3.525
   _groundAcceleration: 18
   _groundDeceleration: 24

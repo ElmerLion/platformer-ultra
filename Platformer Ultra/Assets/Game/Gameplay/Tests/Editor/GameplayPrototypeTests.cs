@@ -26,7 +26,7 @@ namespace PlatformerUltra.Gameplay.Tests
             PlayerMovementSettings settings = ScriptableObject.CreateInstance<PlayerMovementSettings>();
             try
             {
-                Assert.That(settings.MovementSpeed, Is.GreaterThan(0f));
+                Assert.That(settings.MovementSpeed, Is.EqualTo(3.525f).Within(0.0001f));
                 Assert.That(settings.SprintSpeed, Is.EqualTo(3.525f).Within(0.0001f));
                 Assert.That(settings.GroundAcceleration, Is.GreaterThan(settings.AirAcceleration));
                 Assert.That(settings.JumpHeight, Is.GreaterThan(0f));
@@ -44,12 +44,13 @@ namespace PlatformerUltra.Gameplay.Tests
         }
 
         [Test]
-        public void PrototypeMovementAsset_UsesOneAndAHalfTimesFasterSprint()
+        public void PrototypeMovementAsset_UsesFormerSprintSpeedAsDefault()
         {
             PlayerMovementSettings settings = AssetDatabase.LoadAssetAtPath<PlayerMovementSettings>(
                 "Assets/Game/Gameplay/Data/DA_PlayerMovement_Prototype.asset");
 
             Assert.That(settings, Is.Not.Null);
+            Assert.That(settings.MovementSpeed, Is.EqualTo(settings.SprintSpeed).Within(0.0001f));
             Assert.That(settings.SprintSpeed, Is.EqualTo(3.525f).Within(0.0001f));
             Assert.That(settings.DashDistance, Is.EqualTo(2.4f).Within(0.0001f));
             Assert.That(settings.DashExitSpeed, Is.EqualTo(settings.SprintSpeed).Within(0.0001f));
@@ -65,9 +66,18 @@ namespace PlatformerUltra.Gameplay.Tests
             Assert.That(dash.action, Is.Not.Null);
             Assert.That(dash.action.name, Is.EqualTo("Dash"));
             Assert.That(dash.action.bindings, Has.Some.Matches<InputBinding>(binding =>
-                binding.path == "<Keyboard>/leftCtrl"));
+                binding.path == "<Keyboard>/leftShift"));
+            Assert.That(dash.action.bindings, Has.Some.Matches<InputBinding>(binding =>
+                binding.path == "<Gamepad>/leftStickPress"));
             Assert.That(dash.action.bindings, Has.Some.Matches<InputBinding>(binding =>
                 binding.path == "<Gamepad>/buttonEast"));
+            Assert.That(dash.action.bindings, Has.None.Matches<InputBinding>(binding =>
+                binding.path == "<Keyboard>/leftCtrl"));
+
+            InputActionReference sprint = AssetDatabase.LoadAssetAtPath<InputActionReference>(
+                "Assets/Game/Input/IAR_Sprint.asset");
+            Assert.That(sprint, Is.Not.Null);
+            Assert.That(sprint.action.bindings, Is.Empty);
         }
 
         [Test]

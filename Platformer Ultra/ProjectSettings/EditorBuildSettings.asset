@@ -6,14 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
-    path: Assets/Game/Scenes/ConveyorTestScene.unity
-    guid: 3d7a0d0d2dc51dc4a83773de2804975a
+    path: Assets/Game/Scenes/FactoryIntro.unity
+    guid: 05481f7171078bd4084190dbb6176136
   - enabled: 1
     path: Assets/Game/Scenes/FactoryVerticalMap.unity
     guid: edc511b1c9242da4e90a36c931fb1942
+  - enabled: 0
+    path: Assets/Scenes/SampleScene.unity
+    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 0
+    path: Assets/Game/Scenes/ConveyorTestScene.unity
+    guid: 3d7a0d0d2dc51dc4a83773de2804975a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

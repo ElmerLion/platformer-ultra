@@ -2,7 +2,7 @@
     <ui:VisualElement class="hud-root">
         <ui:VisualElement name="objective-card" class="objective-card">
             <ui:Label text="CURRENT OBJECTIVE" class="hud-kicker" />
-            <ui:Label name="current-objective" text="Activate the Mine" class="objective-text" />
+            <ui:Label name="current-objective" text="Restore production: Activate the Mine" class="objective-text" />
             <ui:VisualElement name="broken-machines-panel" class="broken-machines-panel">
                 <ui:Label text="REPAIRS NEEDED" class="repair-kicker" />
                 <ui:Label name="broken-machines" text="" class="broken-machines-text" />
@@ -21,7 +21,7 @@
         </ui:VisualElement>
         <ui:VisualElement class="player-health-panel">
             <ui:VisualElement class="player-health-heading">
-                <ui:Label text="SUIT INTEGRITY" class="player-health-title" />
+                <ui:Label text="CHASSIS INTEGRITY" class="player-health-title" />
                 <ui:Label name="player-health-value" text="100 / 100" class="player-health-value" />
             </ui:VisualElement>
             <ui:ProgressBar name="player-health-progress" low-value="0" high-value="100" value="100" class="player-health-progress" />
@@ -35,7 +35,7 @@
             <ui:VisualElement class="game-over-card">
                 <ui:Label text="SYSTEM FAILURE" class="game-over-kicker" />
                 <ui:Label text="GAME OVER" class="game-over-title" />
-                <ui:Label text="Factory defense link terminated." class="game-over-message" />
+                <ui:Label text="Maintenance unit destroyed. Factory control lost." class="game-over-message" />
                 <ui:Button name="retry-button" text="RETRY FACTORY" class="retry-button" />
             </ui:VisualElement>
         </ui:VisualElement>
@@ -43,7 +43,7 @@
             <ui:VisualElement class="pause-card">
                 <ui:Label text="OPERATIONS SUSPENDED" class="pause-kicker" />
                 <ui:Label text="PAUSED" class="pause-title" />
-                <ui:Label text="The factory simulation is holding position." class="pause-message" />
+                <ui:Label text="Emergency operations suspended." class="pause-message" />
                 <ui:Button name="resume-button" text="RESUME" class="primary-menu-button" />
                 <ui:Button name="pause-retry-button" text="RETRY FACTORY" class="secondary-menu-button" />
             </ui:VisualElement>
@@ -51,8 +51,8 @@
         <ui:VisualElement name="victory-panel" class="victory-panel">
             <ui:VisualElement class="victory-card">
                 <ui:Label text="PRODUCTION CHAIN RESTORED" class="victory-kicker" />
-                <ui:Label text="FACTORY SECURED" class="victory-title" />
-                <ui:Label text="The portal is stable. You escaped the vertical factory." class="victory-message" />
+                <ui:Label text="EVACUATION COMPLETE" class="victory-title" />
+                <ui:Label text="Portal stabilized. The maintenance unit escaped before factory control was lost." class="victory-message" />
                 <ui:Button name="victory-retry-button" text="REPLAY FACTORY" class="victory-button" />
             </ui:VisualElement>
         </ui:VisualElement>

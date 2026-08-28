@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: IAR_Jump
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: 11400000, guid: 93bb8a39e0020fd4ca46f4685cd1507a, type: 2}
-  m_ActionId: 28421b54-36c8-40ae-9a7f-38316a1a3cba
+  m_ActionId: 68310cd4-b180-44b6-b5dd-511c8f51c5ce

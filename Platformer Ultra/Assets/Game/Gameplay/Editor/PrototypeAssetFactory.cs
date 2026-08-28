@@ -159,7 +159,7 @@ namespace PlatformerUltra.Gameplay.Editor
             }
 
             SerializedObject serializedSettings = new SerializedObject(settings);
-            serializedSettings.FindProperty("_movementSpeed").floatValue = 1.55f;
+            serializedSettings.FindProperty("_movementSpeed").floatValue = 3.525f;
             serializedSettings.FindProperty("_sprintSpeed").floatValue = 3.525f;
             serializedSettings.FindProperty("_groundAcceleration").floatValue = 18f;
             serializedSettings.FindProperty("_groundDeceleration").floatValue = 24f;
@@ -205,11 +205,10 @@ namespace PlatformerUltra.Gameplay.Editor
             jump.AddBinding("<Gamepad>/buttonSouth");
 
             InputAction sprint = gameplay.AddAction("Sprint", InputActionType.Button);
-            sprint.AddBinding("<Keyboard>/leftShift");
-            sprint.AddBinding("<Gamepad>/leftStickPress");
 
             InputAction dash = gameplay.AddAction("Dash", InputActionType.Button);
-            dash.AddBinding("<Keyboard>/leftCtrl");
+            dash.AddBinding("<Keyboard>/leftShift");
+            dash.AddBinding("<Gamepad>/leftStickPress");
             dash.AddBinding("<Gamepad>/buttonEast");
 
             InputAction interact = gameplay.AddAction("Interact", InputActionType.Button);

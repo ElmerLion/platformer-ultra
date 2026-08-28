@@ -47,6 +47,7 @@ namespace PlatformerUltra.Factory.Editor
         private const string PortalPrefabPath = PrefabFolder + "/PF_Factory_Portal.prefab";
         private const string PortalCorePrefabPath = PrefabFolder + "/PF_Factory_PortalCore.prefab";
         private const string ConveyorPrefabPath = FactoryRoot + "/Conveyors/Prefabs/PF_Conveyor_PointToPoint.prefab";
+        private const string ConveyorTurnPrefabPath = FactoryRoot + "/Conveyors/Prefabs/PF_Conveyor_Turn.prefab";
 
         private const string PlayerPrefabPath = "Assets/Game/Gameplay/Prefabs/PF_Player_Prototype.prefab";
         private const string DroneEnemyPrefabPath = "Assets/Game/Enemies/Prefabs/PF_Enemy_Drone.prefab";
@@ -70,7 +71,6 @@ namespace PlatformerUltra.Factory.Editor
         private const string CrusherAmbienceAudioPath = "Assets/Audio/Crusher.mp3";
         private const string RubbleCrashAudioPath = "Assets/Audio/freeeverythingxx-rubble-crash-275691.mp3";
         private const string PlayerHitAudioPath = "Assets/Audio/sound-effects-v2_Person_hit-1.mp3";
-        private const string PlayerDashAudioPath = "Assets/Audio/sound-effects-v2_Person_performs_a_jump-2.mp3";
         private const string RepairHammerAudioPath = "Assets/Audio/Hammer Loop_1.wav";
         private const string MusicTrackOnePath = "Assets/Audio/Music/LOOP_Casual Puzzle Solving 1 (live).wav";
         private const string MusicTrackTwoPath = "Assets/Audio/Music/LOOP_Casual Puzzle Solving 2 (live).wav";
@@ -84,7 +84,6 @@ namespace PlatformerUltra.Factory.Editor
         private const string FurnaceMaterialPath = MaterialFolder + "/M_Factory_EmissiveOrange.mat";
         private const string ActiveMaterialPath = MaterialFolder + "/M_Factory_IndicatorGreen.mat";
         private const string BrokenMarkerMaterialPath = MaterialFolder + "/M_Factory_BrokenMarker.mat";
-        private const string EnemyBridgeMaterialPath = MaterialFolder + "/M_Factory_EnemyNavigationBridge.mat";
         private const string MachineBodyMaterialPath = MaterialFolder + "/M_Factory_MachinePurple.mat";
 
         [MenuItem("Tools/Factory/Build Vertical Factory Map")]
@@ -102,8 +101,6 @@ namespace PlatformerUltra.Factory.Editor
             EnemyAssetFactory.BuildAll();
             MapMaterials materials = BuildMapMaterials();
             FactoryDefenseAssetFactory.BuildAll();
-            BuildMinePrefab(materials);
-            BuildGeneratorPrefab(materials);
             BuildUpgradeStationPrefab(materials);
             BuildCranePrefab(materials);
             BuildScene(materials);
@@ -164,159 +161,12 @@ namespace PlatformerUltra.Factory.Editor
                 Furnace = RequireMaterial(FurnaceMaterialPath, new Color(1f, 0.25f, 0.025f), 0.1f, 0.5f, new Color(4f, 0.35f, 0.02f)),
                 Active = RequireMaterial(ActiveMaterialPath, new Color(0.08f, 0.88f, 0.4f), 0.1f, 0.6f, new Color(0.05f, 1.7f, 0.32f)),
                 Broken = RequireMaterial(BrokenMarkerMaterialPath, new Color(1f, 0.035f, 0.02f), 0.05f, 0.68f, new Color(5.5f, 0.03f, 0.01f)),
-                EnemyBridge = CreateOrUpdateTransparentMaterial(EnemyBridgeMaterialPath, new Color(0.08f, 0.72f, 0.95f, 0.42f)),
                 Floor = CreateOrUpdateMaterial(MaterialFolder + "/M_Factory_MapFloor.mat", new Color(0.075f, 0.085f, 0.09f), 0.72f, 0.35f, Color.black),
                 Deck = CreateOrUpdateMaterial(MaterialFolder + "/M_Factory_MapDeck.mat", new Color(0.13f, 0.16f, 0.175f), 0.7f, 0.46f, Color.black),
                 Wall = CreateOrUpdateMaterial(MaterialFolder + "/M_Factory_MapWall.mat", new Color(0.055f, 0.065f, 0.075f), 0.45f, 0.28f, Color.black),
                 Hazard = CreateOrUpdateMaterial(MaterialFolder + "/M_Factory_MapHazard.mat", new Color(0.98f, 0.57f, 0.035f), 0.2f, 0.35f, new Color(0.28f, 0.045f, 0f)),
                 Ore = CreateOrUpdateMaterial(MaterialFolder + "/M_Factory_MapOre.mat", new Color(0.12f, 0.24f, 0.29f), 0.75f, 0.3f, new Color(0.01f, 0.12f, 0.16f))
             };
-        }
-
-        private static void BuildMinePrefab(MapMaterials materials)
-        {
-            GameObject root = new GameObject("PF_Factory_Mine");
-            try
-            {
-                CreateBox("Structural Base", root.transform, new Vector3(0f, 0.22f, 0f), new Vector3(6.2f, 0.44f, 5.2f), materials.Frame, true);
-                CreateBox("Extractor Housing", root.transform, new Vector3(0f, 1.65f, 0.8f), new Vector3(3.8f, 2.85f, 2.5f), materials.Machine, true);
-                CreateBox("Housing Service Panel", root.transform, new Vector3(0f, 1.8f, -0.49f), new Vector3(2.5f, 1.35f, 0.1f), materials.Steel, false);
-                CreateBox("Panel Header", root.transform, new Vector3(0f, 2.5f, -0.56f), new Vector3(2.8f, 0.18f, 0.16f), materials.Frame, false);
-
-                GameObject drillAssembly = new GameObject("Drill Assembly");
-                drillAssembly.transform.SetParent(root.transform, false);
-                CreateCylinder("Drill Drum", drillAssembly.transform, new Vector3(0f, 1.18f, -1.65f), new Vector3(1.15f, 0.82f, 1.15f), Quaternion.Euler(0f, 0f, 90f), materials.Dark, true);
-                CreateCylinder("Drill Hub", drillAssembly.transform, new Vector3(-0.9f, 1.18f, -1.65f), new Vector3(0.48f, 0.18f, 0.48f), Quaternion.Euler(0f, 0f, 90f), materials.Steel, false);
-                for (int index = 0; index < 10; index++)
-                {
-                    float angle = index * 36f * Mathf.Deg2Rad;
-                    Vector3 position = new Vector3(
-                        0f,
-                        1.18f + Mathf.Cos(angle) * 1.18f,
-                        -1.65f + Mathf.Sin(angle) * 1.18f);
-                    CreateBox(
-                        "Drill Tooth " + (index + 1),
-                        drillAssembly.transform,
-                        position,
-                        new Vector3(1.85f, 0.18f, 0.36f),
-                        materials.Steel,
-                        false,
-                        Quaternion.Euler(index * 36f, 0f, 0f));
-                }
-
-                CreateBox("Hopper Floor", root.transform, new Vector3(0f, 0.82f, 2.0f), new Vector3(3.4f, 0.24f, 1.4f), materials.Dark, true);
-                CreateBox("Hopper Left", root.transform, new Vector3(-1.45f, 1.35f, 2f), new Vector3(0.18f, 1.3f, 1.6f), materials.Machine, false, Quaternion.Euler(0f, 0f, -15f));
-                CreateBox("Hopper Right", root.transform, new Vector3(1.45f, 1.35f, 2f), new Vector3(0.18f, 1.3f, 1.6f), materials.Machine, false, Quaternion.Euler(0f, 0f, 15f));
-
-                for (int index = 0; index < 5; index++)
-                {
-                    float x = -1.05f + index * 0.52f;
-                    CreatePrimitive(
-                        PrimitiveType.Sphere,
-                        "Ore Chunk " + (index + 1),
-                        root.transform,
-                        new Vector3(x, 1.05f + (index % 2) * 0.22f, 2f + (index % 3) * 0.18f),
-                        new Vector3(0.38f, 0.3f, 0.42f),
-                        Quaternion.Euler(index * 13f, index * 27f, 0f),
-                        materials.Ore,
-                        false);
-                }
-
-                CreateCylinder("Hydraulic Tank", root.transform, new Vector3(2.35f, 1.15f, 0.7f), new Vector3(0.65f, 1.05f, 0.65f), Quaternion.identity, materials.Steel, true);
-                CreateCylinder("Tank Band A", root.transform, new Vector3(2.35f, 0.55f, 0.7f), new Vector3(0.72f, 0.1f, 0.72f), Quaternion.identity, materials.Frame, false);
-                CreateCylinder("Tank Band B", root.transform, new Vector3(2.35f, 1.75f, 0.7f), new Vector3(0.72f, 0.1f, 0.72f), Quaternion.identity, materials.Frame, false);
-                CreatePipeBetween("Hydraulic Feed", root.transform, new Vector3(2.35f, 2.2f, 0.7f), new Vector3(1.3f, 2.75f, 0.7f), 0.18f, materials.Steel, false);
-                Renderer statusRenderer = CreateBox(
-                    "Mine Status Beacon",
-                    root.transform,
-                    new Vector3(0f, 3.25f, 0.7f),
-                    new Vector3(0.85f, 0.16f, 0.28f),
-                    materials.Energy,
-                    false).GetComponent<Renderer>();
-
-                MachineLoopAudio minerAudio = drillAssembly.AddComponent<MachineLoopAudio>();
-                minerAudio.Configure(
-                    AssetDatabase.LoadAssetAtPath<AudioClip>(MinerAudioPath),
-                    0.1f,
-                    2.5f,
-                    15f);
-
-                GameObject brokenMarker = CreateBrokenMarker(
-                    root.transform,
-                    new Vector3(0f, 4.75f, 0f),
-                    materials.Broken);
-                AddMachineCombat(
-                    root,
-                    "Mine",
-                    120,
-                    5f,
-                    new Vector3(0f, 2f, -2.75f),
-                    new[] { statusRenderer },
-                    brokenMarker);
-                SavePrefab(root, MinePrefabPath);
-            }
-            finally
-            {
-                UnityEngine.Object.DestroyImmediate(root);
-            }
-        }
-
-        private static void BuildGeneratorPrefab(MapMaterials materials)
-        {
-            GameObject root = new GameObject("PF_Factory_Generator");
-            try
-            {
-                CreateBox("Generator Base", root.transform, new Vector3(0f, 0.24f, 0f), new Vector3(5.6f, 0.48f, 4.4f), materials.Frame, true);
-                CreateBox("Generator Housing", root.transform, new Vector3(0f, 1.55f, 0.2f), new Vector3(3.3f, 2.4f, 2.5f), materials.Machine, true);
-
-                GameObject energyAssembly = new GameObject("Energy Assembly");
-                energyAssembly.transform.SetParent(root.transform, false);
-                CreateCylinder("Left Dynamo", energyAssembly.transform, new Vector3(-1.55f, 1.55f, 0.1f), new Vector3(1f, 0.9f, 1f), Quaternion.Euler(0f, 0f, 90f), materials.Steel, true);
-                CreateCylinder("Right Dynamo", energyAssembly.transform, new Vector3(1.55f, 1.55f, 0.1f), new Vector3(1f, 0.9f, 1f), Quaternion.Euler(0f, 0f, 90f), materials.Steel, true);
-                for (int index = -2; index <= 2; index++)
-                {
-                    CreateCylinder(
-                        "Energy Coil " + (index + 3),
-                        energyAssembly.transform,
-                        new Vector3(index * 0.45f, 1.55f, -1.28f),
-                        new Vector3(0.65f, 0.13f, 0.65f),
-                        Quaternion.Euler(90f, 0f, 0f),
-                        index == 0 ? materials.Energy : materials.Frame,
-                        false);
-                }
-
-                CreateCylinder("Central Turbine", root.transform, new Vector3(0f, 2.95f, 0.25f), new Vector3(0.82f, 0.5f, 0.82f), Quaternion.Euler(90f, 0f, 0f), materials.Machine, true);
-                CreateCylinder("Turbine Core", root.transform, new Vector3(0f, 2.95f, -0.82f), new Vector3(0.45f, 0.2f, 0.45f), Quaternion.Euler(90f, 0f, 0f), materials.Energy, false);
-                CreatePipeBetween("Exhaust Left", root.transform, new Vector3(-1.2f, 2.7f, 1.1f), new Vector3(-2.15f, 4.1f, 1.1f), 0.24f, materials.Steel, false);
-                CreatePipeBetween("Exhaust Right", root.transform, new Vector3(1.2f, 2.7f, 1.1f), new Vector3(2.15f, 4.1f, 1.1f), 0.24f, materials.Steel, false);
-                CreateCylinder("Exhaust Crown Left", root.transform, new Vector3(-2.15f, 4.15f, 1.1f), new Vector3(0.38f, 0.12f, 0.38f), Quaternion.identity, materials.Frame, false);
-                CreateCylinder("Exhaust Crown Right", root.transform, new Vector3(2.15f, 4.15f, 1.1f), new Vector3(0.38f, 0.12f, 0.38f), Quaternion.identity, materials.Frame, false);
-                Renderer statusRenderer = CreateBox(
-                    "Generator Status",
-                    root.transform,
-                    new Vector3(0f, 2.35f, -1.1f),
-                    new Vector3(1.5f, 0.18f, 0.12f),
-                    materials.Active,
-                    false).GetComponent<Renderer>();
-
-                GameObject brokenMarker = CreateBrokenMarker(
-                    root.transform,
-                    new Vector3(0f, 5.35f, 0f),
-                    materials.Broken);
-                AddMachineCombat(
-                    root,
-                    "Generator",
-                    180,
-                    5f,
-                    new Vector3(0f, 2f, -2.35f),
-                    new[] { statusRenderer },
-                    brokenMarker);
-                SavePrefab(root, GeneratorPrefabPath);
-            }
-            finally
-            {
-                UnityEngine.Object.DestroyImmediate(root);
-            }
         }
 
         private static void BuildUpgradeStationPrefab(MapMaterials materials)
@@ -408,7 +258,7 @@ namespace PlatformerUltra.Factory.Editor
             BuildGroundRoute(groundRoute.transform, materials);
             BuildMiddleRoute(middleRoute.transform, materials);
             BuildUpperRoute(upperRoute.transform, materials);
-            EnemyBridgeSet enemyBridges = BuildEnemyServiceRoute(enemyNavigation.transform, materials);
+            EnemyAccessRouteSet enemyAccessRoutes = BuildEnemyAccessRoutes(enemyNavigation.transform, materials);
             EnemyEntranceSet entrances = BuildFutureEntrances(futureEntrances.transform, materials);
 
             GameObject mine = PlacePrefab(MinePrefabPath, new Vector3(-13f, 0f, -11f), Quaternion.Euler(0f, 180f, 0f), machinery.transform, "Mine Extractor");
@@ -563,6 +413,7 @@ namespace PlatformerUltra.Factory.Editor
                 conveyors.transform,
                 mineTerminal,
                 smelterTerminal,
+                generatorTerminal,
                 assemblerTerminal,
                 mineToSmelter,
                 smelterToAssembler,
@@ -581,11 +432,10 @@ namespace PlatformerUltra.Factory.Editor
             ConfigureMachineBreakPresentation(smelter, player.CameraShake);
             ConfigureMachineBreakPresentation(generator, player.CameraShake);
             ConfigureMachineBreakPresentation(assembler, player.CameraShake);
-            enemyBridges.Configure(
+            enemyAccessRoutes.Configure(
                 smelterTerminal,
                 generatorTerminal,
-                assemblerTerminal,
-                player.Targetable.GetComponentsInChildren<Collider>(true));
+                assemblerTerminal);
             EnemySpawnManager spawnManager = BuildEnemySpawnManager(
                 enemySystems.transform,
                 entrances,
@@ -596,6 +446,16 @@ namespace PlatformerUltra.Factory.Editor
                 assemblerTerminal,
                 player.CameraShake);
             BuildPortalCompletionFlow(portalGate, portal, player, spawnManager, objectives.transform);
+            FactorySceneEntryController sceneEntry = player.Hud.AddComponent<FactorySceneEntryController>();
+            sceneEntry.Configure(
+                player.PlayerController,
+                player.PlayerInteractor,
+                player.OrbitCamera,
+                player.Targetable,
+                player.StatusPresenter,
+                factoryHud,
+                player.Hud.GetComponent<FactoryPauseController>(),
+                spawnManager);
             BuildTurretSpots(turretSpots.transform, machineRegistry, enemyRegistry);
             BuildAudio(audio);
             BuildAndPersistEnemyNavMesh(enemyNavigation);
@@ -919,154 +779,297 @@ namespace PlatformerUltra.Factory.Editor
             AddSafetyRail(parent, new Vector3(-11f, 9.8f, 11.3f), 7f, true, materials);
         }
 
-        private static EnemyBridgeSet BuildEnemyServiceRoute(Transform parent, MapMaterials materials)
+        private static EnemyAccessRouteSet BuildEnemyAccessRoutes(Transform parent, MapMaterials materials)
         {
-            GameObject smelterBridgeRoot = CreateGroup("Smelter Enemy Bridge", parent);
-            CreateServiceRamp(
-                "Ground to Smelter Service Ramp",
-                smelterBridgeRoot.transform,
-                new Vector3(-6.5f, 0.05f, -10.5f),
-                // Meet the exposed south edge of the mezzanine. The former endpoint ran
-                // underneath the router deck, whose low underside clipped the upper ramp
-                // out of the baked NavMesh.
-                new Vector3(-11f, 5.2f, -4.9f),
-                2.8f,
+            EnemyAccessRouteBuildData smelterRoute = CreateEnemyAccessRoute(
+                "Smelter Enemy Access Route",
+                parent);
+            CreateEnemyLandingPad(
+                "Ground Ladder Landing",
+                smelterRoute.Root,
+                new Vector3(-11.45f, 0.08f, -5.75f),
+                new Vector3(3.4f, 0.24f, 1.5f),
                 materials);
+            smelterRoute.Add(CreateDeployableEnemyLadder(
+                "Ground to Smelter Ladder",
+                smelterRoute.Root,
+                new Vector3(-11.45f, 0.2f, -5.75f),
+                new Vector3(-11.45f, 5.2f, -4.55f),
+                Vector3.forward,
+                materials));
 
-            GameObject generatorBridgeRoot = CreateGroup("Generator Enemy Bridge", parent);
-            CreateServiceRamp(
-                "Smelter to Generator South Bypass Ramp",
-                generatorBridgeRoot.transform,
-                new Vector3(-13.5f, 5.2f, -9f),
-                new Vector3(4.8f, 6.8f, -9f),
-                2.6f,
+            EnemyAccessRouteBuildData generatorRoute = CreateEnemyAccessRoute(
+                "Generator Enemy Access Route",
+                parent);
+            CreateEnemyLandingPad(
+                "Router Ladder Lower Landing",
+                generatorRoute.Root,
+                new Vector3(-3.5f, 5.08f, 5.1f),
+                new Vector3(1.6f, 0.24f, 3f),
                 materials);
-            CreateBox(
-                "Smelter Bypass Link Grating",
-                generatorBridgeRoot.transform,
-                new Vector3(-13.5f, 5.12f, -6.55f),
-                new Vector3(1.4f, 0.16f, 4.9f),
-                materials.EnemyBridge,
-                false);
-            CreateBox(
-                "Smelter Bypass Link Underframe",
-                generatorBridgeRoot.transform,
-                new Vector3(-13.5f, 4.96f, -6.55f),
-                new Vector3(1.58f, 0.12f, 4.9f),
-                materials.EnemyBridge,
-                false);
-            CreateEnemyNavMeshLink(
-                "Smelter Bypass Departure Link",
-                generatorBridgeRoot.transform,
-                new Vector3(-13.5f, 5.25f, -4.1f),
-                new Vector3(-13.5f, 5.25f, -9f),
-                1.2f);
-            CreateBox(
-                "Generator South Bypass Landing",
-                generatorBridgeRoot.transform,
-                new Vector3(5.8f, 6.64f, -9f),
-                new Vector3(2f, 0.32f, 3f),
-                materials.EnemyBridge,
-                true);
-            CreateBox(
-                "Generator South Bypass Landing Underframe",
-                generatorBridgeRoot.transform,
-                new Vector3(5.8f, 6.43f, -9f),
-                new Vector3(2.18f, 0.1f, 3.18f),
-                materials.EnemyBridge,
-                false);
-            CreateServiceRamp(
-                "Generator South Bypass Ramp",
-                generatorBridgeRoot.transform,
-                new Vector3(6.8f, 6.8f, -9f),
-                new Vector3(8f, 8f, -3f),
-                2.6f,
+            CreateEnemyLandingPad(
+                "Router Ladder Upper Landing",
+                generatorRoute.Root,
+                new Vector3(-2.6f, 7.43f, 5.1f),
+                new Vector3(1.2f, 0.24f, 3f),
                 materials);
-            CreateEnemyNavMeshLink(
-                "Generator Bypass Dock Link",
-                generatorBridgeRoot.transform,
-                new Vector3(7.72f, 7.72f, -3.82f),
-                new Vector3(8.55f, 8f, -3f),
-                1.2f);
+            generatorRoute.Add(CreateDeployableEnemyLadder(
+                "Smelter to Generator Ladder",
+                generatorRoute.Root,
+                new Vector3(-3.45f, 5.2f, 5.1f),
+                new Vector3(-2.65f, 7.55f, 5.1f),
+                Vector3.right,
+                materials));
+            generatorRoute.Add(CreateEnemyJumpLink(
+                "Smelter Deck to Router Link",
+                generatorRoute.Root,
+                new Vector3(-9.667f, 5.718f, -1f),
+                new Vector3(-8.4f, 5.234f, 2.17f),
+                0f,
+                1f));
+            generatorRoute.Add(CreateEnemyJumpLink(
+                "Router to Double Jump Station Link",
+                generatorRoute.Root,
+                new Vector3(-5.83f, 5.22f, 2.17f),
+                new Vector3(-5.5f, 5.22f, 3.83f),
+                0f,
+                0.65f));
+            generatorRoute.Add(CreateEnemyJumpLink(
+                "Freight Roof to Crusher Ledge Link",
+                generatorRoute.Root,
+                new Vector3(-0.83f, 7.55f, 4.8f),
+                new Vector3(2f, 8.05f, 4.8f),
+                0f,
+                1.1f));
+            generatorRoute.Add(CreateEnemyJumpLink(
+                "Crusher Ledge to Generator Catwalk Link",
+                generatorRoute.Root,
+                new Vector3(3.83f, 8.05f, 3.5f),
+                new Vector3(6.5f, 8.05f, 2.5f),
+                0f,
+                0.8f));
+            generatorRoute.Add(CreateEnemyJumpLink(
+                "Generator Deck to Crusher Turret Link",
+                generatorRoute.Root,
+                new Vector3(8.5f, 8.05f, -2.85f),
+                new Vector3(4.5f, 9.39f, -2.85f),
+                0f,
+                1.2f));
+            CreateEnemyLandingPad(
+                "West Turret Ladder Lower Landing",
+                generatorRoute.Root,
+                new Vector3(-13.12f, 5.08f, 4.8f),
+                new Vector3(3.2f, 0.24f, 1.6f),
+                materials);
+            CreateEnemyLandingPad(
+                "West Turret Ladder Upper Landing",
+                generatorRoute.Root,
+                new Vector3(-13.12f, 8.88f, 5.55f),
+                new Vector3(3.2f, 0.24f, 1.6f),
+                materials);
+            generatorRoute.Add(CreateDeployableEnemyLadder(
+                "Smelter to West Turret Ladder",
+                generatorRoute.Root,
+                new Vector3(-13.12f, 5.2f, 4.65f),
+                new Vector3(-13.12f, 9f, 5.95f),
+                Vector3.forward,
+                materials));
 
-            GameObject assemblerBridgeRoot = CreateGroup("Assembler Enemy Bridge", parent);
-            CreateServiceRamp(
-                "Generator to Assembler Service Ramp",
-                assemblerBridgeRoot.transform,
-                new Vector3(8.7f, 8f, 1.4f),
-                // Stop flush with the assembler deck instead of continuing beneath it;
-                // an overlapping incline is treated as having insufficient headroom.
-                new Vector3(8.7f, 13.2f, 7.5f),
-                3f,
+            EnemyAccessRouteBuildData assemblerRoute = CreateEnemyAccessRoute(
+                "Assembler Enemy Access Route",
+                parent);
+            CreateEnemyLandingPad(
+                "Freight Shaft Ladder Lower Landing",
+                assemblerRoute.Root,
+                new Vector3(13.2f, 7.88f, 5.7f),
+                new Vector3(3f, 0.24f, 1.4f),
                 materials);
+            CreateEnemyLandingPad(
+                "Freight Shaft Ladder Upper Landing",
+                assemblerRoute.Root,
+                new Vector3(13.2f, 13.08f, 6.85f),
+                new Vector3(3f, 0.24f, 1.4f),
+                materials);
+            assemblerRoute.Add(CreateDeployableEnemyLadder(
+                "Generator to Assembler Ladder",
+                assemblerRoute.Root,
+                new Vector3(13.2f, 8f, 5.8f),
+                new Vector3(13.2f, 13.2f, 6.75f),
+                Vector3.forward,
+                materials));
+            assemblerRoute.Add(CreateEnemyJumpLink(
+                "Assembler Deck to East Turret Link",
+                assemblerRoute.Root,
+                new Vector3(8.83f, 13.22f, 13f),
+                new Vector3(7.67f, 15.55f, 12.73f),
+                0f,
+                1.2f));
 
-            return new EnemyBridgeSet(
-                smelterBridgeRoot.AddComponent<EnemyNavigationBridge>(),
-                generatorBridgeRoot.AddComponent<EnemyNavigationBridge>(),
-                assemblerBridgeRoot.AddComponent<EnemyNavigationBridge>());
+            return new EnemyAccessRouteSet(smelterRoute, generatorRoute, assemblerRoute);
         }
 
-        private static void CreateServiceRamp(
+        private static EnemyAccessRouteBuildData CreateEnemyAccessRoute(string name, Transform parent)
+        {
+            GameObject root = CreateGroup(name, parent);
+            return new EnemyAccessRouteBuildData(
+                root.transform,
+                root.AddComponent<EnemyAccessRoute>());
+        }
+
+        private static EnemyLadderBuildData CreateDeployableEnemyLadder(
             string name,
             Transform parent,
-            Vector3 surfaceStart,
-            Vector3 surfaceEnd,
-            float width,
+            Vector3 bottomPoint,
+            Vector3 topPoint,
+            Vector3 facingDirection,
             MapMaterials materials)
         {
-            const float thickness = 0.32f;
-            Vector3 delta = surfaceEnd - surfaceStart;
-            Vector3 horizontal = Vector3.ProjectOnPlane(delta, Vector3.up);
-            if (horizontal.sqrMagnitude <= 0.001f)
+            const float outerWidth = 2.9f;
+            const float linkWidth = 2.6f;
+            const float rungSpacing = 0.42f;
+            const float railOffset = 1.36f;
+
+            Vector3 ladderDelta = topPoint - bottomPoint;
+            float ladderLength = ladderDelta.magnitude;
+            if (ladderLength <= 0.1f)
             {
-                throw new InvalidOperationException(name + " requires horizontally separated endpoints.");
+                throw new InvalidOperationException(name + " requires separated endpoints.");
             }
 
-            float pitch = Mathf.Atan2(delta.y, horizontal.magnitude) * Mathf.Rad2Deg;
-            Quaternion rotation = Quaternion.LookRotation(horizontal.normalized, Vector3.up) *
-                                  Quaternion.Euler(-pitch, 0f, 0f);
-            Vector3 surfaceNormal = rotation * Vector3.up;
+            Vector3 localUp = ladderDelta.normalized;
+            Vector3 requestedForward = Vector3.ProjectOnPlane(facingDirection, localUp).normalized;
+            if (requestedForward.sqrMagnitude <= 0.001f)
+            {
+                requestedForward = Vector3.ProjectOnPlane(Vector3.forward, localUp).normalized;
+            }
 
-            GameObject ramp = CreateGroup(name, parent);
-            ramp.transform.SetPositionAndRotation(
-                Vector3.Lerp(surfaceStart, surfaceEnd, 0.5f) - surfaceNormal * (thickness * 0.5f),
-                rotation);
+            GameObject ladderRoot = CreateGroup(name, parent);
+            ladderRoot.transform.SetPositionAndRotation(
+                bottomPoint,
+                Quaternion.LookRotation(requestedForward, localUp));
+
+            NavMeshLink link = ladderRoot.AddComponent<NavMeshLink>();
+            link.agentTypeID = 0;
+            link.startPoint = Vector3.zero;
+            link.endPoint = Vector3.up * ladderLength;
+            link.width = linkWidth;
+            link.bidirectional = true;
+            link.costModifier = -1f;
+
+            EnemyTraversalLink traversal = ladderRoot.AddComponent<EnemyTraversalLink>();
+            traversal.Configure(link, EnemyTraversalKind.Ladder, Vector3.forward, 0f, 4.5f, 0.18f, 0.18f);
+
             CreateBox(
-                "Walkable Service Grating",
-                ramp.transform,
-                Vector3.zero,
-                new Vector3(width, thickness, delta.magnitude),
-                materials.EnemyBridge,
-                true);
-            CreateBox(
-                "Orange Underframe",
-                ramp.transform,
-                new Vector3(0f, -0.22f, 0f),
-                new Vector3(width + 0.18f, 0.12f, delta.magnitude),
-                materials.EnemyBridge,
+                "Upper Deployment Housing",
+                ladderRoot.transform,
+                new Vector3(0f, ladderLength + 0.12f, 0f),
+                new Vector3(outerWidth, 0.28f, 0.38f),
+                materials.Dark,
                 false);
             CreateBox(
-                "Left Hazard Edge",
-                ramp.transform,
-                new Vector3(-width * 0.48f, 0.18f, 0f),
-                new Vector3(0.12f, 0.08f, delta.magnitude),
-                materials.EnemyBridge,
+                "Left Hostile Indicator",
+                ladderRoot.transform,
+                new Vector3(-1.16f, ladderLength + 0.13f, -0.21f),
+                new Vector3(0.22f, 0.14f, 0.08f),
+                materials.Broken,
                 false);
             CreateBox(
-                "Right Hazard Edge",
-                ramp.transform,
-                new Vector3(width * 0.48f, 0.18f, 0f),
-                new Vector3(0.12f, 0.08f, delta.magnitude),
-                materials.EnemyBridge,
+                "Right Hostile Indicator",
+                ladderRoot.transform,
+                new Vector3(1.16f, ladderLength + 0.13f, -0.21f),
+                new Vector3(0.22f, 0.14f, 0.08f),
+                materials.Broken,
                 false);
+
+            List<Transform> parts = new List<Transform>();
+            List<Vector3> retractedPositions = new List<Vector3>();
+            AddDeployingLadderPart(
+                CreateBox(
+                    "Left Rail",
+                    ladderRoot.transform,
+                    new Vector3(-railOffset, ladderLength * 0.5f, 0f),
+                    new Vector3(0.17f, ladderLength, 0.17f),
+                    materials.Steel,
+                    false).transform,
+                ladderLength,
+                parts,
+                retractedPositions);
+            AddDeployingLadderPart(
+                CreateBox(
+                    "Right Rail",
+                    ladderRoot.transform,
+                    new Vector3(railOffset, ladderLength * 0.5f, 0f),
+                    new Vector3(0.17f, ladderLength, 0.17f),
+                    materials.Steel,
+                    false).transform,
+                ladderLength,
+                parts,
+                retractedPositions);
+            AddDeployingLadderPart(
+                CreateBox(
+                    "Left Hazard Trim",
+                    ladderRoot.transform,
+                    new Vector3(-1.46f, ladderLength * 0.5f, 0.02f),
+                    new Vector3(0.08f, ladderLength, 0.21f),
+                    materials.Hazard,
+                    false).transform,
+                ladderLength,
+                parts,
+                retractedPositions);
+            AddDeployingLadderPart(
+                CreateBox(
+                    "Right Hazard Trim",
+                    ladderRoot.transform,
+                    new Vector3(1.46f, ladderLength * 0.5f, 0.02f),
+                    new Vector3(0.08f, ladderLength, 0.21f),
+                    materials.Hazard,
+                    false).transform,
+                ladderLength,
+                parts,
+                retractedPositions);
+
+            int rungCount = Mathf.Max(2, Mathf.FloorToInt(ladderLength / rungSpacing));
+            for (int index = 0; index <= rungCount; index++)
+            {
+                float height = Mathf.Min(ladderLength, index * ladderLength / rungCount);
+                AddDeployingLadderPart(
+                    CreateBox(
+                        "Rung " + (index + 1),
+                        ladderRoot.transform,
+                        new Vector3(0f, height, 0f),
+                        new Vector3(linkWidth, 0.1f, 0.14f),
+                        materials.Frame,
+                        false).transform,
+                    ladderLength,
+                    parts,
+                    retractedPositions);
+            }
+
+            return new EnemyLadderBuildData(
+                traversal,
+                parts.ToArray(),
+                retractedPositions.ToArray());
         }
 
-        private static void CreateEnemyNavMeshLink(
+        private static void AddDeployingLadderPart(
+            Transform part,
+            float retractedHeight,
+            ICollection<Transform> parts,
+            ICollection<Vector3> retractedPositions)
+        {
+            parts.Add(part);
+            Vector3 retractedPosition = part.localPosition;
+            retractedPosition.y = retractedHeight;
+            retractedPositions.Add(retractedPosition);
+        }
+
+        private static EnemyTraversalLink CreateEnemyJumpLink(
             string name,
             Transform parent,
             Vector3 startPoint,
             Vector3 endPoint,
-            float width)
+            float width,
+            float arcHeight)
         {
             GameObject linkObject = CreateGroup(name, parent);
             NavMeshLink link = linkObject.AddComponent<NavMeshLink>();
@@ -1076,6 +1079,29 @@ namespace PlatformerUltra.Factory.Editor
             link.width = Mathf.Max(0f, width);
             link.bidirectional = true;
             link.costModifier = -1f;
+
+            EnemyTraversalLink traversal = linkObject.AddComponent<EnemyTraversalLink>();
+            Vector3 facing = Vector3.ProjectOnPlane(endPoint - startPoint, Vector3.up).normalized;
+            traversal.Configure(link, EnemyTraversalKind.Jump, facing, arcHeight, 4.5f, 0.18f, 0.18f);
+            return traversal;
+        }
+
+        private static void CreateEnemyLandingPad(
+            string name,
+            Transform parent,
+            Vector3 position,
+            Vector3 scale,
+            MapMaterials materials)
+        {
+            GameObject root = CreateGroup(name, parent);
+            CreateBox("Steel Landing", root.transform, position, scale, materials.Deck, true);
+            CreateBox(
+                "Hazard Perimeter",
+                root.transform,
+                position + Vector3.down * (scale.y * 0.55f),
+                new Vector3(scale.x + 0.14f, 0.08f, scale.z + 0.14f),
+                materials.Hazard,
+                false);
         }
 
         private static EnemyEntranceSet BuildFutureEntrances(Transform parent, MapMaterials materials)
@@ -1247,17 +1273,38 @@ namespace PlatformerUltra.Factory.Editor
             CreateIndustrialDeck("Retractable Bridge Segment", bridge.transform, new Vector3(0f, 13.75f), new Vector2(4f, 1.5f), 15.5f, 9f, materials, true, false);
             CreateBox("Bridge Direction Arrow", bridge.transform, new Vector3(0f, 15.69f, 13.75f), new Vector3(0.8f, 0.03f, 0.9f), materials.Energy, false, Quaternion.Euler(0f, 45f, 0f));
 
+            GameObject coreRack = CreateGroup("Portal Core Capacitor Bank", parent);
+            CreateBox("Core Bank Backplate", coreRack.transform, new Vector3(-2.55f, 18.42f, 18.55f), new Vector3(0.92f, 3.22f, 0.28f), materials.Dark, false);
+            CreateBox("Core Bank Left Brace", coreRack.transform, new Vector3(-3.06f, 18.42f, 18.42f), new Vector3(0.14f, 3.48f, 0.22f), materials.Frame, false);
+            CreateBox("Core Bank Right Brace", coreRack.transform, new Vector3(-2.04f, 18.42f, 18.42f), new Vector3(0.14f, 3.48f, 0.22f), materials.Frame, false);
+
             Renderer[] sockets = new Renderer[3];
+            GameObject[] installedCores = new GameObject[3];
             for (int index = 0; index < sockets.Length; index++)
             {
-                float x = -1.35f + index * 1.35f;
-                CreateCylinder("Portal Core Socket " + (index + 1), parent, new Vector3(x, 16.65f, 17.15f), new Vector3(0.48f, 0.16f, 0.48f), Quaternion.identity, materials.Frame, true);
-                sockets[index] = CreateCylinder("Portal Socket Indicator " + (index + 1), parent, new Vector3(x, 16.84f, 17.15f), new Vector3(0.27f, 0.08f, 0.27f), Quaternion.identity, materials.Energy, false).GetComponent<Renderer>();
+                Vector3 socketPosition = new Vector3(-2.55f, 17.48f + index * 0.94f, 18.31f);
+                CreateCylinder("Portal Core Socket " + (index + 1), coreRack.transform, socketPosition, new Vector3(0.47f, 0.11f, 0.47f), Quaternion.Euler(90f, 0f, 0f), materials.Frame, false);
+                sockets[index] = CreateCylinder("Portal Socket Indicator " + (index + 1), coreRack.transform, socketPosition + new Vector3(0f, 0f, -0.13f), new Vector3(0.3f, 0.04f, 0.3f), Quaternion.Euler(90f, 0f, 0f), materials.Energy, false).GetComponent<Renderer>();
+
+                GameObject installedCore = PlacePrefab(
+                    PortalCorePrefabPath,
+                    socketPosition + new Vector3(0f, 0f, -0.28f),
+                    Quaternion.Euler(90f, 0f, 0f),
+                    coreRack.transform,
+                    "Installed Portal Core " + (index + 1));
+                installedCore.transform.localScale = Vector3.one * 0.3f;
+                foreach (Collider collider in installedCore.GetComponentsInChildren<Collider>(true))
+                {
+                    collider.enabled = false;
+                }
+
+                installedCore.SetActive(false);
+                installedCores[index] = installedCore;
             }
 
             FactoryPortalVisual portalVisual = portal != null ? portal.GetComponent<FactoryPortalVisual>() : null;
             FactoryPortalGate gate = (portal != null ? portal : CreateGroup("Portal Gate Logic", parent)).AddComponent<FactoryPortalGate>();
-            gate.Configure(portalVisual, bridge, sockets, 3);
+            gate.Configure(portalVisual, bridge, sockets, installedCores, 3);
 
             gate.ResetGate();
             return gate;
@@ -1424,7 +1471,6 @@ namespace PlatformerUltra.Factory.Editor
                 repairSource,
                 RequireAsset<AudioClip>(PlayerHitAudioPath),
                 RequireAsset<AudioClip>(RepairHammerAudioPath),
-                RequireAsset<AudioClip>(PlayerDashAudioPath),
                 RequireAsset<GameObject>(EnemyAssetFactory.PlayerJumpEffectPath),
                 RequireAsset<GameObject>(EnemyAssetFactory.DoubleJumpEffectPath),
                 RequireAsset<GameObject>(EnemyAssetFactory.PlayerDashEffectPath),
@@ -1624,12 +1670,15 @@ namespace PlatformerUltra.Factory.Editor
             else
             {
                 EditorUtility.CopySerialized(generatedData, persistedData);
+                persistedData.name = "NavMesh-EnemyService";
                 EditorUtility.SetDirty(persistedData);
                 UnityEngine.Object.DestroyImmediate(generatedData);
             }
 
             surface.navMeshData = persistedData;
             surface.AddData();
+            persistedData.name = "NavMesh-EnemyService";
+            EditorUtility.SetDirty(persistedData);
             NavMeshLink[] links = navigationRoot.GetComponentsInChildren<NavMeshLink>(true);
             foreach (NavMeshLink link in links)
             {
@@ -1660,6 +1709,35 @@ namespace PlatformerUltra.Factory.Editor
                     routePoints[index + 1],
                     ConveyorOperatingState.Offline);
                 belts[index].gameObject.SetActive(false);
+            }
+
+            for (int index = 1; index < routePoints.Length - 1; index++)
+            {
+                Vector3 incoming = (routePoints[index] - routePoints[index - 1]).normalized;
+                Vector3 outgoing = (routePoints[index + 1] - routePoints[index]).normalized;
+                if (Vector3.Dot(incoming, outgoing) > 0.998f)
+                {
+                    continue;
+                }
+
+                GameObject turnObject = PlacePrefab(
+                    ConveyorTurnPrefabPath,
+                    routePoints[index],
+                    Quaternion.identity,
+                    root.transform,
+                    name + " Turn " + index);
+                PrefabUtility.UnpackPrefabInstance(
+                    turnObject,
+                    PrefabUnpackMode.Completely,
+                    InteractionMode.AutomatedAction);
+                ConveyorTurnModule turn = turnObject.GetComponent<ConveyorTurnModule>();
+                if (turn == null)
+                {
+                    throw new InvalidOperationException("Missing ConveyorTurnModule on " + ConveyorTurnPrefabPath + ".");
+                }
+
+                turn.Configure(routePoints[index - 1], routePoints[index], routePoints[index + 1]);
+                turnObject.transform.SetParent(belts[index - 1].transform, true);
             }
 
             return new ProductionConveyorRoute(root, belts, routePoints);
@@ -1759,6 +1837,7 @@ namespace PlatformerUltra.Factory.Editor
             Transform parent,
             FactoryObjectiveTerminal mineTerminal,
             FactoryObjectiveTerminal smelterTerminal,
+            FactoryObjectiveTerminal generatorTerminal,
             FactoryObjectiveTerminal assemblerTerminal,
             FactoryConveyorConnection mineToSmelter,
             FactoryConveyorConnection smelterToAssembler,
@@ -1783,6 +1862,19 @@ namespace PlatformerUltra.Factory.Editor
                 4f,
                 3f,
                 4f);
+            productionLine.BindPresentation(
+                mineTerminal != null && mineTerminal.MachineHealth != null
+                    ? mineTerminal.MachineHealth.GetComponent<FactoryMachinePresentation>()
+                    : null,
+                smelterTerminal != null && smelterTerminal.MachineHealth != null
+                    ? smelterTerminal.MachineHealth.GetComponent<FactoryMachinePresentation>()
+                    : null,
+                generatorTerminal != null && generatorTerminal.MachineHealth != null
+                    ? generatorTerminal.MachineHealth.GetComponent<FactoryMachinePresentation>()
+                    : null,
+                assemblerTerminal != null && assemblerTerminal.MachineHealth != null
+                    ? assemblerTerminal.MachineHealth.GetComponent<FactoryMachinePresentation>()
+                    : null);
         }
 
         private static ConveyorBelt CreateConveyor(
@@ -1860,10 +1952,7 @@ namespace PlatformerUltra.Factory.Editor
                 AssetDatabase.CreateAsset(profile, VolumeProfilePath);
             }
 
-            if (!profile.TryGet(out Bloom bloom))
-            {
-                bloom = profile.Add<Bloom>(true);
-            }
+            Bloom bloom = GetOrCreateVolumeOverride<Bloom>(profile);
 
             bloom.active = true;
             bloom.threshold.Override(0.95f);
@@ -1871,10 +1960,7 @@ namespace PlatformerUltra.Factory.Editor
             bloom.scatter.Override(0.55f);
             bloom.tint.Override(new Color(0.82f, 0.93f, 1f));
 
-            if (!profile.TryGet(out ColorAdjustments colorAdjustments))
-            {
-                colorAdjustments = profile.Add<ColorAdjustments>(true);
-            }
+            ColorAdjustments colorAdjustments = GetOrCreateVolumeOverride<ColorAdjustments>(profile);
 
             colorAdjustments.active = true;
             colorAdjustments.postExposure.Override(0.05f);
@@ -1882,19 +1968,13 @@ namespace PlatformerUltra.Factory.Editor
             colorAdjustments.saturation.Override(-5f);
             colorAdjustments.colorFilter.Override(new Color(0.94f, 0.98f, 1f));
 
-            if (!profile.TryGet(out Vignette vignette))
-            {
-                vignette = profile.Add<Vignette>(true);
-            }
+            Vignette vignette = GetOrCreateVolumeOverride<Vignette>(profile);
 
             vignette.active = true;
             vignette.intensity.Override(0.15f);
             vignette.smoothness.Override(0.32f);
 
-            if (!profile.TryGet(out Tonemapping tonemapping))
-            {
-                tonemapping = profile.Add<Tonemapping>(true);
-            }
+            Tonemapping tonemapping = GetOrCreateVolumeOverride<Tonemapping>(profile);
 
             tonemapping.active = true;
             tonemapping.mode.Override(TonemappingMode.Neutral);
@@ -1909,6 +1989,25 @@ namespace PlatformerUltra.Factory.Editor
             volume.priority = 0f;
             volume.weight = 1f;
             volume.sharedProfile = profile;
+        }
+
+        private static T GetOrCreateVolumeOverride<T>(VolumeProfile profile)
+            where T : VolumeComponent
+        {
+            profile.components.RemoveAll(component => component == null);
+            if (profile.TryGet(out T existing) && existing != null)
+            {
+                return existing;
+            }
+
+            T created = ScriptableObject.CreateInstance<T>();
+            created.name = typeof(T).Name;
+            created.active = true;
+            profile.components.Add(created);
+            AssetDatabase.AddObjectToAsset(created, profile);
+            EditorUtility.SetDirty(created);
+            EditorUtility.SetDirty(profile);
+            return created;
         }
 
         private static Light CreatePointLight(string name, Transform parent, Vector3 position, Color color, float range, float intensity)
@@ -2470,25 +2569,6 @@ namespace PlatformerUltra.Factory.Editor
             return material;
         }
 
-        private static Material CreateOrUpdateTransparentMaterial(string path, Color color)
-        {
-            Material material = CreateOrUpdateMaterial(path, color, 0.15f, 0.58f, Color.black);
-            material.SetOverrideTag("RenderType", "Transparent");
-            material.SetFloat("_Surface", 1f);
-            material.SetFloat("_Blend", 0f);
-            material.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha);
-            material.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
-            material.SetFloat("_ZWrite", 0f);
-            material.SetFloat("_AlphaClip", 0f);
-            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-            material.DisableKeyword("_ALPHATEST_ON");
-            material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-            material.renderQueue = (int)RenderQueue.Transparent;
-            material.SetShaderPassEnabled("ShadowCaster", false);
-            EditorUtility.SetDirty(material);
-            return material;
-        }
-
         private static void SavePrefab(GameObject root, string path)
         {
             PrefabUtility.SaveAsPrefabAsset(root, path);
@@ -2651,44 +2731,94 @@ namespace PlatformerUltra.Factory.Editor
             public Vector3[] RoutePoints { get; }
         }
 
-        private sealed class EnemyBridgeSet
+        private sealed class EnemyAccessRouteSet
         {
-            private readonly EnemyNavigationBridge _smelterBridge;
-            private readonly EnemyNavigationBridge _generatorBridge;
-            private readonly EnemyNavigationBridge _assemblerBridge;
+            private readonly EnemyAccessRouteBuildData _smelterRoute;
+            private readonly EnemyAccessRouteBuildData _generatorRoute;
+            private readonly EnemyAccessRouteBuildData _assemblerRoute;
 
-            public EnemyBridgeSet(
-                EnemyNavigationBridge smelterBridge,
-                EnemyNavigationBridge generatorBridge,
-                EnemyNavigationBridge assemblerBridge)
+            public EnemyAccessRouteSet(
+                EnemyAccessRouteBuildData smelterRoute,
+                EnemyAccessRouteBuildData generatorRoute,
+                EnemyAccessRouteBuildData assemblerRoute)
             {
-                _smelterBridge = smelterBridge;
-                _generatorBridge = generatorBridge;
-                _assemblerBridge = assemblerBridge;
+                _smelterRoute = smelterRoute;
+                _generatorRoute = generatorRoute;
+                _assemblerRoute = assemblerRoute;
             }
 
             public void Configure(
                 FactoryObjectiveTerminal smelterTerminal,
                 FactoryObjectiveTerminal generatorTerminal,
-                FactoryObjectiveTerminal assemblerTerminal,
-                Collider[] playerColliders)
+                FactoryObjectiveTerminal assemblerTerminal)
             {
-                ConfigureBridge(_smelterBridge, smelterTerminal, playerColliders);
-                ConfigureBridge(_generatorBridge, generatorTerminal, playerColliders);
-                ConfigureBridge(_assemblerBridge, assemblerTerminal, playerColliders);
+                _smelterRoute.Configure(smelterTerminal);
+                _generatorRoute.Configure(generatorTerminal);
+                _assemblerRoute.Configure(assemblerTerminal);
+            }
+        }
+
+        private sealed class EnemyAccessRouteBuildData
+        {
+            private readonly List<EnemyTraversalLink> _links = new List<EnemyTraversalLink>();
+            private readonly List<Transform> _deploymentParts = new List<Transform>();
+            private readonly List<Vector3> _retractedPositions = new List<Vector3>();
+
+            public EnemyAccessRouteBuildData(Transform root, EnemyAccessRoute route)
+            {
+                Root = root;
+                Route = route;
             }
 
-            private static void ConfigureBridge(
-                EnemyNavigationBridge bridge,
-                FactoryObjectiveTerminal terminal,
-                Collider[] playerColliders)
+            public Transform Root { get; }
+            public EnemyAccessRoute Route { get; }
+
+            public void Add(EnemyTraversalLink traversalLink)
             {
-                bridge.Configure(
-                    terminal,
-                    bridge.GetComponentsInChildren<Renderer>(true),
-                    bridge.GetComponentsInChildren<Collider>(true),
-                    playerColliders);
+                if (traversalLink != null)
+                {
+                    _links.Add(traversalLink);
+                }
             }
+
+            public void Add(EnemyLadderBuildData ladder)
+            {
+                if (ladder == null)
+                {
+                    return;
+                }
+
+                Add(ladder.TraversalLink);
+                _deploymentParts.AddRange(ladder.DeploymentParts);
+                _retractedPositions.AddRange(ladder.RetractedPositions);
+            }
+
+            public void Configure(FactoryObjectiveTerminal terminal)
+            {
+                Route.Configure(
+                    terminal,
+                    _links.ToArray(),
+                    _deploymentParts.ToArray(),
+                    _retractedPositions.ToArray(),
+                    1.35f);
+            }
+        }
+
+        private sealed class EnemyLadderBuildData
+        {
+            public EnemyLadderBuildData(
+                EnemyTraversalLink traversalLink,
+                Transform[] deploymentParts,
+                Vector3[] retractedPositions)
+            {
+                TraversalLink = traversalLink;
+                DeploymentParts = deploymentParts;
+                RetractedPositions = retractedPositions;
+            }
+
+            public EnemyTraversalLink TraversalLink { get; }
+            public Transform[] DeploymentParts { get; }
+            public Vector3[] RetractedPositions { get; }
         }
 
         private sealed class MapMaterials
@@ -2701,7 +2831,6 @@ namespace PlatformerUltra.Factory.Editor
             public Material Furnace;
             public Material Active;
             public Material Broken;
-            public Material EnemyBridge;
             public Material Floor;
             public Material Deck;
             public Material Wall;

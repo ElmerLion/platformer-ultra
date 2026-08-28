@@ -206,15 +206,7 @@ namespace PlatformerUltra.Gameplay
                 return;
             }
 
-            Scene activeScene = SceneManager.GetActiveScene();
-            if (!string.IsNullOrWhiteSpace(activeScene.path))
-            {
-                SceneManager.LoadSceneAsync(activeScene.path, LoadSceneMode.Single);
-            }
-            else if (activeScene.buildIndex >= 0)
-            {
-                SceneManager.LoadSceneAsync(activeScene.buildIndex, LoadSceneMode.Single);
-            }
+            FactoryRunSceneLoader.LoadNewRun();
         }
 
         private void RestoreGlobalState()

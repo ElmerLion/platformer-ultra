@@ -3,6 +3,7 @@
   "rootNamespace": "PlatformerUltra.Gameplay.Tests",
   "references": [
     "PlatformerUltra.Gameplay.Runtime",
+    "PlatformerUltra.Audio.Runtime",
     "PlatformerUltra.Combat.Runtime",
     "PlatformerUltra.Conveyors.Runtime",
     "Unity.InputSystem"

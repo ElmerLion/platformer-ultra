@@ -20,6 +20,8 @@ namespace PlatformerUltra.FactoryDefense
         [SerializeField] private Transform _muzzle;
         [SerializeField] private GameObject _muzzleFlash;
         [SerializeField] private TurretLaserTracer _laserTracerPrefab;
+        [SerializeField] private AudioSource _shotAudioSource;
+        [SerializeField] private AudioClip _shotClip;
         [SerializeField] private EnemyRuntimeRegistry _enemyRegistry;
         [SerializeField] private MachineTargetRegistry _factoryRegistry;
 
@@ -52,6 +54,7 @@ namespace PlatformerUltra.FactoryDefense
         public int Damage => _damage;
         public float ShotInterval => _shotInterval;
         public TurretLaserTracer LaserTracerPrefab => _laserTracerPrefab;
+        public AudioClip ShotClip => _shotClip;
 
         public event Action<DamageInfo> Damaged;
         public event Action<DamageInfo> Died;
@@ -110,7 +113,9 @@ namespace PlatformerUltra.FactoryDefense
             float turnSpeed = 90f,
             float firingTolerance = 5f,
             float targetRefreshInterval = 0.2f,
-            TurretLaserTracer laserTracerPrefab = null)
+            TurretLaserTracer laserTracerPrefab = null,
+            AudioSource shotAudioSource = null,
+            AudioClip shotClip = null)
         {
             _health = health;
             _factionMember = factionMember;
@@ -120,6 +125,8 @@ namespace PlatformerUltra.FactoryDefense
             _muzzle = muzzle;
             _muzzleFlash = muzzleFlash;
             _laserTracerPrefab = laserTracerPrefab;
+            _shotAudioSource = shotAudioSource;
+            _shotClip = shotClip;
             _lineOfSightMask = lineOfSightMask;
             _maximumHealth = Mathf.Max(1, maximumHealth);
             _range = Mathf.Max(1f, range);
@@ -326,6 +333,10 @@ namespace PlatformerUltra.FactoryDefense
             }
 
             SpawnLaserTracer(hitPoint);
+            if (_shotAudioSource != null && _shotClip != null && _shotAudioSource.isActiveAndEnabled)
+            {
+                _shotAudioSource.PlayOneShot(_shotClip);
+            }
 
             Fired?.Invoke(this, enemy);
         }

@@ -11,6 +11,12 @@ namespace PlatformerUltra.Gameplay
         [SerializeField] private FactoryObjectiveTerminal _smelterTerminal;
         [SerializeField] private FactoryObjectiveTerminal _assemblerTerminal;
 
+        [Header("Presentation")]
+        [SerializeField] private FactoryMachinePresentation _minePresentation;
+        [SerializeField] private FactoryMachinePresentation _smelterPresentation;
+        [SerializeField] private FactoryMachinePresentation _generatorPresentation;
+        [SerializeField] private FactoryMachinePresentation _assemblerPresentation;
+
         [Header("Connections")]
         [SerializeField] private FactoryConveyorConnection _mineToSmelter;
         [SerializeField] private FactoryConveyorConnection _smelterToAssembler;
@@ -66,6 +72,11 @@ namespace PlatformerUltra.Gameplay
             AdvanceProduction(Time.deltaTime);
         }
 
+        private void OnDisable()
+        {
+            SetPresentationWorkloads(0f, 0f, 0f);
+        }
+
         public void Configure(
             FactoryObjectiveTerminal mineTerminal,
             FactoryObjectiveTerminal smelterTerminal,
@@ -110,13 +121,28 @@ namespace PlatformerUltra.Gameplay
             _oreInTransit = false;
             _ingotInTransit = false;
             _portalComponentInTransit = false;
+            UpdatePresentationWorkloads();
             ProductionChanged?.Invoke();
+        }
+
+        public void BindPresentation(
+            FactoryMachinePresentation mine,
+            FactoryMachinePresentation smelter,
+            FactoryMachinePresentation generator,
+            FactoryMachinePresentation assembler)
+        {
+            _minePresentation = mine;
+            _smelterPresentation = smelter;
+            _generatorPresentation = generator;
+            _assemblerPresentation = assembler;
+            UpdatePresentationWorkloads();
         }
 
         public void AdvanceProduction(float deltaTime)
         {
             if (HasCompletedPortalRequirement())
             {
+                SetPresentationWorkloads(0f, 0f, 0f);
                 return;
             }
 
@@ -124,6 +150,7 @@ namespace PlatformerUltra.Gameplay
             AdvanceMine(step);
             AdvanceSmelter(step);
             AdvanceAssembler(step);
+            UpdatePresentationWorkloads();
         }
 
         private void AdvanceMine(float deltaTime)
@@ -142,6 +169,7 @@ namespace PlatformerUltra.Gameplay
 
             _mineTimer = 0f;
             _oreInTransit = true;
+            _minePresentation?.PlayOutputFeedback();
             SpawnCargo(FactoryCargoKind.Ore, _oreCargoPrefab, _mineToSmelter);
         }
 
@@ -184,6 +212,7 @@ namespace PlatformerUltra.Gameplay
             _assemblerTimer = 0f;
             _storedIngots--;
             _portalComponentInTransit = true;
+            _assemblerPresentation?.PlayOutputFeedback();
             SpawnCargo(
                 FactoryCargoKind.PortalComponent,
                 _portalComponentCargoPrefab,
@@ -244,6 +273,53 @@ namespace PlatformerUltra.Gameplay
         {
             return _portalReceiver != null &&
                    _portalReceiver.DeliveredCount >= _portalReceiver.RequiredCount;
+        }
+
+        private void UpdatePresentationWorkloads()
+        {
+            float mine = ResolveWorkload(
+                !_oreInTransit &&
+                _storedOre < _maximumStoredItems &&
+                _mineToSmelter != null &&
+                _mineToSmelter.IsOperational,
+                _mineTimer,
+                _mineProductionSeconds);
+            float smelter = ResolveWorkload(
+                _storedOre > 0 &&
+                _storedIngots < _maximumStoredItems &&
+                !_ingotInTransit &&
+                _smelterToAssembler != null &&
+                _smelterToAssembler.IsOperational,
+                _smelterTimer,
+                _smeltingSeconds);
+            float assembler = ResolveWorkload(
+                _storedIngots > 0 &&
+                !_portalComponentInTransit &&
+                _assemblerToPortal != null &&
+                _assemblerToPortal.IsOperational &&
+                !HasCompletedPortalRequirement(),
+                _assemblerTimer,
+                _assemblySeconds);
+            SetPresentationWorkloads(mine, smelter, assembler);
+        }
+
+        private void SetPresentationWorkloads(float mine, float smelter, float assembler)
+        {
+            _minePresentation?.SetWorkload(mine);
+            _smelterPresentation?.SetWorkload(smelter);
+            _assemblerPresentation?.SetWorkload(assembler);
+            _generatorPresentation?.SetWorkload(Mathf.Max(mine, Mathf.Max(smelter, assembler)));
+        }
+
+        private static float ResolveWorkload(bool active, float timer, float duration)
+        {
+            if (!active)
+            {
+                return 0f;
+            }
+
+            float progress = duration > 0f ? Mathf.Clamp01(timer / duration) : 0f;
+            return Mathf.Lerp(0.45f, 1f, progress);
         }
 
         private void ResolveReceiver()

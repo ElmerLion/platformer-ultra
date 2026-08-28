@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: IAR_Pause
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: 11400000, guid: 93bb8a39e0020fd4ca46f4685cd1507a, type: 2}
-  m_ActionId: aeb1cab7-4bfc-4731-995a-b71f1a51a213
+  m_ActionId: b0c930ca-bd60-4d95-8701-ab9d48f327f5

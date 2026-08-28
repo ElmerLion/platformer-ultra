@@ -328,9 +328,8 @@ namespace PlatformerUltra.Gameplay
             Vector3 cameraForward = Vector3.ProjectOnPlane(_cameraTransform.forward, Vector3.up).normalized;
             Vector3 cameraRight = Vector3.ProjectOnPlane(_cameraTransform.right, Vector3.up).normalized;
             Vector3 desiredDirection = (cameraForward * input.y + cameraRight * input.x).normalized;
-            bool sprintHeld = _sprintAction != null && _sprintAction.action.IsPressed();
-            IsSprinting = sprintHeld && input.sqrMagnitude > 0.0001f;
-            float targetSpeed = IsSprinting ? _settings.SprintSpeed : _settings.MovementSpeed;
+            IsSprinting = input.sqrMagnitude > 0.0001f;
+            float targetSpeed = _settings.MovementSpeed;
             Vector3 targetVelocity = desiredDirection * targetSpeed * input.magnitude;
 
             float acceleration;

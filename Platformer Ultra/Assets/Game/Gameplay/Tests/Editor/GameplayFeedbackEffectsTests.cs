@@ -105,7 +105,6 @@ namespace PlatformerUltra.Gameplay.Tests
                     null,
                     null,
                     null,
-                    null,
                     player.transform);
 
                 Assert.That(controller.TryStartDash(Vector3.forward), Is.True);

@@ -7,7 +7,8 @@
     "PlatformerUltra.Enemies.Runtime",
     "PlatformerUltra.Enemies.Editor",
     "PlatformerUltra.FactoryDefense.Runtime",
-    "PlatformerUltra.Gameplay.Runtime"
+    "PlatformerUltra.Gameplay.Runtime",
+    "Unity.AI.Navigation"
   ],
   "includePlatforms": [
     "Editor"

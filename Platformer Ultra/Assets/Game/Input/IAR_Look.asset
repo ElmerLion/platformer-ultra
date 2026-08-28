@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: IAR_Look
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: 11400000, guid: 93bb8a39e0020fd4ca46f4685cd1507a, type: 2}
-  m_ActionId: fd1d0045-8846-4497-9782-0bf76e285418
+  m_ActionId: d796088e-2d74-45d8-9b82-ca9e3b9c9a3f

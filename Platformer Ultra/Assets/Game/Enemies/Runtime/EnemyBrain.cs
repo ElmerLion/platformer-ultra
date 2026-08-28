@@ -16,6 +16,7 @@ namespace PlatformerUltra.Enemies
         [SerializeField, Min(0f)] private float _attackVerticalTolerance = 2.5f;
 
         private IEnemyMotor _motor;
+        private IEnemyTraversalMotor _traversalMotor;
         private MachineTargetRegistry _machineRegistry;
         private Targetable _player;
         private IFactoryTarget _factoryTarget;
@@ -118,6 +119,12 @@ namespace PlatformerUltra.Enemies
         {
             if (_definition == null || _health == null || !_health.IsAlive || State == EnemyState.Dead)
             {
+                return;
+            }
+
+            if (_traversalMotor != null && _traversalMotor.IsTraversing)
+            {
+                State = _targetingPlayer ? EnemyState.ChasePlayer : EnemyState.MoveToMachine;
                 return;
             }
 
@@ -366,6 +373,7 @@ namespace PlatformerUltra.Enemies
         private void ResolveReferences()
         {
             _motor = _motorBehaviour as IEnemyMotor;
+            _traversalMotor = _motorBehaviour as IEnemyTraversalMotor;
         }
 
         private void SubscribeToRegistry()

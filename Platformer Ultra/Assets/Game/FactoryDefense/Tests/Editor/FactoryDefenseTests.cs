@@ -2,6 +2,7 @@ using NUnit.Framework;
 using PlatformerUltra.Combat;
 using PlatformerUltra.Enemies;
 using PlatformerUltra.Gameplay;
+using UnityEditor;
 using UnityEngine;
 
 namespace PlatformerUltra.FactoryDefense.Tests
@@ -36,6 +37,24 @@ namespace PlatformerUltra.FactoryDefense.Tests
             {
                 Object.DestroyImmediate(root);
             }
+        }
+
+        [Test]
+        public void GeneratedTurretPrefab_HasSpatialLaserShotAudio()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Game/FactoryDefense/Prefabs/PF_Factory_Turret.prefab");
+
+            Assert.That(prefab, Is.Not.Null);
+            FactoryTurret turret = prefab.GetComponent<FactoryTurret>();
+            Assert.That(turret, Is.Not.Null);
+            Assert.That(turret.ShotClip, Is.Not.Null);
+            Assert.That(AssetDatabase.GetAssetPath(turret.ShotClip),
+                Is.EqualTo("Assets/Audio/freesound_community-laser-45816.mp3"));
+            AudioSource source = prefab.GetComponentInChildren<AudioSource>(true);
+            Assert.That(source, Is.Not.Null);
+            Assert.That(source.playOnAwake, Is.False);
+            Assert.That(source.spatialBlend, Is.EqualTo(1f).Within(0.0001f));
         }
 
         [Test]

@@ -1,0 +1,180 @@
+.intro-root {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    color: rgb(231, 244, 247);
+}
+
+.boot-veil {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(2, 6, 8);
+}
+
+.boot-card {
+    width: 520px;
+    padding: 22px 28px 25px 28px;
+    background-color: rgba(5, 15, 19, 0.96);
+    border-left-width: 4px;
+    border-left-color: rgb(72, 224, 255);
+}
+
+.boot-kicker,
+.core-kicker,
+.subtitle-speaker {
+    font-size: 12px;
+    letter-spacing: 3px;
+    -unity-font-style: bold;
+    color: rgb(98, 225, 255);
+}
+
+.boot-status {
+    margin-top: 8px;
+    margin-bottom: 12px;
+    font-size: 20px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+}
+
+.boot-progress,
+.skip-progress {
+    height: 8px;
+    background-color: rgb(18, 41, 48);
+    --unity-progress-bar-background-color: rgb(18, 41, 48);
+    --unity-progress-bar-progress-color: rgb(72, 224, 255);
+}
+
+.subtitle-panel {
+    position: absolute;
+    align-self: center;
+    bottom: 72px;
+    width: 760px;
+    padding: 15px 22px 17px 22px;
+    background-color: rgba(3, 9, 12, 0.92);
+    border-bottom-width: 3px;
+    border-bottom-color: rgb(102, 224, 255);
+    display: none;
+}
+
+.subtitle-speaker {
+    margin-bottom: 6px;
+}
+
+.subtitle-text {
+    font-size: 22px;
+    -unity-font-style: bold;
+    white-space: normal;
+    -unity-text-align: middle-center;
+    color: rgb(242, 248, 249);
+}
+
+.skip-panel {
+    position: absolute;
+    right: 30px;
+    bottom: 28px;
+    width: 190px;
+    padding: 9px 13px 11px 13px;
+    background-color: rgba(3, 9, 12, 0.88);
+    display: none;
+}
+
+.skip-label {
+    margin-bottom: 6px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+    color: rgb(198, 224, 230);
+}
+
+.core-requirement {
+    position: absolute;
+    align-self: center;
+    top: 76px;
+    min-width: 300px;
+    padding: 15px 24px 18px 24px;
+    align-items: center;
+    background-color: rgba(5, 13, 18, 0.9);
+    border-top-width: 3px;
+    border-top-color: rgb(185, 92, 255);
+    display: none;
+}
+
+.core-kicker {
+    color: rgb(198, 139, 255);
+}
+
+.core-title {
+    margin-top: 4px;
+    font-size: 18px;
+    letter-spacing: 2px;
+    -unity-font-style: bold;
+}
+
+.core-count {
+    margin-top: 3px;
+    font-size: 34px;
+    -unity-font-style: bold;
+    color: rgb(102, 224, 255);
+}
+
+.letterbox {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 46px;
+    background-color: rgb(0, 0, 0);
+}
+
+.letterbox-top {
+    top: 0;
+}
+
+.letterbox-bottom {
+    bottom: 0;
+}
+
+.transition-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(0, 2, 4);
+    display: none;
+    opacity: 0;
+}
+
+.static-band {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: rgba(124, 235, 255, 0.35);
+}
+
+.static-band-a {
+    top: 37%;
+}
+
+.static-band-b {
+    top: 64%;
+}
+
+.sync-label {
+    padding: 12px 18px;
+    font-size: 14px;
+    letter-spacing: 3px;
+    -unity-font-style: bold;
+    color: rgb(104, 222, 246);
+    background-color: rgba(3, 11, 15, 0.94);
+    display: none;
+}

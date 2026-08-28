@@ -19,6 +19,7 @@ namespace PlatformerUltra.Factory.Editor
         private const string DarkMaterialPath = "Assets/Game/Factory/Conveyors/Materials/M_Conveyor_Belt.mat";
         private const string HazardMaterialPath = "Assets/Game/Factory/Materials/M_Factory_MapHazard.mat";
         private const string MuzzleMaterialPath = "Assets/Game/Factory/Materials/M_Factory_EmissiveOrange.mat";
+        private const string LaserAudioPath = "Assets/Audio/freesound_community-laser-45816.mp3";
 
         public static void BuildAll()
         {
@@ -87,6 +88,19 @@ namespace PlatformerUltra.Factory.Editor
                 GameObject muzzleObject = new GameObject("Muzzle");
                 muzzleObject.transform.SetParent(barrel, false);
                 muzzleObject.transform.localPosition = new Vector3(0f, 0f, 1.55f);
+                AudioSource shotAudioSource = muzzleObject.AddComponent<AudioSource>();
+                shotAudioSource.playOnAwake = false;
+                shotAudioSource.loop = false;
+                shotAudioSource.spatialBlend = 1f;
+                shotAudioSource.dopplerLevel = 0f;
+                shotAudioSource.minDistance = 2f;
+                shotAudioSource.maxDistance = 22f;
+                shotAudioSource.volume = 0.18f;
+                AudioClip shotClip = AssetDatabase.LoadAssetAtPath<AudioClip>(LaserAudioPath);
+                if (shotClip == null)
+                {
+                    throw new InvalidOperationException("Missing turret laser sound at " + LaserAudioPath + ".");
+                }
 
                 GameObject targetPointObject = new GameObject("Target Point");
                 targetPointObject.transform.SetParent(root.transform, false);
@@ -119,7 +133,9 @@ namespace PlatformerUltra.Factory.Editor
                     90f,
                     5f,
                     0.2f,
-                    laserTracerPrefab);
+                    laserTracerPrefab,
+                    shotAudioSource,
+                    shotClip);
                 PrefabUtility.SaveAsPrefabAsset(root, TurretPrefabPath);
             }
             finally

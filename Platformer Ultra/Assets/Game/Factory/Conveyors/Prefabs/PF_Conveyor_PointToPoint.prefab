@@ -871,6 +871,7 @@ MonoBehaviour:
   _startEndpoint: {fileID: 2771228578778565359}
   _endEndpoint: {fileID: 596394594070565076}
   _autoRebuild: 1
+  _generatedGeometryEnabled: 1
   _operatingState: 1
   _speed: 2.5
   _reverseDirection: 0

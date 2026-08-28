@@ -78,13 +78,13 @@ namespace PlatformerUltra.Enemies.Tests.PlayMode
             Assert.That(machineRegistry.Machines, Has.Count.EqualTo(4));
             Assert.That(NavMesh.CalculateTriangulation().vertices, Is.Not.Empty, "The factory NavMesh was not loaded.");
 
-            AssertCompleteGroundRoutes(lowerDoorSpawnPoints, machineRegistry.Machines);
-
             FactoryObjectiveTerminal[] terminals = Object.FindObjectsByType<FactoryObjectiveTerminal>(
                 FindObjectsInactive.Include,
                 FindObjectsSortMode.None);
             ActivateProgressionInOrder(terminals);
-            yield return null;
+            yield return WaitForAllAccessRoutes();
+
+            AssertCompleteGroundRoutes(lowerDoorSpawnPoints, machineRegistry.Machines);
 
             Assert.That(machineRegistry.HasOperationalMachines, Is.True);
             Assert.That(managers[0].SpawningUnlocked, Is.True);
@@ -121,6 +121,32 @@ namespace PlatformerUltra.Enemies.Tests.PlayMode
             }
 
             yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator SaboteurAndArmored_TraverseEveryDeployedAccessRouteContinuously()
+        {
+            PrepareCombatScenario(
+                out EnemySpawnManager manager,
+                out PlayerHealth player,
+                out IReadOnlyList<FactoryMachineHealth> machines);
+            yield return WaitForAllAccessRoutes();
+
+            FactoryMachineHealth assembler = GetMachine(machines, "Assembler");
+            yield return TraverseGroundEnemyToAssembler(
+                manager,
+                assembler,
+                EnemyArchetype.Saboteur,
+                3000f,
+                0.1f);
+            yield return TraverseGroundEnemyToAssembler(
+                manager,
+                assembler,
+                EnemyArchetype.Armored,
+                4000f,
+                0.99f);
+
+            player.Targetable.SetTargetable(true);
         }
 
         [UnityTest]
@@ -236,6 +262,7 @@ namespace PlatformerUltra.Enemies.Tests.PlayMode
                 out EnemySpawnManager manager,
                 out PlayerHealth player,
                 out IReadOnlyList<FactoryMachineHealth> machines);
+            yield return WaitForAllAccessRoutes();
 
             EnemyHealth saboteur = SpawnEnemy(
                 manager,
@@ -339,6 +366,70 @@ namespace PlatformerUltra.Enemies.Tests.PlayMode
                     Assert.That(path.status, Is.EqualTo(NavMeshPathStatus.PathComplete), RouteMessage(spawnPoint, machine));
                 }
             }
+        }
+
+        private static IEnumerator WaitForAllAccessRoutes()
+        {
+            EnemyAccessRoute[] routes = Object.FindObjectsByType<EnemyAccessRoute>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            Assert.That(routes, Has.Length.EqualTo(3));
+            float deadline = Time.realtimeSinceStartup + 3f;
+            while (routes.Any(route => !route.IsDeployed) && Time.realtimeSinceStartup < deadline)
+            {
+                yield return null;
+            }
+
+            Assert.That(routes.All(route => route.IsDeployed), Is.True,
+                "Every activated machine route must finish deploying before navigation begins.");
+        }
+
+        private static IEnumerator TraverseGroundEnemyToAssembler(
+            EnemySpawnManager manager,
+            FactoryMachineHealth assembler,
+            EnemyArchetype archetype,
+            float timestamp,
+            float weightSample)
+        {
+            EnemyHealth enemy = SpawnEnemy(manager, timestamp, 0f, weightSample, archetype);
+            EnemyBrain brain = enemy.GetComponent<EnemyBrain>();
+            NavMeshEnemyMotor motor = enemy.GetComponent<NavMeshEnemyMotor>();
+            ProceduralEnemyAnimator proceduralAnimator = enemy.GetComponentInChildren<ProceduralEnemyAnimator>();
+            Assert.That(brain, Is.Not.Null);
+            Assert.That(motor, Is.Not.Null);
+            Assert.That(proceduralAnimator, Is.Not.Null);
+            Assert.That(motor.IsReady, Is.True);
+
+            brain.ForceMachineTargetForTests(assembler);
+            int startingHealth = assembler.CurrentHealth;
+            Vector3 previousPosition = enemy.transform.position;
+            bool observedLadder = false;
+            bool observedJump = false;
+            float maximumStep = 0f;
+            float maximumHeight = previousPosition.y;
+            float deadline = Time.realtimeSinceStartup + 60f;
+
+            while (assembler.CurrentHealth == startingHealth && Time.realtimeSinceStartup < deadline)
+            {
+                Vector3 currentPosition = enemy.transform.position;
+                maximumStep = Mathf.Max(maximumStep, Vector3.Distance(previousPosition, currentPosition));
+                maximumHeight = Mathf.Max(maximumHeight, currentPosition.y);
+                observedLadder |= motor.ActiveTraversalKind == EnemyTraversalKind.Ladder;
+                observedJump |= motor.ActiveTraversalKind == EnemyTraversalKind.Jump;
+                previousPosition = currentPosition;
+                yield return null;
+            }
+
+            Assert.That(observedLadder, Is.True, archetype + " never entered a ladder traversal.");
+            Assert.That(observedJump, Is.True, archetype + " never entered a jump traversal.");
+            Assert.That(maximumHeight, Is.GreaterThan(12f), archetype + " never reached the Assembler deck.");
+            Assert.That(maximumStep, Is.LessThan(2f),
+                archetype + " moved too far in one frame, indicating a traversal teleport.");
+            Assert.That(assembler.CurrentHealth, Is.LessThan(startingHealth),
+                archetype + " did not traverse the full route and attack the Assembler within 60 seconds.");
+
+            Object.Destroy(enemy.gameObject);
+            yield return null;
         }
 
         private static void ActivateProgressionInOrder(IReadOnlyList<FactoryObjectiveTerminal> terminals)

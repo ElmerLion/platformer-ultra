@@ -888,7 +888,7 @@ namespace PlatformerUltra.Enemies.Editor
             agent.stoppingDistance = Mathf.Max(0.1f, definition.MachineAttackRange * 0.8f);
             agent.autoBraking = true;
             agent.autoRepath = true;
-            agent.autoTraverseOffMeshLink = true;
+            agent.autoTraverseOffMeshLink = false;
             agent.updatePosition = true;
             agent.updateRotation = false;
             agent.updateUpAxis = true;

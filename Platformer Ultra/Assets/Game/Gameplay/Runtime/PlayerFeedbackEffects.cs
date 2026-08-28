@@ -17,10 +17,8 @@ namespace PlatformerUltra.Gameplay
         [Header("Audio")]
         [SerializeField] private AudioClip _playerHitClip;
         [SerializeField] private AudioClip _repairLoopClip;
-        [SerializeField] private AudioClip _dashClip;
         [SerializeField, Range(0f, 1f)] private float _hitVolume = 0.8f;
         [SerializeField, Range(0f, 1f)] private float _repairVolume = 0.32f;
-        [SerializeField, Range(0f, 1f)] private float _dashVolume = 0.48f;
 
         [Header("Visual Effects")]
         [SerializeField] private GameObject _jumpEffectPrefab;
@@ -65,7 +63,6 @@ namespace PlatformerUltra.Gameplay
             AudioSource repairLoopSource,
             AudioClip playerHitClip,
             AudioClip repairLoopClip,
-            AudioClip dashClip,
             GameObject jumpEffectPrefab,
             GameObject doubleJumpEffectPrefab,
             GameObject dashEffectPrefab,
@@ -82,7 +79,6 @@ namespace PlatformerUltra.Gameplay
             _repairLoopSource = repairLoopSource;
             _playerHitClip = playerHitClip;
             _repairLoopClip = repairLoopClip;
-            _dashClip = dashClip;
             _jumpEffectPrefab = jumpEffectPrefab;
             _doubleJumpEffectPrefab = doubleJumpEffectPrefab;
             _dashEffectPrefab = dashEffectPrefab;
@@ -99,7 +95,6 @@ namespace PlatformerUltra.Gameplay
         private void HandleDashed(Vector3 direction, bool airborne)
         {
             DashFeedbackCount++;
-            PlayOneShot(_dashClip, _dashVolume, 1.08f, 1.18f);
             Quaternion rotation = direction.sqrMagnitude > 0.0001f
                 ? Quaternion.LookRotation(direction.normalized, Vector3.up)
                 : transform.rotation;

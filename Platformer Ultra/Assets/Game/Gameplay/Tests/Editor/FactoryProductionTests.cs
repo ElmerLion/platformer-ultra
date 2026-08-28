@@ -115,6 +115,69 @@ namespace PlatformerUltra.Gameplay.Tests
             }
         }
 
+        [Test]
+        public void ProductionLine_DrivesMineAndGeneratorWorkloadWhileMineTimerAdvances()
+        {
+            GameObject root = new GameObject("Production Presentation Test");
+            GameObject mineTerminalObject = new GameObject("Mine Terminal");
+            GameObject smelterTerminalObject = new GameObject("Smelter Terminal");
+            GameObject assemblerTerminalObject = new GameObject("Assembler Terminal");
+            try
+            {
+                FactoryObjectiveTerminal mine = CreateActiveTerminal(mineTerminalObject, "Mine");
+                FactoryObjectiveTerminal smelter = CreateActiveTerminal(smelterTerminalObject, "Smelter");
+                FactoryObjectiveTerminal assembler = CreateActiveTerminal(assemblerTerminalObject, "Assembler");
+                FactoryConveyorConnection mineToSmelter = CreateBuiltConnection(root.transform, mine, smelter);
+                FactoryConveyorConnection smelterToAssembler = CreateBuiltConnection(root.transform, smelter, assembler);
+                FactoryConveyorConnection assemblerToPortal = CreateBuiltConnection(root.transform, assembler, null);
+
+                FactoryMachinePresentation minePresentation = new GameObject("Mine Presentation").AddComponent<FactoryMachinePresentation>();
+                FactoryMachinePresentation smelterPresentation = new GameObject("Smelter Presentation").AddComponent<FactoryMachinePresentation>();
+                FactoryMachinePresentation generatorPresentation = new GameObject("Generator Presentation").AddComponent<FactoryMachinePresentation>();
+                FactoryMachinePresentation assemblerPresentation = new GameObject("Assembler Presentation").AddComponent<FactoryMachinePresentation>();
+                minePresentation.transform.SetParent(root.transform, false);
+                smelterPresentation.transform.SetParent(root.transform, false);
+                generatorPresentation.transform.SetParent(root.transform, false);
+                assemblerPresentation.transform.SetParent(root.transform, false);
+
+                FactoryProductionLine productionLine = root.AddComponent<FactoryProductionLine>();
+                productionLine.Configure(
+                    mine,
+                    smelter,
+                    assembler,
+                    mineToSmelter,
+                    smelterToAssembler,
+                    assemblerToPortal,
+                    null,
+                    null,
+                    null,
+                    root.transform,
+                    null,
+                    1f,
+                    1f,
+                    1f);
+                productionLine.BindPresentation(
+                    minePresentation,
+                    smelterPresentation,
+                    generatorPresentation,
+                    assemblerPresentation);
+
+                productionLine.AdvanceProduction(0.25f);
+
+                Assert.That(minePresentation.Workload, Is.GreaterThan(0.45f));
+                Assert.That(generatorPresentation.Workload, Is.EqualTo(minePresentation.Workload).Within(0.001f));
+                Assert.That(smelterPresentation.Workload, Is.Zero);
+                Assert.That(assemblerPresentation.Workload, Is.Zero);
+            }
+            finally
+            {
+                Object.DestroyImmediate(assemblerTerminalObject);
+                Object.DestroyImmediate(smelterTerminalObject);
+                Object.DestroyImmediate(mineTerminalObject);
+                Object.DestroyImmediate(root);
+            }
+        }
+
         private static FactoryObjectiveTerminal CreateActiveTerminal(GameObject target, string name)
         {
             FactoryObjectiveTerminal terminal = target.AddComponent<FactoryObjectiveTerminal>();

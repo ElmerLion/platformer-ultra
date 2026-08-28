@@ -19,6 +19,7 @@ namespace PlatformerUltra.Gameplay
         private bool _presenterBound;
 
         public bool IsPaused { get; private set; }
+        public bool PauseAllowed { get; private set; } = true;
 
         private void OnEnable()
         {
@@ -68,6 +69,11 @@ namespace PlatformerUltra.Gameplay
 
         public bool TogglePause()
         {
+            if (!PauseAllowed)
+            {
+                return false;
+            }
+
             if (IsPaused)
             {
                 ResumeGame();
@@ -82,6 +88,11 @@ namespace PlatformerUltra.Gameplay
 
             PauseGame();
             return true;
+        }
+
+        public void SetPauseAllowed(bool allowed)
+        {
+            PauseAllowed = allowed;
         }
 
         public void PauseGame()
@@ -149,15 +160,7 @@ namespace PlatformerUltra.Gameplay
                 return;
             }
 
-            Scene activeScene = SceneManager.GetActiveScene();
-            if (!string.IsNullOrWhiteSpace(activeScene.path))
-            {
-                SceneManager.LoadSceneAsync(activeScene.path, LoadSceneMode.Single);
-            }
-            else if (activeScene.buildIndex >= 0)
-            {
-                SceneManager.LoadSceneAsync(activeScene.buildIndex, LoadSceneMode.Single);
-            }
+            FactoryRunSceneLoader.LoadNewRun();
         }
 
         private void RestoreGlobalState()

@@ -6,7 +6,8 @@
     "PlatformerUltra.Gameplay.Runtime",
     "PlatformerUltra.Combat.Runtime",
     "PlatformerUltra.Conveyors.Runtime",
-    "Unity.InputSystem"
+    "Unity.InputSystem",
+    "Unity.Timeline"
   ],
   "includePlatforms": [
     "Editor"

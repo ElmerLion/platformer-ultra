@@ -4,6 +4,7 @@
   "references": [
     "PlatformerUltra.Combat.Runtime",
     "PlatformerUltra.Conveyors.Runtime",
+    "PlatformerUltra.Audio.Runtime",
     "Unity.InputSystem"
   ],
   "includePlatforms": [],

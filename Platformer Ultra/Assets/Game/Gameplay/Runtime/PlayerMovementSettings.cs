@@ -6,7 +6,7 @@ namespace PlatformerUltra.Gameplay
     public sealed class PlayerMovementSettings : ScriptableObject
     {
         [Header("Horizontal Movement")]
-        [SerializeField, Min(0f)] private float _movementSpeed = 1.55f;
+        [SerializeField, Min(0f)] private float _movementSpeed = 3.525f;
         [SerializeField, Min(0f)] private float _sprintSpeed = 3.525f;
         [SerializeField, Min(0f)] private float _groundAcceleration = 18f;
         [SerializeField, Min(0f)] private float _groundDeceleration = 24f;

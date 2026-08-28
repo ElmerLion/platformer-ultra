@@ -201,7 +201,7 @@ NavMeshAgent:
   avoidancePriority: 40
   m_AngularSpeed: 360
   m_StoppingDistance: 2.72
-  m_AutoTraverseOffMeshLink: 1
+  m_AutoTraverseOffMeshLink: 0
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 4.2
@@ -462,23 +462,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4225924045145374407, guid: b6ee6a7964ae370458847c9751611d58, type: 3}
       propertyPath: _brain
-      value:
+      value: 
       objectReference: {fileID: 8901213467926839325}
     - target: {fileID: 4225924045145374407, guid: b6ee6a7964ae370458847c9751611d58, type: 3}
       propertyPath: _health
-      value:
+      value: 
       objectReference: {fileID: 7537446182239622732}
     - target: {fileID: 4225924045145374407, guid: b6ee6a7964ae370458847c9751611d58, type: 3}
       propertyPath: _definition
-      value:
+      value: 
       objectReference: {fileID: 11400000, guid: c351fcb7f462f3d419b584769e1dc714, type: 2}
     - target: {fileID: 4225924045145374407, guid: b6ee6a7964ae370458847c9751611d58, type: 3}
       propertyPath: _motorBehaviour
-      value:
+      value: 
       objectReference: {fileID: 3258788893876651645}
     - target: {fileID: 4225924045145374407, guid: b6ee6a7964ae370458847c9751611d58, type: 3}
       propertyPath: _attackController
-      value:
+      value: 
       objectReference: {fileID: 3641392186395870413}
     - target: {fileID: 4282760708922598771, guid: b6ee6a7964ae370458847c9751611d58, type: 3}
       propertyPath: m_Layer
