@@ -266,10 +266,11 @@ MonoBehaviour:
   _yawPivot: {fileID: 1237587437486387439}
   _muzzle: {fileID: 4217694261790661088}
   _muzzleFlash: {fileID: 4194798224642995559}
+  _laserTracerPrefab: {fileID: 360364605051816070, guid: 980e9b89523416f49b6197fd3d39f30c, type: 3}
   _enemyRegistry: {fileID: 0}
   _factoryRegistry: {fileID: 0}
   _maximumHealth: 80
-  _range: 12
+  _range: 15
   _damage: 10
   _shotInterval: 1.2
   _turnSpeed: 90

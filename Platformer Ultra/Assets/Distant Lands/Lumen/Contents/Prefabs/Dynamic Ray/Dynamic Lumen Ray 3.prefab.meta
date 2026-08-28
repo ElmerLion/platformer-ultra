@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 7c43213a561ccda42a2741427f60ef24
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Contents/Prefabs/Dynamic Ray/Dynamic Lumen
+    Ray 3.prefab
+  uploadId: 678378

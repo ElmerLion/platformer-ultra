@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bef47acb6d1856e4b9178982a3cf59bc
+timeCreated: 1444382442
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Scenes/Demo Assets/Fonts/RobotoLicense.txt
+  uploadId: 678378

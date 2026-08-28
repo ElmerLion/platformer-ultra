@@ -92,6 +92,8 @@ namespace PlatformerUltra.Gameplay
         private void HandleRetryRequested()
         {
             RetryRequested?.Invoke();
+            Time.timeScale = 1f;
+            AudioListener.pause = false;
             if (!Application.isPlaying)
             {
                 return;

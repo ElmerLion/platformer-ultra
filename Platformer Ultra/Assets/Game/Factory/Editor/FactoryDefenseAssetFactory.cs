@@ -11,6 +11,7 @@ namespace PlatformerUltra.Factory.Editor
     {
         public const string TurretPrefabPath = "Assets/Game/FactoryDefense/Prefabs/PF_Factory_Turret.prefab";
         public const string BuildSpotPrefabPath = "Assets/Game/FactoryDefense/Prefabs/PF_Factory_TurretBuildSpot.prefab";
+        public const string LaserTracerPrefabPath = "Assets/Game/FactoryDefense/Prefabs/PF_Factory_TurretLaser.prefab";
 
         private const string SyntyTurretPath =
             "Assets/Synty/PolygonSciFiSpace/Prefabs/Props/SM_Prop_Turret_Base_Single_01.prefab";
@@ -23,11 +24,40 @@ namespace PlatformerUltra.Factory.Editor
         {
             EnsureFolder("Assets/Game/FactoryDefense");
             EnsureFolder("Assets/Game/FactoryDefense/Prefabs");
-            BuildTurretPrefab();
+            TurretLaserTracer laserTracerPrefab = BuildLaserTracerPrefab();
+            BuildTurretPrefab(laserTracerPrefab);
             BuildSpotPrefab();
         }
 
-        private static void BuildTurretPrefab()
+        private static TurretLaserTracer BuildLaserTracerPrefab()
+        {
+            GameObject root = new GameObject("PF_Factory_TurretLaser");
+            try
+            {
+                LineRenderer lineRenderer = root.AddComponent<LineRenderer>();
+                lineRenderer.sharedMaterial = LoadMaterial(MuzzleMaterialPath);
+                lineRenderer.useWorldSpace = true;
+                lineRenderer.positionCount = 2;
+                lineRenderer.numCapVertices = 3;
+                lineRenderer.startColor = new Color(1f, 0.72f, 0.16f, 1f);
+                lineRenderer.endColor = new Color(1f, 0.18f, 0.02f, 0.78f);
+                TurretLaserTracer tracer = root.AddComponent<TurretLaserTracer>();
+                tracer.Configure(lineRenderer, 0.12f, 0.075f, 0.02f);
+                GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, LaserTracerPrefabPath);
+                if (prefab == null)
+                {
+                    throw new InvalidOperationException("Could not save turret laser prefab.");
+                }
+
+                return prefab.GetComponent<TurretLaserTracer>();
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+            }
+        }
+
+        private static void BuildTurretPrefab(TurretLaserTracer laserTracerPrefab)
         {
             GameObject source = AssetDatabase.LoadAssetAtPath<GameObject>(SyntyTurretPath);
             if (source == null)
@@ -83,12 +113,13 @@ namespace PlatformerUltra.Factory.Editor
                     muzzleFlash,
                     ~0,
                     80,
-                    12f,
+                    15f,
                     10,
                     1.2f,
                     90f,
                     5f,
-                    0.2f);
+                    0.2f,
+                    laserTracerPrefab);
                 PrefabUtility.SaveAsPrefabAsset(root, TurretPrefabPath);
             }
             finally

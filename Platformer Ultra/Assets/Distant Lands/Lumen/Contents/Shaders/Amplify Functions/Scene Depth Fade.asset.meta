@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b80e7cce07f3ff241b5ed9e75228c4d5
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Contents/Shaders/Amplify Functions/Scene
+    Depth Fade.asset
+  uploadId: 678378

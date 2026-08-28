@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionAsset
   m_ActionMaps:
   - m_Name: Gameplay
-    m_Id: 5c1cb3cc-ff7e-4387-a860-c62fbd4fa291
+    m_Id: 779612d0-2ee1-474a-8d75-bb079f3d156c
     m_Asset: {fileID: 11400000}
     m_Actions:
     - m_Name: Move
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: cfe34448-9ff5-4892-bf59-6cae960c077b
+      m_Id: 9675d242-f243-48bb-9f21-51fafd5d5ddd
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -28,7 +28,7 @@ MonoBehaviour:
     - m_Name: Look
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: a7707cb0-8e01-4cb5-bca8-a6d7774fde6d
+      m_Id: fd1d0045-8846-4497-9782-0bf76e285418
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -36,7 +36,7 @@ MonoBehaviour:
     - m_Name: Jump
       m_Type: 1
       m_ExpectedControlType: 
-      m_Id: 5465991a-a838-4b26-a0da-2364c961eacd
+      m_Id: 28421b54-36c8-40ae-9a7f-38316a1a3cba
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -44,7 +44,7 @@ MonoBehaviour:
     - m_Name: Sprint
       m_Type: 1
       m_ExpectedControlType: 
-      m_Id: 0e1253db-e66f-4449-bc95-74e2ff57353a
+      m_Id: e960fc9a-b933-48df-8acd-7812590edadf
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -52,14 +52,22 @@ MonoBehaviour:
     - m_Name: Interact
       m_Type: 1
       m_ExpectedControlType: 
-      m_Id: 415e9eda-e811-4200-b2a8-da68dcc3397e
+      m_Id: 3c4004f6-f3d0-4bb7-a608-4bb1e43e7701
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    - m_Name: Pause
+      m_Type: 1
+      m_ExpectedControlType: 
+      m_Id: aeb1cab7-4bfc-4731-995a-b71f1a51a213
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Bindings:
     - m_Name: 2DVector
-      m_Id: 01e2ceed-c92f-4148-a5fd-8ff4f2195ac1
+      m_Id: d6b30632-1007-43d3-9abd-931e17b2ba63
       m_Path: 2DVector
       m_Interactions: 
       m_Processors: 
@@ -67,7 +75,7 @@ MonoBehaviour:
       m_Action: Move
       m_Flags: 4
     - m_Name: Up
-      m_Id: ec62d174-03eb-449b-9dd2-b9a29fc58932
+      m_Id: a5b1f2dd-d503-40de-94f3-f2821c203cc7
       m_Path: <Keyboard>/w
       m_Interactions: 
       m_Processors: 
@@ -75,7 +83,7 @@ MonoBehaviour:
       m_Action: Move
       m_Flags: 8
     - m_Name: Down
-      m_Id: 8d93cf66-acae-4de0-9df0-0e75966aa71c
+      m_Id: cc36bbf5-40d2-4a78-9141-02379901f902
       m_Path: <Keyboard>/s
       m_Interactions: 
       m_Processors: 
@@ -83,7 +91,7 @@ MonoBehaviour:
       m_Action: Move
       m_Flags: 8
     - m_Name: Left
-      m_Id: 4fb6b37d-beac-4e07-a99c-1842dc70a1d5
+      m_Id: c9515a44-e94a-411b-8efd-fde5c0716c80
       m_Path: <Keyboard>/a
       m_Interactions: 
       m_Processors: 
@@ -91,7 +99,7 @@ MonoBehaviour:
       m_Action: Move
       m_Flags: 8
     - m_Name: Right
-      m_Id: 18d96564-7553-45b0-8da8-1ea8e1b13aa0
+      m_Id: 4a00ea8a-b93a-4bd4-b502-3c314eb39e06
       m_Path: <Keyboard>/d
       m_Interactions: 
       m_Processors: 
@@ -99,7 +107,7 @@ MonoBehaviour:
       m_Action: Move
       m_Flags: 8
     - m_Name: 
-      m_Id: 1e8ebf34-c691-47a1-935f-abc284396fd6
+      m_Id: 8ce33f07-7c8c-4e9b-a03c-afea1d6b887b
       m_Path: <Gamepad>/leftStick
       m_Interactions: 
       m_Processors: 
@@ -107,7 +115,7 @@ MonoBehaviour:
       m_Action: Move
       m_Flags: 0
     - m_Name: 
-      m_Id: 793aca8f-19de-4f60-beeb-c5f8c46c1adb
+      m_Id: 45d4264c-8da7-4d65-8fce-e3d8b4ccc185
       m_Path: <Mouse>/delta
       m_Interactions: 
       m_Processors: 
@@ -115,7 +123,7 @@ MonoBehaviour:
       m_Action: Look
       m_Flags: 0
     - m_Name: 
-      m_Id: 12899b68-3054-45f2-868b-d683c09cf98e
+      m_Id: 06992840-a615-4f7f-a5be-79e590ec27e2
       m_Path: <Gamepad>/rightStick
       m_Interactions: 
       m_Processors: 
@@ -123,7 +131,7 @@ MonoBehaviour:
       m_Action: Look
       m_Flags: 0
     - m_Name: 
-      m_Id: 99bfad40-8bf8-46d7-8cbf-8f44892d874a
+      m_Id: faeb8a9b-f2b9-4996-8028-13d575edd115
       m_Path: <Keyboard>/space
       m_Interactions: 
       m_Processors: 
@@ -131,7 +139,7 @@ MonoBehaviour:
       m_Action: Jump
       m_Flags: 0
     - m_Name: 
-      m_Id: 96ec0fc4-ff49-4b44-b926-5bea0e1c8b1a
+      m_Id: 5039beba-5dd4-40d5-9fd5-0f75b975be6e
       m_Path: <Gamepad>/buttonSouth
       m_Interactions: 
       m_Processors: 
@@ -139,7 +147,7 @@ MonoBehaviour:
       m_Action: Jump
       m_Flags: 0
     - m_Name: 
-      m_Id: 45c85a74-fba2-4f5d-a905-76f77cb803b8
+      m_Id: 784c5162-1c98-4d25-bde6-b6c180886e16
       m_Path: <Keyboard>/leftShift
       m_Interactions: 
       m_Processors: 
@@ -147,7 +155,7 @@ MonoBehaviour:
       m_Action: Sprint
       m_Flags: 0
     - m_Name: 
-      m_Id: 6b944163-752b-4c7d-ad0a-a75843fee1dc
+      m_Id: 7691792d-54a9-4dd3-ba5d-272b7e323e9a
       m_Path: <Gamepad>/leftStickPress
       m_Interactions: 
       m_Processors: 
@@ -155,7 +163,7 @@ MonoBehaviour:
       m_Action: Sprint
       m_Flags: 0
     - m_Name: 
-      m_Id: e8a2e68f-e871-4e8c-a58a-1ebf54e57045
+      m_Id: b14d315a-cadb-49a4-a17f-7ebdbb732bb5
       m_Path: <Keyboard>/e
       m_Interactions: 
       m_Processors: 
@@ -163,12 +171,28 @@ MonoBehaviour:
       m_Action: Interact
       m_Flags: 0
     - m_Name: 
-      m_Id: 77e94fc2-d326-4102-b4ca-e680edadea58
+      m_Id: bb0d5579-3fb9-433d-af6b-493a17c5589a
       m_Path: <Gamepad>/buttonWest
       m_Interactions: 
       m_Processors: 
       m_Groups: 
       m_Action: Interact
+      m_Flags: 0
+    - m_Name: 
+      m_Id: b3591f37-9544-43ee-a5a5-4c1475601a37
+      m_Path: <Keyboard>/escape
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Pause
+      m_Flags: 0
+    - m_Name: 
+      m_Id: 2ddb5dfd-2d75-4795-91b5-ed0408344631
+      m_Path: <Gamepad>/start
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Pause
       m_Flags: 0
   m_ControlSchemes: []
   m_IsProjectWide: 0

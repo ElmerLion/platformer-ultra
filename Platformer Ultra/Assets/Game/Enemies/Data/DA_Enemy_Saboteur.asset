@@ -48,4 +48,4 @@ MonoBehaviour:
   _specialMachineDamage: 0
   _specialDuration: 1
   _leapHeight: 0
-  _deathRemovalDelay: 1.5
+  _deathRemovalDelay: 3.366667

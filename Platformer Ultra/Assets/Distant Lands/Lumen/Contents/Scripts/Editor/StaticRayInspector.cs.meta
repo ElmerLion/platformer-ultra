@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: faa4dc03d6e707c4189260d7c9b28222
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Contents/Scripts/Editor/StaticRayInspector.cs
+  uploadId: 678378

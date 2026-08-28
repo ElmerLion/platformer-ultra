@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 944c859ff9ec2d64fb37ad02d0e739e9
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Contents/Data/Dynamic Rays/Dynamic Ray 8.asset
+  uploadId: 678378

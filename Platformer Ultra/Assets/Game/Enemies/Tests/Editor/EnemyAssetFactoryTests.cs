@@ -20,8 +20,10 @@ namespace PlatformerUltra.Enemies.Tests
         private const string WalkingAnimationPath = "Assets/Animations/Paladin J Nordstrom@Walking.fbx";
         private const string RunningAnimationPath = "Assets/Animations/Paladin J Nordstrom@Standard Run.fbx";
         private const string ZombieAttackAnimationPath = "Assets/Animations/Paladin J Nordstrom@Zombie Attack.fbx";
+        private const string ZombieDeathAnimationPath = "Assets/Animations/Paladin J Nordstrom@Zombie Death.fbx";
         private const string MutantSwipeAnimationPath = "Assets/Animations/Paladin J Nordstrom@Mutant Swiping.fbx";
         private const string MutantJumpAttackAnimationPath = "Assets/Animations/Paladin J Nordstrom@Mutant Jump Attack.fbx";
+        private const string DyingAnimationPath = "Assets/Animations/Paladin J Nordstrom@Dying.fbx";
 
         [OneTimeSetUp]
         public void RebuildGeneratedAssetsBeforeValidation()
@@ -89,6 +91,7 @@ namespace PlatformerUltra.Enemies.Tests
                 Assert.That(animator.applyRootMotion, Is.False);
                 Assert.That(visual.GetComponent<EnemyAnimatorDriver>(), Is.Not.Null);
                 Assert.That(visual.GetComponent<EnemyAnimationEventRelay>(), Is.Not.Null);
+                AssertRequiredReference(prefab.GetComponent<EnemyHealth>(), "_animatorDriver");
             }
 
             if (archetype == EnemyArchetype.Armored)
@@ -123,8 +126,10 @@ namespace PlatformerUltra.Enemies.Tests
             EnemyDefinition saboteur = AssetDatabase.LoadAssetAtPath<EnemyDefinition>(EnemyAssetFactory.SaboteurDefinitionPath);
             EnemyDefinition armored = AssetDatabase.LoadAssetAtPath<EnemyDefinition>(EnemyAssetFactory.ArmoredDefinitionPath);
             AnimationClip zombie = LoadAnimationClip(ZombieAttackAnimationPath);
+            AnimationClip zombieDeath = LoadAnimationClip(ZombieDeathAnimationPath);
             AnimationClip swipe = LoadAnimationClip(MutantSwipeAnimationPath);
             AnimationClip jump = LoadAnimationClip(MutantJumpAttackAnimationPath);
+            AnimationClip dying = LoadAnimationClip(DyingAnimationPath);
 
             Assert.That(drone, Is.Not.Null);
             Assert.That(drone.MaximumHealth, Is.EqualTo(30));
@@ -142,6 +147,7 @@ namespace PlatformerUltra.Enemies.Tests
             Assert.That(saboteur.PlayerDamage, Is.EqualTo(12));
             Assert.That(saboteur.MachineDamage, Is.EqualTo(16));
             Assert.That(saboteur.AttackDuration, Is.EqualTo(zombie.length).Within(0.001f));
+            Assert.That(saboteur.DeathRemovalDelay, Is.EqualTo(zombieDeath.length + 0.4f).Within(0.001f));
 
             Assert.That(armored.MaximumHealth, Is.EqualTo(180));
             Assert.That(armored.MachineTravelSpeed, Is.EqualTo(1.8f));
@@ -159,6 +165,7 @@ namespace PlatformerUltra.Enemies.Tests
             Assert.That(armored.SpecialImpactRadius, Is.EqualTo(3f));
             Assert.That(armored.SpecialPlayerDamage, Is.EqualTo(35));
             Assert.That(armored.SpecialMachineDamage, Is.EqualTo(40));
+            Assert.That(armored.DeathRemovalDelay, Is.EqualTo(dying.length + 0.4f).Within(0.001f));
         }
 
         [Test]
@@ -172,6 +179,7 @@ namespace PlatformerUltra.Enemies.Tests
                 false,
                 nameof(EnemyAnimationEventRelay.OnAttackImpact),
                 0.46f);
+            AssertAnimationImport(ZombieDeathAnimationPath, false, null, 0f);
             AssertAnimationImport(
                 MutantSwipeAnimationPath,
                 false,
@@ -182,6 +190,7 @@ namespace PlatformerUltra.Enemies.Tests
                 false,
                 nameof(EnemyAnimationEventRelay.OnSpecialImpact),
                 0.60f);
+            AssertAnimationImport(DyingAnimationPath, false, null, 0f);
         }
 
         [Test]
@@ -192,12 +201,15 @@ namespace PlatformerUltra.Enemies.Tests
 
             AssertController(
                 saboteur,
-                new[] { "Idle", "Walk", "Run", "Zombie Attack" },
+                new[] { "Idle", "Walk", "Run", "Zombie Attack", "Zombie Death" },
                 includeSpecial: false);
             AssertController(
                 armored,
-                new[] { "Idle", "Walk", "Mutant Swipe", "Mutant Jump Attack" },
+                new[] { "Idle", "Walk", "Mutant Swipe", "Mutant Jump Attack", "Dying" },
                 includeSpecial: true);
+
+            Assert.That(FindState(saboteur, "Zombie Death").transitions, Is.Empty);
+            Assert.That(FindState(armored, "Dying").transitions, Is.Empty);
         }
 
         [Test]
@@ -343,7 +355,15 @@ namespace PlatformerUltra.Enemies.Tests
             Assert.That(parameters[EnemyAnimatorDriver.LocomotionRateParameter], Is.EqualTo(AnimatorControllerParameterType.Float));
             Assert.That(parameters[EnemyAnimatorDriver.ChasingPlayerParameter], Is.EqualTo(AnimatorControllerParameterType.Bool));
             Assert.That(parameters[EnemyAnimatorDriver.AttackParameter], Is.EqualTo(AnimatorControllerParameterType.Trigger));
+            Assert.That(parameters[EnemyAnimatorDriver.DeathParameter], Is.EqualTo(AnimatorControllerParameterType.Trigger));
             Assert.That(parameters.ContainsKey(EnemyAnimatorDriver.SpecialAttackParameter), Is.EqualTo(includeSpecial));
+        }
+
+        private static AnimatorState FindState(AnimatorController controller, string stateName)
+        {
+            return controller.layers[0].stateMachine.states
+                .Select(child => child.state)
+                .Single(state => state.name == stateName);
         }
 
         private static AnimationClip LoadAnimationClip(string path)

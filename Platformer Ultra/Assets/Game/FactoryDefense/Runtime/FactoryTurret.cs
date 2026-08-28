@@ -19,12 +19,13 @@ namespace PlatformerUltra.FactoryDefense
         [SerializeField] private Transform _yawPivot;
         [SerializeField] private Transform _muzzle;
         [SerializeField] private GameObject _muzzleFlash;
+        [SerializeField] private TurretLaserTracer _laserTracerPrefab;
         [SerializeField] private EnemyRuntimeRegistry _enemyRegistry;
         [SerializeField] private MachineTargetRegistry _factoryRegistry;
 
         [Header("Balance")]
         [SerializeField, Min(1)] private int _maximumHealth = 80;
-        [SerializeField, Min(1f)] private float _range = 12f;
+        [SerializeField, Min(1f)] private float _range = 15f;
         [SerializeField, Min(1)] private int _damage = 10;
         [SerializeField, Min(0.05f)] private float _shotInterval = 1.2f;
         [SerializeField, Min(1f)] private float _turnSpeed = 90f;
@@ -50,6 +51,7 @@ namespace PlatformerUltra.FactoryDefense
         public float Range => _range;
         public int Damage => _damage;
         public float ShotInterval => _shotInterval;
+        public TurretLaserTracer LaserTracerPrefab => _laserTracerPrefab;
 
         public event Action<DamageInfo> Damaged;
         public event Action<DamageInfo> Died;
@@ -102,12 +104,13 @@ namespace PlatformerUltra.FactoryDefense
             GameObject muzzleFlash,
             LayerMask lineOfSightMask,
             int maximumHealth = 80,
-            float range = 12f,
+            float range = 15f,
             int damage = 10,
             float shotInterval = 1.2f,
             float turnSpeed = 90f,
             float firingTolerance = 5f,
-            float targetRefreshInterval = 0.2f)
+            float targetRefreshInterval = 0.2f,
+            TurretLaserTracer laserTracerPrefab = null)
         {
             _health = health;
             _factionMember = factionMember;
@@ -116,6 +119,7 @@ namespace PlatformerUltra.FactoryDefense
             _yawPivot = yawPivot;
             _muzzle = muzzle;
             _muzzleFlash = muzzleFlash;
+            _laserTracerPrefab = laserTracerPrefab;
             _lineOfSightMask = lineOfSightMask;
             _maximumHealth = Mathf.Max(1, maximumHealth);
             _range = Mathf.Max(1f, range);
@@ -321,7 +325,23 @@ namespace PlatformerUltra.FactoryDefense
                 _muzzleFlashUntil = timestamp + 0.08f;
             }
 
+            SpawnLaserTracer(hitPoint);
+
             Fired?.Invoke(this, enemy);
+        }
+
+        private void SpawnLaserTracer(Vector3 hitPoint)
+        {
+            if (_laserTracerPrefab == null || _muzzle == null || !Application.isPlaying)
+            {
+                return;
+            }
+
+            TurretLaserTracer tracer = Instantiate(
+                _laserTracerPrefab,
+                _muzzle.position,
+                Quaternion.identity);
+            tracer.Initialize(_muzzle.position, hitPoint);
         }
 
         private void HandleDeath(DamageInfo damageInfo)

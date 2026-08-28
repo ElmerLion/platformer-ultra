@@ -200,3 +200,109 @@
 .retry-button:hover {
     background-color: rgb(255, 163, 70);
 }
+
+.pause-panel,
+.victory-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(5, 9, 13, 0.76);
+    display: none;
+}
+
+.pause-card,
+.victory-card {
+    width: 480px;
+    padding: 30px 40px 34px 40px;
+    align-items: center;
+    background-color: rgba(9, 17, 23, 0.98);
+    border-top-width: 4px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(80, 111, 123);
+}
+
+.pause-card {
+    border-top-color: rgb(99, 224, 255);
+}
+
+.victory-card {
+    border-top-color: rgb(176, 91, 255);
+    background-color: rgba(13, 10, 24, 0.98);
+}
+
+.pause-kicker,
+.victory-kicker {
+    font-size: 13px;
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+}
+
+.pause-kicker {
+    color: rgb(99, 224, 255);
+}
+
+.victory-kicker {
+    color: rgb(202, 142, 255);
+}
+
+.pause-title,
+.victory-title {
+    font-size: 38px;
+    -unity-font-style: bold;
+    color: rgb(242, 247, 248);
+    margin-bottom: 10px;
+}
+
+.pause-message,
+.victory-message {
+    font-size: 16px;
+    color: rgb(170, 190, 196);
+    margin-bottom: 24px;
+}
+
+.primary-menu-button,
+.secondary-menu-button,
+.victory-button {
+    width: 230px;
+    height: 46px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 16px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+}
+
+.primary-menu-button {
+    color: rgb(8, 16, 20);
+    background-color: rgb(99, 224, 255);
+}
+
+.primary-menu-button:hover {
+    background-color: rgb(151, 238, 255);
+}
+
+.secondary-menu-button {
+    color: rgb(213, 228, 232);
+    background-color: rgb(31, 49, 58);
+}
+
+.secondary-menu-button:hover {
+    background-color: rgb(48, 69, 79);
+}
+
+.victory-button {
+    color: rgb(18, 9, 27);
+    background-color: rgb(190, 113, 255);
+}
+
+.victory-button:hover {
+    background-color: rgb(218, 164, 255);
+}

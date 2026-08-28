@@ -14,6 +14,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
@@ -28,6 +29,8 @@ namespace PlatformerUltra.Factory.Editor
         private const string ScenePath = SceneFolder + "/FactoryVerticalMap.unity";
         private const string NavMeshFolder = SceneFolder + "/FactoryVerticalMap";
         private const string NavMeshDataPath = NavMeshFolder + "/NavMesh-EnemyService.asset";
+        private const string LightingFolder = FactoryRoot + "/Lighting";
+        private const string VolumeProfilePath = LightingFolder + "/VP_FactoryAtmosphere.asset";
 
         private const string MinePrefabPath = PrefabFolder + "/PF_Factory_Mine.prefab";
         private const string GeneratorPrefabPath = PrefabFolder + "/PF_Factory_Generator.prefab";
@@ -54,18 +57,22 @@ namespace PlatformerUltra.Factory.Editor
         private const string JumpReferencePath = "Assets/Game/Input/IAR_Jump.asset";
         private const string SprintReferencePath = "Assets/Game/Input/IAR_Sprint.asset";
         private const string InteractReferencePath = "Assets/Game/Input/IAR_Interact.asset";
+        private const string PauseReferencePath = "Assets/Game/Input/IAR_Pause.asset";
+        private const string InputActionsPath = "Assets/Game/Input/IA_Gameplay.asset";
         private const string PanelSettingsPath = "Assets/Game/UI/PS_PrototypeHUD.asset";
         private const string HudLayoutPath = "Assets/Game/UI/FactoryMapHUD.uxml";
         private const string HudStylePath = "Assets/Game/UI/PrototypeHUD.uss";
 
         private const string MinerAudioPath = "Assets/Audio/Miner.wav";
+        private const string SmelterAmbienceAudioPath = "Assets/Audio/IndustrialFireBUrning.mp3";
+        private const string CrusherAmbienceAudioPath = "Assets/Audio/Crusher.mp3";
         private const string RubbleCrashAudioPath = "Assets/Audio/freeeverythingxx-rubble-crash-275691.mp3";
-        private const string PlayerJumpAudioPath = "Assets/Audio/sound-effects-v2_Person_performs_a_jump-2.mp3";
         private const string PlayerHitAudioPath = "Assets/Audio/sound-effects-v2_Person_hit-1.mp3";
         private const string RepairHammerAudioPath = "Assets/Audio/Hammer Loop_1.wav";
         private const string MusicTrackOnePath = "Assets/Audio/Music/LOOP_Casual Puzzle Solving 1 (live).wav";
         private const string MusicTrackTwoPath = "Assets/Audio/Music/LOOP_Casual Puzzle Solving 2 (live).wav";
         private const string MusicTrackThreePath = "Assets/Audio/Music/LOOP_Casual Puzzle Solving 4.wav";
+        private const string SkyboxMaterialPath = "Assets/Starfield Skybox/Skybox.mat";
 
         private const string FrameMaterialPath = FactoryRoot + "/Conveyors/Materials/M_Conveyor_Frame.mat";
         private const string DarkMaterialPath = FactoryRoot + "/Conveyors/Materials/M_Conveyor_Belt.mat";
@@ -75,15 +82,18 @@ namespace PlatformerUltra.Factory.Editor
         private const string ActiveMaterialPath = MaterialFolder + "/M_Factory_IndicatorGreen.mat";
         private const string BrokenMarkerMaterialPath = MaterialFolder + "/M_Factory_BrokenMarker.mat";
         private const string EnemyBridgeMaterialPath = MaterialFolder + "/M_Factory_EnemyNavigationBridge.mat";
+        private const string MachineBodyMaterialPath = MaterialFolder + "/M_Factory_MachinePurple.mat";
 
         [MenuItem("Tools/Factory/Build Vertical Factory Map")]
         public static void BuildAll()
         {
             EnsureFolder(PrefabFolder);
             EnsureFolder(MaterialFolder);
+            EnsureFolder(LightingFolder);
             EnsureFolder(SceneFolder);
             EnsureFolder(NavMeshFolder);
 
+            EnsurePauseInputAction();
             FactoryMachineAssetFactory.BuildAll();
             EnemyAssetFactory.BuildAll();
             MapMaterials materials = BuildMapMaterials();
@@ -101,6 +111,43 @@ namespace PlatformerUltra.Factory.Editor
             Debug.Log("Vertical factory map built at " + ScenePath + ".");
         }
 
+        private static void EnsurePauseInputAction()
+        {
+            InputActionAsset inputActions = AssetDatabase.LoadAssetAtPath<InputActionAsset>(InputActionsPath);
+            if (inputActions == null)
+            {
+                throw new InvalidOperationException(
+                    "Missing gameplay input actions at " + InputActionsPath +
+                    ". Run Tools/Platformer Ultra/Build Prototype Assets and Conveyor Test Scene first.");
+            }
+
+            InputActionMap gameplay = inputActions.FindActionMap("Gameplay", true);
+            InputAction pause = gameplay.FindAction("Pause");
+            if (pause == null)
+            {
+                pause = gameplay.AddAction("Pause", InputActionType.Button);
+                pause.AddBinding("<Keyboard>/escape");
+                pause.AddBinding("<Gamepad>/start");
+                EditorUtility.SetDirty(inputActions);
+            }
+
+            InputActionReference pauseReference = AssetDatabase.LoadAssetAtPath<InputActionReference>(
+                PauseReferencePath);
+            if (pauseReference != null && pauseReference.action == pause)
+            {
+                return;
+            }
+
+            if (pauseReference != null)
+            {
+                AssetDatabase.DeleteAsset(PauseReferencePath);
+            }
+
+            pauseReference = InputActionReference.Create(pause);
+            pauseReference.name = "IAR_Pause";
+            AssetDatabase.CreateAsset(pauseReference, PauseReferencePath);
+        }
+
         private static MapMaterials BuildMapMaterials()
         {
             return new MapMaterials
@@ -108,6 +155,7 @@ namespace PlatformerUltra.Factory.Editor
                 Frame = RequireMaterial(FrameMaterialPath, new Color(0.88f, 0.31f, 0.055f), 0.5f, 0.4f, Color.black),
                 Dark = RequireMaterial(DarkMaterialPath, new Color(0.045f, 0.055f, 0.062f), 0.2f, 0.3f, Color.black),
                 Steel = RequireMaterial(SteelMaterialPath, new Color(0.42f, 0.52f, 0.58f), 0.75f, 0.62f, Color.black),
+                Machine = RequireMaterial(MachineBodyMaterialPath, new Color(0.38f, 0.12f, 0.58f), 0.42f, 0.5f, new Color(0.08f, 0.01f, 0.14f)),
                 Energy = RequireMaterial(EnergyMaterialPath, new Color(0.05f, 0.72f, 0.95f), 0.1f, 0.75f, new Color(0.1f, 2.2f, 4.2f)),
                 Furnace = RequireMaterial(FurnaceMaterialPath, new Color(1f, 0.25f, 0.025f), 0.1f, 0.5f, new Color(4f, 0.35f, 0.02f)),
                 Active = RequireMaterial(ActiveMaterialPath, new Color(0.08f, 0.88f, 0.4f), 0.1f, 0.6f, new Color(0.05f, 1.7f, 0.32f)),
@@ -127,7 +175,7 @@ namespace PlatformerUltra.Factory.Editor
             try
             {
                 CreateBox("Structural Base", root.transform, new Vector3(0f, 0.22f, 0f), new Vector3(6.2f, 0.44f, 5.2f), materials.Frame, true);
-                CreateBox("Extractor Housing", root.transform, new Vector3(0f, 1.65f, 0.8f), new Vector3(3.8f, 2.85f, 2.5f), materials.Dark, true);
+                CreateBox("Extractor Housing", root.transform, new Vector3(0f, 1.65f, 0.8f), new Vector3(3.8f, 2.85f, 2.5f), materials.Machine, true);
                 CreateBox("Housing Service Panel", root.transform, new Vector3(0f, 1.8f, -0.49f), new Vector3(2.5f, 1.35f, 0.1f), materials.Steel, false);
                 CreateBox("Panel Header", root.transform, new Vector3(0f, 2.5f, -0.56f), new Vector3(2.8f, 0.18f, 0.16f), materials.Frame, false);
 
@@ -153,8 +201,8 @@ namespace PlatformerUltra.Factory.Editor
                 }
 
                 CreateBox("Hopper Floor", root.transform, new Vector3(0f, 0.82f, 2.0f), new Vector3(3.4f, 0.24f, 1.4f), materials.Dark, true);
-                CreateBox("Hopper Left", root.transform, new Vector3(-1.45f, 1.35f, 2f), new Vector3(0.18f, 1.3f, 1.6f), materials.Frame, false, Quaternion.Euler(0f, 0f, -15f));
-                CreateBox("Hopper Right", root.transform, new Vector3(1.45f, 1.35f, 2f), new Vector3(0.18f, 1.3f, 1.6f), materials.Frame, false, Quaternion.Euler(0f, 0f, 15f));
+                CreateBox("Hopper Left", root.transform, new Vector3(-1.45f, 1.35f, 2f), new Vector3(0.18f, 1.3f, 1.6f), materials.Machine, false, Quaternion.Euler(0f, 0f, -15f));
+                CreateBox("Hopper Right", root.transform, new Vector3(1.45f, 1.35f, 2f), new Vector3(0.18f, 1.3f, 1.6f), materials.Machine, false, Quaternion.Euler(0f, 0f, 15f));
 
                 for (int index = 0; index < 5; index++)
                 {
@@ -215,7 +263,7 @@ namespace PlatformerUltra.Factory.Editor
             try
             {
                 CreateBox("Generator Base", root.transform, new Vector3(0f, 0.24f, 0f), new Vector3(5.6f, 0.48f, 4.4f), materials.Frame, true);
-                CreateBox("Generator Housing", root.transform, new Vector3(0f, 1.55f, 0.2f), new Vector3(3.3f, 2.4f, 2.5f), materials.Dark, true);
+                CreateBox("Generator Housing", root.transform, new Vector3(0f, 1.55f, 0.2f), new Vector3(3.3f, 2.4f, 2.5f), materials.Machine, true);
 
                 GameObject energyAssembly = new GameObject("Energy Assembly");
                 energyAssembly.transform.SetParent(root.transform, false);
@@ -233,7 +281,7 @@ namespace PlatformerUltra.Factory.Editor
                         false);
                 }
 
-                CreateCylinder("Central Turbine", root.transform, new Vector3(0f, 2.95f, 0.25f), new Vector3(0.82f, 0.5f, 0.82f), Quaternion.Euler(90f, 0f, 0f), materials.Dark, true);
+                CreateCylinder("Central Turbine", root.transform, new Vector3(0f, 2.95f, 0.25f), new Vector3(0.82f, 0.5f, 0.82f), Quaternion.Euler(90f, 0f, 0f), materials.Machine, true);
                 CreateCylinder("Turbine Core", root.transform, new Vector3(0f, 2.95f, -0.82f), new Vector3(0.45f, 0.2f, 0.45f), Quaternion.Euler(90f, 0f, 0f), materials.Energy, false);
                 CreatePipeBetween("Exhaust Left", root.transform, new Vector3(-1.2f, 2.7f, 1.1f), new Vector3(-2.15f, 4.1f, 1.1f), 0.24f, materials.Steel, false);
                 CreatePipeBetween("Exhaust Right", root.transform, new Vector3(1.2f, 2.7f, 1.1f), new Vector3(2.15f, 4.1f, 1.1f), 0.24f, materials.Steel, false);
@@ -374,6 +422,7 @@ namespace PlatformerUltra.Factory.Editor
                 new[]
                 {
                     new Vector3(-13f, 0.72f, -9.95f),
+                    new Vector3(-13f, 5.72f, -8f),
                     new Vector3(-12.02f, 5.72f, -2.05f)
                 });
             ProductionConveyorRoute smelterToAssemblerRoute = CreateProductionConveyorRoute(
@@ -414,6 +463,7 @@ namespace PlatformerUltra.Factory.Editor
             Light generatorLight = CreatePointLight("Generator Work Light", lighting.transform, new Vector3(13f, 12.8f, 0.5f), new Color(0.08f, 0.78f, 1f), 10f, 7f);
             Light assemblerLight = CreatePointLight("Assembler Work Light", lighting.transform, new Vector3(12.5f, 18f, 11f), new Color(0.12f, 0.72f, 1f), 10f, 7f);
             CreateLighting(lighting.transform);
+            CreatePostProcessing(lighting.transform);
 
             GameObject minePowered = FindDescendant(mine, "Drill Assembly");
             GameObject smelterPowered = FindDescendant(smelter, "Smoke Plume");
@@ -476,7 +526,7 @@ namespace PlatformerUltra.Factory.Editor
                 mineTerminal,
                 smelterTerminal,
                 materials,
-                new Vector3(-11.7f, 0.78f, -8.25f),
+                new Vector3(-11.7f, 0.219f, -8.25f),
                 new Vector3(-13.2f, 5.42f, -3.2f));
             FactoryConveyorConnection smelterToAssembler = ConfigureProductionConveyorRoute(
                 smelterToAssemblerRoute,
@@ -524,17 +574,17 @@ namespace PlatformerUltra.Factory.Editor
                 generatorTerminal,
                 assemblerTerminal,
                 player.Targetable.GetComponentsInChildren<Collider>(true));
-            BuildEnemySpawnManager(
+            EnemySpawnManager spawnManager = BuildEnemySpawnManager(
                 enemySystems.transform,
                 entrances,
                 player.Targetable,
                 machineRegistry,
                 enemyRegistry,
-                generatorTerminal,
+                smelterTerminal,
                 assemblerTerminal,
                 player.CameraShake);
+            BuildPortalCompletionFlow(portalGate, portal, player, spawnManager, objectives.transform);
             BuildTurretSpots(turretSpots.transform, machineRegistry, enemyRegistry);
-            BuildMapMarkers(objectives.transform, materials);
             BuildAudio(audio);
             BuildAndPersistEnemyNavMesh(enemyNavigation);
 
@@ -584,6 +634,65 @@ namespace PlatformerUltra.Factory.Editor
                 },
                 0.22f,
                 5f);
+
+            CreateAmbientLoop(
+                "Mine Machinery Ambience",
+                audioRoot.transform,
+                RequireAsset<AudioClip>(MinerAudioPath),
+                new Vector3(-13f, 1.4f, -11f),
+                0.11f,
+                3f,
+                15f);
+            CreateAmbientLoop(
+                "Smelter Fire Ambience",
+                audioRoot.transform,
+                RequireAsset<AudioClip>(SmelterAmbienceAudioPath),
+                new Vector3(-12.02f, 6.4f, -0.6f),
+                0.095f,
+                2.5f,
+                14f);
+            CreateAmbientLoop(
+                "Crusher Mechanism Ambience",
+                audioRoot.transform,
+                RequireAsset<AudioClip>(CrusherAmbienceAudioPath),
+                new Vector3(2.8f, 6.2f, -2.8f),
+                0.08f,
+                2.5f,
+                13f);
+
+            AudioReverbZone reverbZone = CreateGroup(
+                "Factory Hall Reverb",
+                audioRoot.transform).AddComponent<AudioReverbZone>();
+            reverbZone.transform.position = new Vector3(0f, 10f, 0f);
+            reverbZone.reverbPreset = AudioReverbPreset.Hangar;
+            reverbZone.minDistance = 30f;
+            reverbZone.maxDistance = 45f;
+        }
+
+        private static AudioSource CreateAmbientLoop(
+            string name,
+            Transform parent,
+            AudioClip clip,
+            Vector3 position,
+            float volume,
+            float minimumDistance,
+            float maximumDistance)
+        {
+            GameObject sourceObject = CreateGroup(name, parent);
+            sourceObject.transform.position = position;
+            AudioSource source = sourceObject.AddComponent<AudioSource>();
+            source.clip = clip;
+            source.loop = true;
+            source.playOnAwake = true;
+            source.volume = Mathf.Clamp01(volume);
+            source.spatialBlend = 0.9f;
+            source.dopplerLevel = 0f;
+            source.rolloffMode = AudioRolloffMode.Linear;
+            source.minDistance = Mathf.Max(0.1f, minimumDistance);
+            source.maxDistance = Mathf.Max(source.minDistance, maximumDistance);
+            source.reverbZoneMix = 0.32f;
+            source.priority = 180;
+            return source;
         }
 
         private static void BuildArchitecture(Transform parent, MapMaterials materials)
@@ -661,27 +770,35 @@ namespace PlatformerUltra.Factory.Editor
         private static void BuildGroundRoute(Transform parent, MapMaterials materials)
         {
             CreateIndustrialDeck("Spawn Checkpoint Apron", parent, new Vector3(0f, -17f), new Vector2(7f, 4.5f), 0.2f, 0f, materials, false, false);
-            CreateIndustrialDeck("Inactive Intake Belt Housing", parent, new Vector3(-4.1f, -15f), new Vector2(4.4f, 2.4f), 0.46f, 0f, materials, false, false);
             CreateIndustrialDeck("Mine Apron", parent, new Vector3(-13f, -10.1f), new Vector2(8f, 6.8f), 0.2f, 0f, materials, true, false);
 
-            CreateIndustrialDeck("Ore Belt Service Deck", parent, new Vector3(-15f, -6.2f), new Vector2(3f, 3.8f), 0.66f, 0f, materials, true, false);
-            CreateMachineHousingPlatform("Pump Skid", parent, new Vector3(-16f, -3.35f), new Vector2(2.7f, 2.5f), 1.72f, materials);
+            CreateMachineHousingPlatform(
+                "Pump Skid",
+                parent,
+                new Vector3(-16.28f, -3.35f),
+                new Vector2(2.7f, 2.5f),
+                1.03f,
+                materials,
+                -0.69f,
+                0.144f);
             CreatePipeRackPlatform(
                 parent,
                 new Vector3(-15.3f, -0.95f),
                 new Vector2(3.2f, 2.1f),
                 2.86f,
                 materials,
-                new Vector3(-15.3f, 2.826f, -0.987f));
+                new Vector3(-15.3f, 2.826f, -0.987f),
+                new Vector3(-0.881f, -0.49f, 0f));
             CreateMachineHousingPlatform(
                 "Valve Housing",
                 parent,
-                new Vector3(-15.4f, 1.35f),
+                new Vector3(-16.31f, 1.35f),
                 new Vector2(2.8f, 2.2f),
                 3.98f,
                 materials,
                 trimYOffset: 0.15f);
-            CreateIndustrialDeck("Smelter Landing", parent, new Vector3(-15.5f, 3.85f), new Vector2(3.2f, 2.7f), 5.16f, 0f, materials, true, false);
+            GameObject smelterLanding = CreateIndustrialDeck("Smelter Landing", parent, new Vector3(-15.5f, 3.85f), new Vector2(3.2f, 2.7f), 5.16f, 0f, materials, true, false);
+            smelterLanding.transform.localPosition = new Vector3(-0.93f, 0f, 0f);
 
             CreateWestSmelterMezzanine(parent, materials);
             AddSafetyRail(parent, new Vector3(-13f, 6.0f, -4.75f), 8f, true, materials);
@@ -707,7 +824,7 @@ namespace PlatformerUltra.Factory.Editor
                 materials,
                 true,
                 false);
-            CreateIndustrialDeck(
+            GameObject southwestAccessWing = CreateIndustrialDeck(
                 "Southwest Access Wing",
                 mezzanine.transform,
                 new Vector3(-16.45f, -3.55f),
@@ -717,13 +834,17 @@ namespace PlatformerUltra.Factory.Editor
                 materials,
                 true,
                 false);
+            RemoveSupportPostAt(southwestAccessWing.transform, new Vector3(-15.18f, 2.375f, -4.62f));
+            RemoveSupportPostAt(southwestAccessWing.transform, new Vector3(-15.18f, 2.375f, -2.48f));
         }
 
         private static void BuildMiddleRoute(Transform parent, MapMaterials materials)
         {
             CreateIndustrialDeck("Double Jump Gate - Freight Lift Roof", parent, new Vector3(-1.7f, 5.1f), new Vector2(2.6f, 3f), 7.55f, 0f, materials, true, false);
-            CreateIndustrialDeck("Crusher Service Ledge", parent, new Vector3(4.45f, 3f), new Vector2(2.9f, 2.5f), 8f, 4.8f, materials, true, false);
-            CreateIndustrialDeck("Generator Belt Catwalk", parent, new Vector3(7.7f, 1.8f), new Vector2(3.3f, 2.4f), 8f, 4.8f, materials, true, false);
+            GameObject crusherServiceLedge = CreateIndustrialDeck("Crusher Service Ledge", parent, new Vector3(4.45f, 3f), new Vector2(2.9f, 2.5f), 8f, 4.8f, materials, true, false);
+            crusherServiceLedge.transform.localPosition = new Vector3(-1.56f, 0f, 1.23f);
+            SetDirectChildSupportPostGeometry(crusherServiceLedge.transform, 3.54f, 8.402899f);
+            CreateIndustrialDeck("Generator Belt Catwalk", parent, new Vector3(7.7f, 1.8f), new Vector2(3.3f, 2.4f), 8f, 4.8f, materials, false, false);
             CreateIndustrialDeck("Crusher Machine Deck", parent, new Vector3(2.8f, -2.8f), new Vector2(7.2f, 6.3f), 4.8f, 0f, materials, true, false);
             AddSafetyRail(parent, new Vector3(2.8f, 5.6f, -5.8f), 6.4f, true, materials);
 
@@ -752,10 +873,6 @@ namespace PlatformerUltra.Factory.Editor
 
         private static void BuildUpperRoute(Transform parent, MapMaterials materials)
         {
-            GameObject craneTransferPlate = CreateIndustrialDeck("Crane Transfer Plate", parent, new Vector3(0.8f, 12.8f), new Vector2(3.1f, 2.4f), 15.25f, 9f, materials, true, false);
-            AddSupportTier(craneTransferPlate.transform, 6.15f, 5.8f, 1, new[] { -0.47f, 2.07f }, new[] { 11.88f, 13.72f }, materials);
-            AddSupportTier(craneTransferPlate.transform, 0.58f, 5.8f, 5, new[] { -0.47f, 2.07f }, new[] { 11.88f, 13.72f }, materials);
-            craneTransferPlate.transform.position = new Vector3(-4.87f, -1.78f, -3.75f);
             GameObject westGantry = CreateIndustrialDeck("West Gantry", parent, new Vector3(-5f, 13f), new Vector2(9f, 2.2f), 15.5f, 9f, materials, true, false);
             AddSupportTier(westGantry.transform, 6.14f, 6.05f, 1, new[] { -9.22f, -0.78f }, new[] { 12.18f, 13.82f }, materials);
             AddSupportTier(westGantry.transform, 0.19f, 6.05f, 5, new[] { -9.22f, -0.78f }, new[] { 12.18f, 13.82f }, materials);
@@ -964,14 +1081,16 @@ namespace PlatformerUltra.Factory.Editor
                 new Vector3(-19.92f, 1.55f, -12f),
                 Quaternion.Euler(0f, 90f, 0f),
                 materials,
-                true);
+                true,
+                new MaintenanceDoorLayout(1.0972f, 0.25f, 2.06f, 0.16f, 0.00195f));
             GameObject generatorDoor = CreateMaintenanceDoor(
                 "Future Enemy Entrance - Generator Service Door",
                 parent,
                 new Vector3(19.92f, 1.55f, -8f),
                 Quaternion.Euler(0f, -90f, 0f),
                 materials,
-                true);
+                true,
+                new MaintenanceDoorLayout(1.1237f, 0.38f, 2.23f, 0.29f, 0.00248f));
             EnemySpawnPoint mineSpawnPoint = CreateEnemySpawnPoint(
                 mineDoor.transform,
                 "Mine Door Enemy Spawn Point",
@@ -1039,7 +1158,6 @@ namespace PlatformerUltra.Factory.Editor
 
             CreateBox("Component Shaft Back Panel", componentShaft.transform, new Vector3(-7f, 9.4f, 11.55f), new Vector3(2.2f, 8.2f, 0.14f), materials.Dark, true);
             CreateBox("Component Shaft Cyan Spine", componentShaft.transform, new Vector3(-5.85f, 9.4f, 10.5f), new Vector3(0.16f, 7.7f, 1.8f), materials.Energy, false);
-            CreatePipeBetween("Upper Material Pipe", parent, new Vector3(-7f, 13.7f, 11.2f), new Vector3(8f, 13.7f, 11.2f), 0.28f, materials.Steel, false);
             CreatePipeBetween("Generator Feed Pipe", parent, new Vector3(13f, 8.7f, -3f), new Vector3(13f, 12f, -3f), 0.3f, materials.Steel, false);
         }
 
@@ -1127,10 +1245,73 @@ namespace PlatformerUltra.Factory.Editor
 
             FactoryPortalVisual portalVisual = portal != null ? portal.GetComponent<FactoryPortalVisual>() : null;
             FactoryPortalGate gate = (portal != null ? portal : CreateGroup("Portal Gate Logic", parent)).AddComponent<FactoryPortalGate>();
-            gate.Configure(portalVisual, bridge, sockets, 3);
+            gate.Configure(portalVisual, bridge, sockets, 1);
 
             gate.ResetGate();
             return gate;
+        }
+
+        private static void BuildPortalCompletionFlow(
+            FactoryPortalGate portalGate,
+            GameObject portal,
+            PlayerRigSet player,
+            EnemySpawnManager spawnManager,
+            Transform parent)
+        {
+            if (portalGate == null || portal == null || player == null)
+            {
+                throw new InvalidOperationException("The portal victory flow requires a portal gate and player rig.");
+            }
+
+            GameObject destination = CreateGroup("Victory Portal Destination", portal.transform);
+            destination.transform.localPosition = new Vector3(0f, 3.15f, 0.1f);
+            destination.transform.localRotation = Quaternion.identity;
+
+            GameObject cameraAnchor = CreateGroup("Victory Camera Anchor", parent);
+            cameraAnchor.transform.position = new Vector3(7.2f, 21.8f, 13f);
+            cameraAnchor.transform.rotation = Quaternion.LookRotation(
+                destination.transform.position - cameraAnchor.transform.position,
+                Vector3.up);
+
+            FactoryVictoryController victoryController = player.Hud.AddComponent<FactoryVictoryController>();
+            victoryController.Configure(
+                player.Player.transform,
+                player.CharacterController,
+                player.PlayerHealth,
+                player.PlayerController,
+                player.PlayerInteractor,
+                player.OrbitCamera,
+                player.CameraTransform,
+                destination.transform,
+                cameraAnchor.transform,
+                player.StatusPresenter,
+                spawnManager,
+                player.Player.GetComponentsInChildren<Renderer>(true),
+                2.6f);
+
+            GameObject triggerObject = CreateGroup("Portal Completion Trigger", portal.transform);
+            triggerObject.transform.localPosition = new Vector3(0f, 1.8f, 0.8f);
+            BoxCollider triggerCollider = triggerObject.AddComponent<BoxCollider>();
+            triggerCollider.center = Vector3.zero;
+            triggerCollider.size = new Vector3(3.4f, 3.4f, 1.6f);
+            triggerCollider.isTrigger = true;
+            FactoryPortalCompletionTrigger completionTrigger =
+                triggerObject.AddComponent<FactoryPortalCompletionTrigger>();
+            completionTrigger.Configure(
+                portalGate,
+                player.Player.transform,
+                victoryController,
+                triggerCollider);
+
+            FactoryPauseController pauseController = player.Hud.AddComponent<FactoryPauseController>();
+            pauseController.Configure(
+                player.PauseAction,
+                player.StatusPresenter,
+                player.PlayerController,
+                player.PlayerInteractor,
+                player.OrbitCamera,
+                player.GameOverController,
+                victoryController);
         }
 
         private static void CreatePortalCorePickup(
@@ -1171,6 +1352,7 @@ namespace PlatformerUltra.Factory.Editor
             InputActionReference jump = AssetDatabase.LoadAssetAtPath<InputActionReference>(JumpReferencePath);
             InputActionReference sprint = AssetDatabase.LoadAssetAtPath<InputActionReference>(SprintReferencePath);
             InputActionReference interact = AssetDatabase.LoadAssetAtPath<InputActionReference>(InteractReferencePath);
+            InputActionReference pause = AssetDatabase.LoadAssetAtPath<InputActionReference>(PauseReferencePath);
             PlayerMovementSettings settings = AssetDatabase.LoadAssetAtPath<PlayerMovementSettings>(MovementSettingsPath);
 
             GameObject cameraObject = new GameObject("Main Camera");
@@ -1181,6 +1363,10 @@ namespace PlatformerUltra.Factory.Editor
             camera.fieldOfView = 68f;
             camera.nearClipPlane = 0.08f;
             camera.farClipPlane = 140f;
+            UniversalAdditionalCameraData cameraData =
+                cameraObject.AddComponent<UniversalAdditionalCameraData>();
+            cameraData.renderPostProcessing = true;
+            cameraData.antialiasing = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
             cameraObject.AddComponent<AudioListener>();
             CameraShakeController cameraShake = cameraObject.AddComponent<CameraShakeController>();
             ThirdPersonOrbitCamera orbitCamera = cameraObject.AddComponent<ThirdPersonOrbitCamera>();
@@ -1222,7 +1408,6 @@ namespace PlatformerUltra.Factory.Editor
                 cameraShake,
                 feedbackSource,
                 repairSource,
-                RequireAsset<AudioClip>(PlayerJumpAudioPath),
                 RequireAsset<AudioClip>(PlayerHitAudioPath),
                 RequireAsset<AudioClip>(RepairHammerAudioPath),
                 RequireAsset<GameObject>(EnemyAssetFactory.PlayerJumpEffectPath),
@@ -1238,7 +1423,20 @@ namespace PlatformerUltra.Factory.Editor
                 playerInteractor,
                 orbitCamera,
                 player.GetComponentsInChildren<Renderer>(true));
-            return new PlayerRigSet(playerTarget, cameraShake);
+            return new PlayerRigSet(
+                player,
+                hud,
+                playerTarget,
+                playerHealth,
+                characterController,
+                playerController,
+                playerInteractor,
+                orbitCamera,
+                cameraObject.transform,
+                playerStatus,
+                gameOver,
+                pause,
+                cameraShake);
         }
 
         private static void ConfigureMachineBreakPresentation(
@@ -1335,15 +1533,16 @@ namespace PlatformerUltra.Factory.Editor
 
             machineHealth.BindTerminal(terminal);
             machineHealth.AssignRegistry(registry);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(machineHealth);
         }
 
-        private static void BuildEnemySpawnManager(
+        private static EnemySpawnManager BuildEnemySpawnManager(
             Transform parent,
             EnemyEntranceSet entrances,
             Targetable player,
             MachineTargetRegistry machineRegistry,
             EnemyRuntimeRegistry enemyRegistry,
-            FactoryObjectiveTerminal generatorTerminal,
+            FactoryObjectiveTerminal spawnUnlockTerminal,
             FactoryObjectiveTerminal assemblerTerminal,
             CameraShakeController cameraShake)
         {
@@ -1372,7 +1571,7 @@ namespace PlatformerUltra.Factory.Editor
                 player,
                 machineRegistry,
                 enemyRegistry,
-                generatorTerminal,
+                spawnUnlockTerminal,
                 assemblerTerminal,
                 6f,
                 12f,
@@ -1380,6 +1579,7 @@ namespace PlatformerUltra.Factory.Editor
                 6,
                 90f,
                 cameraShake);
+            return spawnManager;
         }
 
         private static void BuildAndPersistEnemyNavMesh(GameObject navigationRoot)
@@ -1421,25 +1621,6 @@ namespace PlatformerUltra.Factory.Editor
             }
 
             EditorUtility.SetDirty(surface);
-        }
-
-        private static void BuildMapMarkers(Transform parent, MapMaterials materials)
-        {
-            CreateDirectionMarker(parent, new Vector3(0f, 0.05f, -14f), Quaternion.identity, materials, "Route Marker - Mine");
-            CreateDirectionMarker(parent, new Vector3(-14.5f, 0.7f, -7.2f), Quaternion.identity, materials, "Route Marker - Smelter");
-            CreateDirectionMarker(parent, new Vector3(-6.4f, 5.42f, 3.1f), Quaternion.identity, materials, "Route Marker - Upgrade");
-            CreateDirectionMarker(parent, new Vector3(7.8f, 8.22f, 1.7f), Quaternion.Euler(0f, 90f, 0f), materials, "Route Marker - Generator");
-            CreateDirectionMarker(parent, new Vector3(11.5f, 13.42f, 9f), Quaternion.identity, materials, "Route Marker - Assembler");
-            CreateDirectionMarker(parent, new Vector3(0f, 15.72f, 12.3f), Quaternion.identity, materials, "Route Marker - Portal");
-        }
-
-        private static void CreateDirectionMarker(Transform parent, Vector3 position, Quaternion rotation, MapMaterials materials, string name)
-        {
-            GameObject marker = CreateGroup(name, parent);
-            marker.transform.SetPositionAndRotation(position, rotation);
-            CreateBox("Arrow Stem", marker.transform, new Vector3(0f, 0f, 0f), new Vector3(0.22f, 0.05f, 0.8f), materials.Energy, false);
-            CreateBox("Arrow Head Left", marker.transform, new Vector3(-0.18f, 0f, 0.38f), new Vector3(0.18f, 0.05f, 0.52f), materials.Energy, false, Quaternion.Euler(0f, -35f, 0f));
-            CreateBox("Arrow Head Right", marker.transform, new Vector3(0.18f, 0f, 0.38f), new Vector3(0.18f, 0.05f, 0.52f), materials.Energy, false, Quaternion.Euler(0f, 35f, 0f));
         }
 
         private static ProductionConveyorRoute CreateProductionConveyorRoute(
@@ -1653,6 +1834,67 @@ namespace PlatformerUltra.Factory.Editor
             CreatePointLight("Upper East Work Light", parent, new Vector3(12f, 18f, 13f), new Color(0.1f, 0.68f, 0.95f), 9f, 6f);
         }
 
+        private static void CreatePostProcessing(Transform parent)
+        {
+            VolumeProfile profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(VolumeProfilePath);
+            if (profile == null)
+            {
+                profile = ScriptableObject.CreateInstance<VolumeProfile>();
+                profile.name = "VP_FactoryAtmosphere";
+                AssetDatabase.CreateAsset(profile, VolumeProfilePath);
+            }
+
+            if (!profile.TryGet(out Bloom bloom))
+            {
+                bloom = profile.Add<Bloom>(true);
+            }
+
+            bloom.active = true;
+            bloom.threshold.Override(0.95f);
+            bloom.intensity.Override(0.32f);
+            bloom.scatter.Override(0.55f);
+            bloom.tint.Override(new Color(0.82f, 0.93f, 1f));
+
+            if (!profile.TryGet(out ColorAdjustments colorAdjustments))
+            {
+                colorAdjustments = profile.Add<ColorAdjustments>(true);
+            }
+
+            colorAdjustments.active = true;
+            colorAdjustments.postExposure.Override(0.05f);
+            colorAdjustments.contrast.Override(10f);
+            colorAdjustments.saturation.Override(-5f);
+            colorAdjustments.colorFilter.Override(new Color(0.94f, 0.98f, 1f));
+
+            if (!profile.TryGet(out Vignette vignette))
+            {
+                vignette = profile.Add<Vignette>(true);
+            }
+
+            vignette.active = true;
+            vignette.intensity.Override(0.15f);
+            vignette.smoothness.Override(0.32f);
+
+            if (!profile.TryGet(out Tonemapping tonemapping))
+            {
+                tonemapping = profile.Add<Tonemapping>(true);
+            }
+
+            tonemapping.active = true;
+            tonemapping.mode.Override(TonemappingMode.Neutral);
+            EditorUtility.SetDirty(profile);
+            EditorUtility.SetDirty(bloom);
+            EditorUtility.SetDirty(colorAdjustments);
+            EditorUtility.SetDirty(vignette);
+            EditorUtility.SetDirty(tonemapping);
+
+            Volume volume = CreateGroup("Factory Global Volume", parent).AddComponent<Volume>();
+            volume.isGlobal = true;
+            volume.priority = 0f;
+            volume.weight = 1f;
+            volume.sharedProfile = profile;
+        }
+
         private static Light CreatePointLight(string name, Transform parent, Vector3 position, Color color, float range, float intensity)
         {
             GameObject lightObject = new GameObject(name);
@@ -1670,6 +1912,12 @@ namespace PlatformerUltra.Factory.Editor
 
         private static void ConfigureRenderSettings()
         {
+            Material skybox = AssetDatabase.LoadAssetAtPath<Material>(SkyboxMaterialPath);
+            if (skybox != null)
+            {
+                RenderSettings.skybox = skybox;
+            }
+
             RenderSettings.ambientMode = AmbientMode.Trilight;
             RenderSettings.ambientSkyColor = new Color(0.12f, 0.16f, 0.2f);
             RenderSettings.ambientEquatorColor = new Color(0.055f, 0.07f, 0.085f);
@@ -1696,14 +1944,22 @@ namespace PlatformerUltra.Factory.Editor
             Vector2 size,
             float topY,
             MapMaterials materials,
-            Vector3? gratingPositionOverride = null)
+            Vector3? gratingPositionOverride = null,
+            Vector3? rootLocalPosition = null)
         {
             GameObject root = CreateGroup("Pipe Rack Step " + topY.ToString("0.00"), parent);
+            root.transform.localPosition = rootLocalPosition ?? Vector3.zero;
             float supportBottom = Mathf.Max(0f, topY - 1.3f);
             float supportHeight = Mathf.Max(0.4f, topY - supportBottom);
+            float upperSupportY = supportBottom + supportHeight * 0.5f;
             for (int side = -1; side <= 1; side += 2)
             {
-                CreateBox("Pipe Rack Post", root.transform, new Vector3(center.x + side * (size.x * 0.42f), supportBottom + supportHeight * 0.5f, center.y), new Vector3(0.22f, supportHeight, size.y), materials.Frame, true);
+                float x = center.x + side * (size.x * 0.42f);
+                string middleSuffix = side < 0 ? " (1)" : " (2)";
+                string lowerSuffix = side < 0 ? " (3)" : " (4)";
+                CreateBox("Pipe Rack Post", root.transform, new Vector3(x, upperSupportY, center.y), new Vector3(0.22f, supportHeight, size.y), materials.Frame, true);
+                CreateBox("Pipe Rack Post" + middleSuffix, root.transform, new Vector3(x, upperSupportY - 1.26f, center.y), new Vector3(0.22f, supportHeight, size.y), materials.Frame, true);
+                CreateBox("Pipe Rack Post" + lowerSuffix, root.transform, new Vector3(x, upperSupportY - 2.48f, center.y), new Vector3(0.22f, supportHeight, size.y), materials.Frame, true);
             }
 
             for (int index = -1; index <= 1; index++)
@@ -1799,6 +2055,26 @@ namespace PlatformerUltra.Factory.Editor
             }
 
             return root;
+        }
+
+        private static void SetDirectChildSupportPostGeometry(Transform parent, float y, float height)
+        {
+            for (int childIndex = 0; childIndex < parent.childCount; childIndex++)
+            {
+                Transform child = parent.GetChild(childIndex);
+                if (!child.name.StartsWith("Support Post", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                Vector3 position = child.localPosition;
+                position.y = y;
+                child.localPosition = position;
+
+                Vector3 scale = child.localScale;
+                scale.y = height;
+                child.localScale = scale;
+            }
         }
 
         private static void AddSupportTier(
@@ -1963,20 +2239,21 @@ namespace PlatformerUltra.Factory.Editor
             Vector3 position,
             Quaternion rotation,
             MapMaterials materials,
-            bool open)
+            bool open,
+            MaintenanceDoorLayout layout)
         {
             GameObject root = CreateGroup(name, parent);
             root.transform.SetPositionAndRotation(position, rotation);
             CreateBox(
                 open ? "Raised Door Slab" : "Door Slab",
                 root.transform,
-                open ? new Vector3(0f, 3.25f, 0f) : Vector3.zero,
-                new Vector3(3.2f, 3.1f, 0.24f),
+                open ? new Vector3(0f, layout.SlabY, layout.SlabZ) : Vector3.zero,
+                new Vector3(3.2f, 3.1f, 0.24f) * layout.Scale,
                 materials.Dark,
                 !open);
-            CreateBox("Door Frame Left", root.transform, new Vector3(-1.72f, 0f, -0.02f), new Vector3(0.26f, 3.5f, 0.34f), materials.Frame, true);
-            CreateBox("Door Frame Right", root.transform, new Vector3(1.72f, 0f, -0.02f), new Vector3(0.26f, 3.5f, 0.34f), materials.Frame, true);
-            CreateBox("Door Frame Top", root.transform, new Vector3(0f, 1.65f, -0.02f), new Vector3(3.6f, 0.28f, 0.34f), materials.Frame, true);
+            CreateBox("Door Frame Left", root.transform, new Vector3(-1.72f * layout.Scale, layout.SideFrameY, -0.02f), new Vector3(0.26f, 3.5f, 0.34f) * layout.Scale, materials.Frame, true);
+            CreateBox("Door Frame Right", root.transform, new Vector3(1.72f * layout.Scale, layout.SideFrameY, -0.02f), new Vector3(0.26f, 3.5f, 0.34f) * layout.Scale, materials.Frame, true);
+            CreateBox("Door Frame Top", root.transform, new Vector3(0f, layout.TopFrameY, -0.02f), new Vector3(3.6f, 0.28f, 0.34f) * layout.Scale, materials.Frame, true);
             CreateBox("Door Warning Stripe", root.transform, new Vector3(0f, -0.45f, -0.18f), new Vector3(2.4f, 0.18f, 0.08f), materials.Hazard, false, Quaternion.Euler(0f, 0f, -12f));
             CreateBox("Dormant Status Light", root.transform, new Vector3(0f, 1.1f, -0.18f), new Vector3(0.6f, 0.14f, 0.08f), materials.Dark, false);
             return root;
@@ -2261,13 +2538,48 @@ namespace PlatformerUltra.Factory.Editor
 
         private sealed class PlayerRigSet
         {
-            public PlayerRigSet(Targetable targetable, CameraShakeController cameraShake)
+            public PlayerRigSet(
+                GameObject player,
+                GameObject hud,
+                Targetable targetable,
+                PlayerHealth playerHealth,
+                CharacterController characterController,
+                ThirdPersonPlayerController playerController,
+                PlayerInteractor playerInteractor,
+                ThirdPersonOrbitCamera orbitCamera,
+                Transform cameraTransform,
+                PlayerStatusPresenter statusPresenter,
+                FactoryGameOverController gameOverController,
+                InputActionReference pauseAction,
+                CameraShakeController cameraShake)
             {
+                Player = player;
+                Hud = hud;
                 Targetable = targetable;
+                PlayerHealth = playerHealth;
+                CharacterController = characterController;
+                PlayerController = playerController;
+                PlayerInteractor = playerInteractor;
+                OrbitCamera = orbitCamera;
+                CameraTransform = cameraTransform;
+                StatusPresenter = statusPresenter;
+                GameOverController = gameOverController;
+                PauseAction = pauseAction;
                 CameraShake = cameraShake;
             }
 
+            public GameObject Player { get; }
+            public GameObject Hud { get; }
             public Targetable Targetable { get; }
+            public PlayerHealth PlayerHealth { get; }
+            public CharacterController CharacterController { get; }
+            public ThirdPersonPlayerController PlayerController { get; }
+            public PlayerInteractor PlayerInteractor { get; }
+            public ThirdPersonOrbitCamera OrbitCamera { get; }
+            public Transform CameraTransform { get; }
+            public PlayerStatusPresenter StatusPresenter { get; }
+            public FactoryGameOverController GameOverController { get; }
+            public InputActionReference PauseAction { get; }
             public CameraShakeController CameraShake { get; }
         }
 
@@ -2281,6 +2593,29 @@ namespace PlatformerUltra.Factory.Editor
 
             public EnemySpawnPoint MineDoor { get; }
             public EnemySpawnPoint GeneratorDoor { get; }
+        }
+
+        private readonly struct MaintenanceDoorLayout
+        {
+            public MaintenanceDoorLayout(
+                float scale,
+                float sideFrameY,
+                float topFrameY,
+                float slabY,
+                float slabZ)
+            {
+                Scale = scale;
+                SideFrameY = sideFrameY;
+                TopFrameY = topFrameY;
+                SlabY = slabY;
+                SlabZ = slabZ;
+            }
+
+            public float Scale { get; }
+            public float SideFrameY { get; }
+            public float TopFrameY { get; }
+            public float SlabY { get; }
+            public float SlabZ { get; }
         }
 
         private sealed class ProductionConveyorRoute
@@ -2345,6 +2680,7 @@ namespace PlatformerUltra.Factory.Editor
             public Material Frame;
             public Material Dark;
             public Material Steel;
+            public Material Machine;
             public Material Energy;
             public Material Furnace;
             public Material Active;

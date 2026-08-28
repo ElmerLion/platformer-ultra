@@ -11,6 +11,7 @@ namespace PlatformerUltra.Enemies
         public const string ChasingPlayerParameter = "ChasingPlayer";
         public const string AttackParameter = "Attack";
         public const string SpecialAttackParameter = "SpecialAttack";
+        public const string DeathParameter = "Death";
 
         [SerializeField] private Animator _animator;
         [SerializeField] private MonoBehaviour _motorBehaviour;
@@ -23,8 +24,10 @@ namespace PlatformerUltra.Enemies
         private static readonly int ChasingPlayerHash = Animator.StringToHash(ChasingPlayerParameter);
         private static readonly int AttackHash = Animator.StringToHash(AttackParameter);
         private static readonly int SpecialAttackHash = Animator.StringToHash(SpecialAttackParameter);
+        private static readonly int DeathHash = Animator.StringToHash(DeathParameter);
 
         private IEnemyMotor _motor;
+        private bool _dead;
 
         private void Awake()
         {
@@ -37,7 +40,7 @@ namespace PlatformerUltra.Enemies
 
         private void Update()
         {
-            if (_animator == null || _motor == null || _definition == null)
+            if (_animator == null || _motor == null || _definition == null || _dead)
             {
                 return;
             }
@@ -64,6 +67,7 @@ namespace PlatformerUltra.Enemies
             _motorBehaviour = motorBehaviour;
             _definition = definition;
             _brain = brain;
+            _dead = false;
             ResolveReferences();
             if (_animator != null)
             {
@@ -73,7 +77,7 @@ namespace PlatformerUltra.Enemies
 
         public void PlayAttack(bool special)
         {
-            if (_animator == null)
+            if (_animator == null || _dead)
             {
                 return;
             }
@@ -81,6 +85,25 @@ namespace PlatformerUltra.Enemies
             int trigger = special ? SpecialAttackHash : AttackHash;
             _animator.ResetTrigger(trigger);
             _animator.SetTrigger(trigger);
+        }
+
+        public void PlayDeath()
+        {
+            if (_animator == null || _dead)
+            {
+                return;
+            }
+
+            _dead = true;
+            _animator.ResetTrigger(AttackHash);
+            if (_definition != null && _definition.Archetype == EnemyArchetype.Armored)
+            {
+                _animator.ResetTrigger(SpecialAttackHash);
+            }
+            _animator.SetFloat(MoveSpeedHash, 0f);
+            _animator.SetBool(ChasingPlayerHash, false);
+            _animator.ResetTrigger(DeathHash);
+            _animator.SetTrigger(DeathHash);
         }
 
         private void ResolveReferences()

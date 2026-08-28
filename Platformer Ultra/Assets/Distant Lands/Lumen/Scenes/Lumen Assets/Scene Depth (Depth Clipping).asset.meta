@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 8243312338fecbd469541639e553684b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Scenes/Lumen Assets/Scene Depth (Depth Clipping).asset
+  uploadId: 678378

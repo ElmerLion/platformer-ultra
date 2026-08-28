@@ -5,7 +5,7 @@ using UnityEngine;
 namespace PlatformerUltra.FactoryDefense
 {
     [DisallowMultipleComponent]
-    public sealed class TurretBuildSpot : MonoBehaviour, ITimedInteractable, IInteractionFeedback
+    public sealed class TurretBuildSpot : MonoBehaviour, IMaintenanceTimedInteractable, IInteractionFeedback
     {
         [SerializeField] private FactoryTurret _turretPrefab;
         [SerializeField] private Transform _turretMount;
@@ -25,6 +25,8 @@ namespace PlatformerUltra.FactoryDefense
         public FactoryTurret BuiltTurret => _builtTurret;
         public bool IsBuilt => _builtTurret != null && _builtTurret.IsAlive;
         public GameObject DamagedInstallation => _damagedInstallation;
+        public Vector3 MaintenanceEffectPosition =>
+            (_turretMount != null ? _turretMount : transform).TransformPoint(Vector3.up * 1.15f);
 
         private void Awake()
         {

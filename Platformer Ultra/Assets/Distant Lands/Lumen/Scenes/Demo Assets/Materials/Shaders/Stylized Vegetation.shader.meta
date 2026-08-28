@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 49bf4038aa04398439dd4e0f297ef4b8
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Scenes/Demo Assets/Materials/Shaders/Stylized
+    Vegetation.shader
+  uploadId: 678378

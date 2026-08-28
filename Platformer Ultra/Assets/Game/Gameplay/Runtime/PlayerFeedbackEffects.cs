@@ -15,10 +15,8 @@ namespace PlatformerUltra.Gameplay
         [SerializeField] private AudioSource _repairLoopSource;
 
         [Header("Audio")]
-        [SerializeField] private AudioClip _jumpClip;
         [SerializeField] private AudioClip _playerHitClip;
         [SerializeField] private AudioClip _repairLoopClip;
-        [SerializeField, Range(0f, 1f)] private float _jumpVolume = 0.55f;
         [SerializeField, Range(0f, 1f)] private float _hitVolume = 0.8f;
         [SerializeField, Range(0f, 1f)] private float _repairVolume = 0.32f;
 
@@ -61,7 +59,6 @@ namespace PlatformerUltra.Gameplay
             CameraShakeController cameraShake,
             AudioSource oneShotSource,
             AudioSource repairLoopSource,
-            AudioClip jumpClip,
             AudioClip playerHitClip,
             AudioClip repairLoopClip,
             GameObject jumpEffectPrefab,
@@ -77,7 +74,6 @@ namespace PlatformerUltra.Gameplay
             _cameraShake = cameraShake;
             _oneShotSource = oneShotSource;
             _repairLoopSource = repairLoopSource;
-            _jumpClip = jumpClip;
             _playerHitClip = playerHitClip;
             _repairLoopClip = repairLoopClip;
             _jumpEffectPrefab = jumpEffectPrefab;
@@ -95,7 +91,6 @@ namespace PlatformerUltra.Gameplay
         private void HandleJumped(bool airJump)
         {
             JumpFeedbackCount++;
-            PlayOneShot(_jumpClip, _jumpVolume, 0.96f, 1.04f);
             GameObject effectPrefab = airJump && _doubleJumpEffectPrefab != null
                 ? _doubleJumpEffectPrefab
                 : _jumpEffectPrefab;
@@ -113,8 +108,8 @@ namespace PlatformerUltra.Gameplay
 
         private void HandleTimedInteractionStarted(ITimedInteractable target)
         {
-            FactoryObjectiveTerminal terminal = target as FactoryObjectiveTerminal;
-            if (terminal == null || terminal.MachineState != FactoryMachineState.Broken)
+            IMaintenanceTimedInteractable maintenanceTarget = target as IMaintenanceTimedInteractable;
+            if (maintenanceTarget == null)
             {
                 return;
             }
@@ -129,16 +124,16 @@ namespace PlatformerUltra.Gameplay
                 _repairLoopSource.Play();
             }
 
-            Vector3 position = terminal.MachineHealth != null && terminal.MachineHealth.Targetable != null
-                ? terminal.MachineHealth.Targetable.TargetPoint.position
-                : terminal.transform.position;
-            GameObject instance = SpawnEffect(_repairEffectPrefab, position, 1f);
+            GameObject instance = SpawnEffect(
+                _repairEffectPrefab,
+                maintenanceTarget.MaintenanceEffectPosition,
+                1f);
             _activeRepairEffect = instance != null ? instance.GetComponent<GameplayEffect>() : null;
         }
 
         private void HandleTimedInteractionEnded(ITimedInteractable target, bool completed)
         {
-            if (target is FactoryObjectiveTerminal)
+            if (target is IMaintenanceTimedInteractable)
             {
                 StopRepairFeedback();
             }

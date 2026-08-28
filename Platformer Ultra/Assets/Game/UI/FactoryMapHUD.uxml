@@ -30,5 +30,22 @@
                 <ui:Button name="retry-button" text="RETRY FACTORY" class="retry-button" />
             </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="pause-panel" class="pause-panel">
+            <ui:VisualElement class="pause-card">
+                <ui:Label text="OPERATIONS SUSPENDED" class="pause-kicker" />
+                <ui:Label text="PAUSED" class="pause-title" />
+                <ui:Label text="The factory simulation is holding position." class="pause-message" />
+                <ui:Button name="resume-button" text="RESUME" class="primary-menu-button" />
+                <ui:Button name="pause-retry-button" text="RETRY FACTORY" class="secondary-menu-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="victory-panel" class="victory-panel">
+            <ui:VisualElement class="victory-card">
+                <ui:Label text="PRODUCTION CHAIN RESTORED" class="victory-kicker" />
+                <ui:Label text="FACTORY SECURED" class="victory-title" />
+                <ui:Label text="The portal is stable. You escaped the vertical factory." class="victory-message" />
+                <ui:Button name="victory-retry-button" text="REPLAY FACTORY" class="victory-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 6e3e7349cde87bf458545e698f51548f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Scenes/Demo Assets/Editor/E_TutorialBlock.cs
+  uploadId: 678378

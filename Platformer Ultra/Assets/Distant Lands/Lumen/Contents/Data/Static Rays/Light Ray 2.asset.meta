@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d72548f64cb559e479c5e6d13040a150
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Contents/Data/Static Rays/Light Ray 2.asset
+  uploadId: 678378

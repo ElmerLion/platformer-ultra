@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 39ae2e04313c70d48b4c6080d5c8177d
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Contents/Scripts/Editor/LumenProjectSetup.cs
+  uploadId: 678378

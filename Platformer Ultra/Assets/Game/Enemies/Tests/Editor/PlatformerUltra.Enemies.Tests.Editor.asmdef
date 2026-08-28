@@ -6,6 +6,7 @@
     "PlatformerUltra.Conveyors.Runtime",
     "PlatformerUltra.Enemies.Runtime",
     "PlatformerUltra.Enemies.Editor",
+    "PlatformerUltra.FactoryDefense.Runtime",
     "PlatformerUltra.Gameplay.Runtime"
   ],
   "includePlatforms": [

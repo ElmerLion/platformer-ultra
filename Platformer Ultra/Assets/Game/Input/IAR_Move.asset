@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: IAR_Move
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: 11400000, guid: 93bb8a39e0020fd4ca46f4685cd1507a, type: 2}
-  m_ActionId: cfe34448-9ff5-4892-bf59-6cae960c077b
+  m_ActionId: 9675d242-f243-48bb-9f21-51fafd5d5ddd

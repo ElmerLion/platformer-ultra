@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: IAR_Sprint
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: 11400000, guid: 93bb8a39e0020fd4ca46f4685cd1507a, type: 2}
-  m_ActionId: 0e1253db-e66f-4449-bc95-74e2ff57353a
+  m_ActionId: e960fc9a-b933-48df-8acd-7812590edadf

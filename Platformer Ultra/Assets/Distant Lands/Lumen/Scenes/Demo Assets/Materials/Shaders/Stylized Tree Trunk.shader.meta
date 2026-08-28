@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 47500bddc769bd14ba8e604ef74f04fc
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Scenes/Demo Assets/Materials/Shaders/Stylized
+    Tree Trunk.shader
+  uploadId: 678378

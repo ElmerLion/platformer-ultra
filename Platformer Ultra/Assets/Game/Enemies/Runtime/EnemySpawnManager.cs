@@ -7,7 +7,7 @@ using UnityEngine;
 namespace PlatformerUltra.Enemies
 {
     [DisallowMultipleComponent]
-    public sealed class EnemySpawnManager : MonoBehaviour
+    public sealed class EnemySpawnManager : MonoBehaviour, IEnemySpawningController
     {
         [Header("Assets")]
         [SerializeField] private GameObject _dronePrefab;
@@ -19,7 +19,7 @@ namespace PlatformerUltra.Enemies
         [SerializeField] private Targetable _player;
         [SerializeField] private MachineTargetRegistry _machineRegistry;
         [SerializeField] private EnemyRuntimeRegistry _enemyRegistry;
-        [SerializeField] private FactoryObjectiveTerminal _generatorTerminal;
+        [SerializeField] private FactoryObjectiveTerminal _spawnUnlockTerminal;
         [SerializeField] private FactoryObjectiveTerminal _assemblerTerminal;
         [SerializeField] private CameraShakeController _cameraShake;
 
@@ -31,14 +31,17 @@ namespace PlatformerUltra.Enemies
         [SerializeField, Min(0f)] private float _armoredEscalationDelay = 90f;
 
         private float _nextSpawnTime;
-        private float _generatorActivatedAt = float.PositiveInfinity;
+        private float _spawningUnlockedAt = float.PositiveInfinity;
+        private bool _spawningUnlocked;
+        private bool _spawningEnabled = true;
         private bool _subscribed;
 
         public int ActiveEnemyCap => _activeEnemyCap;
         public IReadOnlyList<EnemySpawnPoint> SpawnPoints => _spawnPoints;
-        public bool SpawningUnlocked => _generatorTerminal != null && _generatorTerminal.IsActivated;
+        public bool SpawningUnlocked => _spawningUnlocked;
+        public bool SpawningEnabled => _spawningEnabled;
         public bool ArmoredUnlocked => (_assemblerTerminal != null && _assemblerTerminal.IsActivated) ||
-                                       (SpawningUnlocked && Time.time >= _generatorActivatedAt + _armoredEscalationDelay);
+                                       (SpawningUnlocked && Time.time >= _spawningUnlockedAt + _armoredEscalationDelay);
 
         public event Action<EnemyHealth, EnemySpawnPoint> EnemySpawned;
 
@@ -49,11 +52,7 @@ namespace PlatformerUltra.Enemies
 
         private void Start()
         {
-            if (SpawningUnlocked && float.IsPositiveInfinity(_generatorActivatedAt))
-            {
-                _generatorActivatedAt = Time.time;
-            }
-
+            TryUnlockSpawning(Time.time);
             _nextSpawnTime = Time.time + _initialDelay;
         }
 
@@ -75,7 +74,7 @@ namespace PlatformerUltra.Enemies
             Targetable player,
             MachineTargetRegistry machineRegistry,
             EnemyRuntimeRegistry enemyRegistry,
-            FactoryObjectiveTerminal generatorTerminal,
+            FactoryObjectiveTerminal spawnUnlockTerminal,
             FactoryObjectiveTerminal assemblerTerminal,
             float initialDelay,
             float minimumSpawnInterval,
@@ -92,7 +91,7 @@ namespace PlatformerUltra.Enemies
             _player = player;
             _machineRegistry = machineRegistry;
             _enemyRegistry = enemyRegistry;
-            _generatorTerminal = generatorTerminal;
+            _spawnUnlockTerminal = spawnUnlockTerminal;
             _assemblerTerminal = assemblerTerminal;
             _initialDelay = Mathf.Max(0f, initialDelay);
             _minimumSpawnInterval = Mathf.Max(0.1f, minimumSpawnInterval);
@@ -100,12 +99,16 @@ namespace PlatformerUltra.Enemies
             _activeEnemyCap = Mathf.Max(1, activeEnemyCap);
             _armoredEscalationDelay = Mathf.Max(0f, armoredEscalationDelay);
             _cameraShake = cameraShake;
+            _spawningUnlocked = false;
+            _spawningUnlockedAt = float.PositiveInfinity;
+            _spawningEnabled = true;
             Subscribe();
+            TryUnlockSpawning(Time.time);
         }
 
         public bool TrySpawn(float timestamp, float pointSample, float weightSample, float intervalSample)
         {
-            if (timestamp < _nextSpawnTime || !SpawningUnlocked ||
+            if (!_spawningEnabled || timestamp < _nextSpawnTime || !SpawningUnlocked ||
                 _machineRegistry == null || !_machineRegistry.HasOperationalMachines ||
                 _enemyRegistry == null ||
                 !CanSpawnForCap(_enemyRegistry.ActiveCount, _activeEnemyCap) ||
@@ -115,7 +118,7 @@ namespace PlatformerUltra.Enemies
             }
 
             bool armoredAllowed = (_assemblerTerminal != null && _assemblerTerminal.IsActivated) ||
-                                   timestamp >= _generatorActivatedAt + _armoredEscalationDelay;
+                                   timestamp >= _spawningUnlockedAt + _armoredEscalationDelay;
             int startIndex = Mathf.Min(_spawnPoints.Length - 1, Mathf.FloorToInt(Mathf.Clamp01(pointSample) * _spawnPoints.Length));
             for (int offset = 0; offset < _spawnPoints.Length; offset++)
             {
@@ -190,35 +193,57 @@ namespace PlatformerUltra.Enemies
             }
         }
 
-        private void HandleGeneratorActivated(FactoryObjectiveTerminal terminal)
+        public void SetSpawningEnabled(bool enabled)
         {
-            _generatorActivatedAt = Time.time;
-            _nextSpawnTime = Mathf.Max(_nextSpawnTime, Time.time + _initialDelay);
+            _spawningEnabled = enabled;
+        }
+
+        private void HandleSpawnUnlockTerminalActivated(FactoryObjectiveTerminal terminal)
+        {
+            TryUnlockSpawning(Time.time);
+        }
+
+        private void HandleSpawnUnlockMachineStateChanged(
+            FactoryObjectiveTerminal terminal,
+            FactoryMachineState state)
+        {
+            TryUnlockSpawning(Time.time);
+        }
+
+        private void TryUnlockSpawning(float timestamp)
+        {
+            if (_spawningUnlocked || _spawnUnlockTerminal == null || !_spawnUnlockTerminal.IsOperational)
+            {
+                return;
+            }
+
+            _spawningUnlocked = true;
+            _spawningUnlockedAt = timestamp;
+            _nextSpawnTime = Mathf.Max(_nextSpawnTime, timestamp + _initialDelay);
         }
 
         private void Subscribe()
         {
-            if (_subscribed || _generatorTerminal == null)
+            if (_subscribed || _spawnUnlockTerminal == null)
             {
                 return;
             }
 
-            _generatorTerminal.Activated += HandleGeneratorActivated;
+            _spawnUnlockTerminal.Activated += HandleSpawnUnlockTerminalActivated;
+            _spawnUnlockTerminal.MachineStateChanged += HandleSpawnUnlockMachineStateChanged;
             _subscribed = true;
-            if (_generatorTerminal.IsActivated && float.IsPositiveInfinity(_generatorActivatedAt))
-            {
-                _generatorActivatedAt = Time.time;
-            }
+            TryUnlockSpawning(Time.time);
         }
 
         private void Unsubscribe()
         {
-            if (!_subscribed || _generatorTerminal == null)
+            if (!_subscribed || _spawnUnlockTerminal == null)
             {
                 return;
             }
 
-            _generatorTerminal.Activated -= HandleGeneratorActivated;
+            _spawnUnlockTerminal.Activated -= HandleSpawnUnlockTerminalActivated;
+            _spawnUnlockTerminal.MachineStateChanged -= HandleSpawnUnlockMachineStateChanged;
             _subscribed = false;
         }
     }

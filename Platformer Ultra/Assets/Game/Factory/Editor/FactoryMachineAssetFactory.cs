@@ -17,6 +17,7 @@ namespace PlatformerUltra.Factory.Editor
         private const string ConveyorFramePath = RootFolder + "/Conveyors/Materials/M_Conveyor_Frame.mat";
         private const string ConveyorBeltPath = RootFolder + "/Conveyors/Materials/M_Conveyor_Belt.mat";
         private const string ConveyorAccentPath = RootFolder + "/Conveyors/Materials/M_Conveyor_Accent.mat";
+        private const string MachineBodyMaterialPath = MaterialFolder + "/M_Factory_MachinePurple.mat";
         private const string CrusherAudioPath = "Assets/Audio/Crusher.mp3";
         private const string SmelterAudioPath = "Assets/Audio/IndustrialFireBUrning.mp3";
         private const string OreCargoPrefabPath = PrefabFolder + "/PF_Factory_OreCargo.prefab";
@@ -98,6 +99,12 @@ namespace PlatformerUltra.Factory.Editor
                 Frame = frame,
                 Dark = belt,
                 Steel = accent,
+                Machine = CreateOrUpdateLitMaterial(
+                    MachineBodyMaterialPath,
+                    new Color(0.38f, 0.12f, 0.58f),
+                    0.42f,
+                    0.5f,
+                    new Color(0.08f, 0.01f, 0.14f)),
                 Furnace = CreateOrUpdateLitMaterial(
                     MaterialFolder + "/M_Factory_EmissiveOrange.mat",
                     new Color(1f, 0.24f, 0.025f),
@@ -143,7 +150,7 @@ namespace PlatformerUltra.Factory.Editor
             try
             {
                 CreateBox("Structural Base", root.transform, new Vector3(0f, 0.25f, 0f), new Vector3(5.4f, 0.5f, 4.2f), materials.Frame);
-                CreateBox("Furnace Housing", root.transform, new Vector3(0f, 1.8f, 0.25f), new Vector3(2.6f, 3.1f, 2.5f), materials.Dark);
+                CreateBox("Furnace Housing", root.transform, new Vector3(0f, 1.8f, 0.25f), new Vector3(2.6f, 3.1f, 2.5f), materials.Machine);
                 GameObject furnaceChamber = CreateBox("Furnace Chamber", root.transform, new Vector3(0f, 1.72f, -1.04f), new Vector3(1.55f, 1.3f, 0.14f), materials.Furnace);
                 CreateBox("Chamber Frame Top", root.transform, new Vector3(0f, 2.44f, -1.17f), new Vector3(1.95f, 0.17f, 0.22f), materials.Frame);
                 CreateBox("Chamber Frame Bottom", root.transform, new Vector3(0f, 1f, -1.17f), new Vector3(1.95f, 0.17f, 0.22f), materials.Frame);
@@ -203,9 +210,12 @@ namespace PlatformerUltra.Factory.Editor
                     3f,
                     16f);
 
-                BoxCollider collider = root.AddComponent<BoxCollider>();
-                collider.center = new Vector3(0f, 2.8f, 0f);
-                collider.size = new Vector3(5.4f, 5.6f, 4.2f);
+                AddBoxCollider(root, new Vector3(0f, 0.25f, 0f), new Vector3(5.4f, 0.5f, 4.2f));
+                AddBoxCollider(root, new Vector3(0f, 1.8f, 0.25f), new Vector3(2.6f, 3.1f, 2.5f));
+                AddCapsuleCollider(root, new Vector3(-1.85f, 1.45f, 0.7f), 0.47f, 2.6f, 1);
+                AddCapsuleCollider(root, new Vector3(1.85f, 1.45f, 0.7f), 0.47f, 2.6f, 1);
+                AddCapsuleCollider(root, new Vector3(1.7f, 0.9f, -1.05f), 0.42f, 1.8f, 0);
+                AddCapsuleCollider(root, new Vector3(0f, 4.55f, 0.65f), 0.38f, 3.8f, 1);
                 GameObject brokenMarker = CreateBrokenMarker(
                     root.transform,
                     new Vector3(0f, 7.35f, 0f),
@@ -233,7 +243,7 @@ namespace PlatformerUltra.Factory.Editor
             {
                 List<Renderer> statusRenderers = new List<Renderer>();
                 CreateBox("Structural Base", root.transform, new Vector3(0f, 0.25f, 0f), new Vector3(5.5f, 0.5f, 4.3f), materials.Frame);
-                CreateBox("Machine Cabinet", root.transform, new Vector3(0f, 1.8f, 0.7f), new Vector3(4.6f, 3.1f, 1.8f), materials.Dark);
+                CreateBox("Machine Cabinet", root.transform, new Vector3(0f, 1.8f, 0.7f), new Vector3(4.6f, 3.1f, 1.8f), materials.Machine);
                 for (int index = -1; index <= 1; index++)
                 {
                     float x = index * 1.35f;
@@ -260,9 +270,9 @@ namespace PlatformerUltra.Factory.Editor
                         materials.Steel);
                 }
 
-                BoxCollider collider = root.AddComponent<BoxCollider>();
-                collider.center = new Vector3(0f, 1.8f, 0.25f);
-                collider.size = new Vector3(5.5f, 3.6f, 4.3f);
+                AddBoxCollider(root, new Vector3(0f, 0.25f, 0f), new Vector3(5.5f, 0.5f, 4.3f));
+                AddBoxCollider(root, new Vector3(0f, 1.8f, 0.7f), new Vector3(4.6f, 3.1f, 1.8f));
+                AddBoxCollider(root, new Vector3(0f, 0.72f, -1.55f), new Vector3(2.7f, 0.18f, 1.35f));
                 GameObject brokenMarker = CreateBrokenMarker(
                     root.transform,
                     new Vector3(0f, 4.75f, 0f),
@@ -288,7 +298,7 @@ namespace PlatformerUltra.Factory.Editor
             GameObject root = new GameObject("PF_Factory_Crusher");
             try
             {
-                CreateBox("Anvil Base", root.transform, new Vector3(0f, 0.3f, 0f), new Vector3(4.5f, 0.6f, 3.7f), materials.Dark);
+                CreateBox("Anvil Base", root.transform, new Vector3(0f, 0.3f, 0f), new Vector3(4.5f, 0.6f, 3.7f), materials.Machine);
                 CreateBox("Anvil Surface", root.transform, new Vector3(0f, 0.68f, 0f), new Vector3(3.45f, 0.18f, 2.65f), materials.Steel);
                 float[] xs = { -1.85f, 1.85f };
                 float[] zs = { -1.45f, 1.45f };
@@ -302,7 +312,8 @@ namespace PlatformerUltra.Factory.Editor
 
                 CreateBox("Top Beam", root.transform, new Vector3(0f, 4.3f, 0f), new Vector3(4.4f, 0.48f, 3.55f), materials.Frame);
                 CreateCylinder("Hydraulic Ram", root.transform, new Vector3(0f, 3.65f, 0f), new Vector3(0.55f, 0.75f, 0.55f), Quaternion.identity, materials.Steel);
-                GameObject plate = CreateBox("Crushing Plate", root.transform, new Vector3(0f, 3.05f, 0f), new Vector3(3.35f, 0.42f, 2.55f), materials.Dark);
+                GameObject plate = CreateBox("Crushing Plate", root.transform, new Vector3(0f, 3.05f, 0f), new Vector3(3.35f, 0.42f, 2.55f), materials.Machine);
+                plate.AddComponent<BoxCollider>();
                 CreateBox("Crushing Plate Hazard Face", plate.transform, new Vector3(0f, -0.55f, 0f), new Vector3(0.92f, 0.16f, 0.92f), materials.Furnace);
                 for (int index = -2; index <= 2; index++)
                 {
@@ -318,9 +329,16 @@ namespace PlatformerUltra.Factory.Editor
                     2.5f,
                     13f,
                     0.2f);
-                BoxCollider collider = root.AddComponent<BoxCollider>();
-                collider.center = new Vector3(0f, 2.25f, 0f);
-                collider.size = new Vector3(4.5f, 4.5f, 3.7f);
+                AddBoxCollider(root, new Vector3(0f, 0.3f, 0f), new Vector3(4.5f, 0.6f, 3.7f));
+                foreach (float x in xs)
+                {
+                    foreach (float z in zs)
+                    {
+                        AddBoxCollider(root, new Vector3(x, 2.35f, z), new Vector3(0.32f, 3.9f, 0.32f));
+                    }
+                }
+
+                AddBoxCollider(root, new Vector3(0f, 4.3f, 0f), new Vector3(4.4f, 0.48f, 3.55f));
                 SavePrefab(root, PrefabFolder + "/PF_Factory_Crusher.prefab");
             }
             finally
@@ -519,7 +537,7 @@ namespace PlatformerUltra.Factory.Editor
 
         private static void CreateTank(Transform parent, string name, Vector3 position, FactoryMaterials materials)
         {
-            CreateCylinder(name + " Body", parent, position, new Vector3(0.82f, 1.25f, 0.82f), Quaternion.identity, materials.Steel);
+            CreateCylinder(name + " Body", parent, position, new Vector3(0.82f, 1.25f, 0.82f), Quaternion.identity, materials.Machine);
             CreateCylinder(name + " Top Band", parent, position + Vector3.up * 1.03f, new Vector3(0.94f, 0.11f, 0.94f), Quaternion.identity, materials.Frame);
             CreateCylinder(name + " Bottom Band", parent, position + Vector3.down * 1.03f, new Vector3(0.94f, 0.11f, 0.94f), Quaternion.identity, materials.Frame);
             CreateCylinder(name + " Valve", parent, position + new Vector3(0f, 1.38f, 0f), new Vector3(0.22f, 0.22f, 0.22f), Quaternion.identity, materials.Dark);
@@ -723,6 +741,29 @@ namespace PlatformerUltra.Factory.Editor
             GameObject bar = CreateBox(name, parent, (start + end) * 0.5f, new Vector3(thickness, direction.magnitude, thickness), material);
             bar.transform.localRotation = Quaternion.FromToRotation(Vector3.up, direction.normalized);
             return bar;
+        }
+
+        private static BoxCollider AddBoxCollider(GameObject target, Vector3 center, Vector3 size)
+        {
+            BoxCollider collider = target.AddComponent<BoxCollider>();
+            collider.center = center;
+            collider.size = size;
+            return collider;
+        }
+
+        private static CapsuleCollider AddCapsuleCollider(
+            GameObject target,
+            Vector3 center,
+            float radius,
+            float height,
+            int direction)
+        {
+            CapsuleCollider collider = target.AddComponent<CapsuleCollider>();
+            collider.center = center;
+            collider.radius = radius;
+            collider.height = height;
+            collider.direction = direction;
+            return collider;
         }
 
         private static GameObject CreateBox(string name, Transform parent, Vector3 position, Vector3 scale, Material material)
@@ -1056,6 +1097,7 @@ namespace PlatformerUltra.Factory.Editor
             public Material Frame;
             public Material Dark;
             public Material Steel;
+            public Material Machine;
             public Material Furnace;
             public Material Energy;
             public Material Active;

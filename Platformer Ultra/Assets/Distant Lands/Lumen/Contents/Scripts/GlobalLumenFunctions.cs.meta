@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 1909f34ad9c0cba44a60cc5fcb4cd6a8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Contents/Scripts/GlobalLumenFunctions.cs
+  uploadId: 678378

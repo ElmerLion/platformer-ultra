@@ -52,8 +52,10 @@ namespace PlatformerUltra.Enemies.Editor
         private const string WalkingAnimationPath = "Assets/Animations/Paladin J Nordstrom@Walking.fbx";
         private const string RunningAnimationPath = "Assets/Animations/Paladin J Nordstrom@Standard Run.fbx";
         private const string ZombieAttackAnimationPath = "Assets/Animations/Paladin J Nordstrom@Zombie Attack.fbx";
+        private const string ZombieDeathAnimationPath = "Assets/Animations/Paladin J Nordstrom@Zombie Death.fbx";
         private const string MutantSwipeAnimationPath = "Assets/Animations/Paladin J Nordstrom@Mutant Swiping.fbx";
         private const string MutantJumpAttackAnimationPath = "Assets/Animations/Paladin J Nordstrom@Mutant Jump Attack.fbx";
+        private const string DyingAnimationPath = "Assets/Animations/Paladin J Nordstrom@Dying.fbx";
 
         private const string DroneBoltMaterialPath = MaterialFolder + "/M_Enemy_DroneBolt.mat";
         private const string DroneTelegraphMaterialPath = MaterialFolder + "/M_Enemy_DroneTelegraph.mat";
@@ -64,6 +66,7 @@ namespace PlatformerUltra.Enemies.Editor
         private const float ZombieImpactNormalizedTime = 0.46f;
         private const float SwipeImpactNormalizedTime = 0.43f;
         private const float JumpImpactNormalizedTime = 0.60f;
+        private const float DeathTailDuration = 0.4f;
 
         [MenuItem("Tools/Factory/Build Enemy Assets")]
         public static void BuildAll()
@@ -81,19 +84,23 @@ namespace PlatformerUltra.Enemies.Editor
             AnimationClip walkingClip = RequireAnimationClip(WalkingAnimationPath);
             AnimationClip runningClip = RequireAnimationClip(RunningAnimationPath);
             AnimationClip zombieAttackClip = RequireAnimationClip(ZombieAttackAnimationPath);
+            AnimationClip zombieDeathClip = RequireAnimationClip(ZombieDeathAnimationPath);
             AnimationClip mutantSwipeClip = RequireAnimationClip(MutantSwipeAnimationPath);
             AnimationClip mutantJumpAttackClip = RequireAnimationClip(MutantJumpAttackAnimationPath);
+            AnimationClip dyingClip = RequireAnimationClip(DyingAnimationPath);
 
             AnimatorController saboteurController = BuildSaboteurController(
                 idleClip,
                 walkingClip,
                 runningClip,
-                zombieAttackClip);
+                zombieAttackClip,
+                zombieDeathClip);
             AnimatorController armoredController = BuildArmoredController(
                 idleClip,
                 walkingClip,
                 mutantSwipeClip,
-                mutantJumpAttackClip);
+                mutantJumpAttackClip,
+                dyingClip);
 
             Material boltMaterial = CreateOrUpdateEmissionMaterial(
                 DroneBoltMaterialPath,
@@ -118,12 +125,14 @@ namespace PlatformerUltra.Enemies.Editor
             EnemyDefinition saboteurDefinition = BuildSaboteurDefinition(
                 saboteurVisual,
                 saboteurController,
-                zombieAttackClip.length);
+                zombieAttackClip.length,
+                zombieDeathClip.length);
             EnemyDefinition armoredDefinition = BuildArmoredDefinition(
                 armoredVisual,
                 armoredController,
                 mutantSwipeClip.length,
-                mutantJumpAttackClip.length);
+                mutantJumpAttackClip.length,
+                dyingClip.length);
 
             GameObject dronePrefab = BuildEnemyPrefab(new EnemyPrefabSpec(
                 "PF_Enemy_Drone",
@@ -176,6 +185,7 @@ namespace PlatformerUltra.Enemies.Editor
                 false,
                 nameof(EnemyAnimationEventRelay.OnAttackImpact),
                 ZombieImpactNormalizedTime);
+            ConfigureAnimationImport(ZombieDeathAnimationPath, false, null, 0f);
             ConfigureAnimationImport(
                 MutantSwipeAnimationPath,
                 false,
@@ -186,6 +196,7 @@ namespace PlatformerUltra.Enemies.Editor
                 false,
                 nameof(EnemyAnimationEventRelay.OnSpecialImpact),
                 JumpImpactNormalizedTime);
+            ConfigureAnimationImport(DyingAnimationPath, false, null, 0f);
         }
 
         private static void ConfigureAnimationImport(
@@ -326,7 +337,8 @@ namespace PlatformerUltra.Enemies.Editor
             AnimationClip idleClip,
             AnimationClip walkingClip,
             AnimationClip runningClip,
-            AnimationClip attackClip)
+            AnimationClip attackClip,
+            AnimationClip deathClip)
         {
             AnimatorController controller = LoadOrCreateController(SaboteurControllerPath);
             AnimatorStateMachine stateMachine = ResetController(controller);
@@ -336,6 +348,7 @@ namespace PlatformerUltra.Enemies.Editor
             AnimatorState walk = AddState(stateMachine, "Walk", walkingClip, new Vector3(420f, 10f), true);
             AnimatorState run = AddState(stateMachine, "Run", runningClip, new Vector3(420f, 100f), true);
             AnimatorState attack = AddState(stateMachine, "Zombie Attack", attackClip, new Vector3(680f, 55f), false);
+            AnimatorState death = AddState(stateMachine, "Zombie Death", deathClip, new Vector3(680f, 165f), false);
             stateMachine.defaultState = idle;
 
             AddLocomotionTransition(idle, walk, AnimatorConditionMode.Greater, 0.05f, false);
@@ -351,6 +364,11 @@ namespace PlatformerUltra.Enemies.Editor
                 EnemyAnimatorDriver.AttackParameter,
                 0.08f);
             AddAttackExitTransitions(attack, idle, walk, run);
+            AddAnyStateTriggerTransition(
+                stateMachine,
+                death,
+                EnemyAnimatorDriver.DeathParameter,
+                0.08f);
 
             EditorUtility.SetDirty(stateMachine);
             EditorUtility.SetDirty(controller);
@@ -361,7 +379,8 @@ namespace PlatformerUltra.Enemies.Editor
             AnimationClip idleClip,
             AnimationClip walkingClip,
             AnimationClip swipeClip,
-            AnimationClip jumpAttackClip)
+            AnimationClip jumpAttackClip,
+            AnimationClip deathClip)
         {
             AnimatorController controller = LoadOrCreateController(ArmoredControllerPath);
             AnimatorStateMachine stateMachine = ResetController(controller);
@@ -371,6 +390,7 @@ namespace PlatformerUltra.Enemies.Editor
             AnimatorState walk = AddState(stateMachine, "Walk", walkingClip, new Vector3(420f, 50f), true);
             AnimatorState swipe = AddState(stateMachine, "Mutant Swipe", swipeClip, new Vector3(680f, 10f), false);
             AnimatorState jump = AddState(stateMachine, "Mutant Jump Attack", jumpAttackClip, new Vector3(680f, 110f), false);
+            AnimatorState death = AddState(stateMachine, "Dying", deathClip, new Vector3(930f, 60f), false);
             stateMachine.defaultState = idle;
 
             AddSpeedTransition(idle, walk, AnimatorConditionMode.Greater, 0.05f);
@@ -387,6 +407,11 @@ namespace PlatformerUltra.Enemies.Editor
                 0.05f);
             AddAttackExitTransitions(swipe, idle, walk, null);
             AddAttackExitTransitions(jump, idle, walk, null);
+            AddAnyStateTriggerTransition(
+                stateMachine,
+                death,
+                EnemyAnimatorDriver.DeathParameter,
+                0.08f);
 
             EditorUtility.SetDirty(stateMachine);
             EditorUtility.SetDirty(controller);
@@ -462,6 +487,7 @@ namespace PlatformerUltra.Enemies.Editor
             controller.AddParameter(EnemyAnimatorDriver.LocomotionRateParameter, AnimatorControllerParameterType.Float);
             controller.AddParameter(EnemyAnimatorDriver.ChasingPlayerParameter, AnimatorControllerParameterType.Bool);
             controller.AddParameter(EnemyAnimatorDriver.AttackParameter, AnimatorControllerParameterType.Trigger);
+            controller.AddParameter(EnemyAnimatorDriver.DeathParameter, AnimatorControllerParameterType.Trigger);
             if (includeSpecial)
             {
                 controller.AddParameter(EnemyAnimatorDriver.SpecialAttackParameter, AnimatorControllerParameterType.Trigger);
@@ -602,7 +628,8 @@ namespace PlatformerUltra.Enemies.Editor
         private static EnemyDefinition BuildSaboteurDefinition(
             GameObject visualPrefab,
             RuntimeAnimatorController controller,
-            float attackClipLength)
+            float attackClipLength,
+            float deathClipLength)
         {
             EnemyDefinition definition = LoadOrCreateDefinition(SaboteurDefinitionPath);
             definition.ConfigureIdentity(
@@ -623,7 +650,7 @@ namespace PlatformerUltra.Enemies.Editor
                 0f,
                 12f);
             definition.ConfigureSpecial(0f, 0f, 0f, 0f, 0f, 0, 0, 1f, 0f);
-            SetDeathRemovalDelay(definition, 1.5f);
+            SetDeathRemovalDelay(definition, Mathf.Max(0f, deathClipLength) + DeathTailDuration);
             EditorUtility.SetDirty(definition);
             return definition;
         }
@@ -632,7 +659,8 @@ namespace PlatformerUltra.Enemies.Editor
             GameObject visualPrefab,
             RuntimeAnimatorController controller,
             float swipeClipLength,
-            float jumpAttackClipLength)
+            float jumpAttackClipLength,
+            float deathClipLength)
         {
             EnemyDefinition definition = LoadOrCreateDefinition(ArmoredDefinitionPath);
             definition.ConfigureIdentity(
@@ -664,7 +692,7 @@ namespace PlatformerUltra.Enemies.Editor
                 40,
                 Mathf.Max(0.05f, jumpAttackClipLength),
                 1.4f);
-            SetDeathRemovalDelay(definition, 2f);
+            SetDeathRemovalDelay(definition, Mathf.Max(0f, deathClipLength) + DeathTailDuration);
             EditorUtility.SetDirty(definition);
             return definition;
         }
@@ -774,7 +802,7 @@ namespace PlatformerUltra.Enemies.Editor
                 health.Configure(spec.Definition.MaximumHealth);
                 factionMember.Configure(Faction.Enemy);
                 targetable.Configure(factionMember, targetPoint, enemyHealth, true);
-                enemyHealth.Configure(spec.Definition, health, factionMember, targetable, brain);
+                enemyHealth.Configure(spec.Definition, health, factionMember, targetable, brain, animatorDriver);
                 enemyHealth.ConfigureDeathExplosion(deathExplosion);
                 attackController.Configure(
                     spec.Definition,

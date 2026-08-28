@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 85e76f51dcbacb34d9de7bd76be4e396
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Scenes/Dynamic Rays Bidirectional Demo.unity
+  uploadId: 678378

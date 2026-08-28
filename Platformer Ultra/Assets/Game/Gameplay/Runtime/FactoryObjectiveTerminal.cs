@@ -5,7 +5,7 @@ using UnityEngine;
 namespace PlatformerUltra.Gameplay
 {
     [DisallowMultipleComponent]
-    public sealed class FactoryObjectiveTerminal : MonoBehaviour, ITimedInteractable, IInteractionFeedback
+    public sealed class FactoryObjectiveTerminal : MonoBehaviour, IMaintenanceTimedInteractable, IInteractionFeedback
     {
         [SerializeField] private string _stationName = "Factory Station";
         [SerializeField] private FactoryObjectiveTerminal _prerequisite;
@@ -39,6 +39,10 @@ namespace PlatformerUltra.Gameplay
             : 0f;
         public string InteractionActionLabel => "Repairing " + _stationName;
         public string LastInteractionFeedback => _lastInteractionFeedback;
+        public Vector3 MaintenanceEffectPosition =>
+            _machineHealth != null && _machineHealth.Targetable != null
+                ? _machineHealth.Targetable.TargetPoint.position
+                : transform.position;
 
         public string InteractionPrompt
         {

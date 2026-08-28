@@ -14,6 +14,7 @@ namespace PlatformerUltra.Enemies
         [SerializeField] private FactionMember _factionMember;
         [SerializeField] private Targetable _targetable;
         [SerializeField] private EnemyBrain _brain;
+        [SerializeField] private EnemyAnimatorDriver _animatorDriver;
         [SerializeField] private DeathExplosionEmitter _deathExplosion;
 
         private EnemyRuntimeRegistry _registry;
@@ -68,13 +69,15 @@ namespace PlatformerUltra.Enemies
             Health health,
             FactionMember factionMember,
             Targetable targetable,
-            EnemyBrain brain)
+            EnemyBrain brain,
+            EnemyAnimatorDriver animatorDriver = null)
         {
             _definition = definition;
             _health = health;
             _factionMember = factionMember;
             _targetable = targetable;
             _brain = brain;
+            _animatorDriver = animatorDriver;
             InitializeHealth();
         }
 
@@ -132,6 +135,7 @@ namespace PlatformerUltra.Enemies
 
             _deathHandled = true;
             _targetable?.SetTargetable(false);
+            _animatorDriver?.PlayDeath();
             _brain?.Die();
             UnregisterFromRuntimeRegistry();
             _activeRuntimeLifecycle = false;

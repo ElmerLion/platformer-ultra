@@ -272,6 +272,57 @@ namespace PlatformerUltra.Enemies.Tests
         }
 
         [Test]
+        public void EnemySpawning_UnlocksPersistentlyWhenSmelterBecomesOperational()
+        {
+            GameObject terminalObject = new GameObject("Smelter Activation Terminal");
+            GameObject managerObject = new GameObject("Enemy Spawn Manager");
+            try
+            {
+                FactoryObjectiveTerminal smelter = terminalObject.AddComponent<FactoryObjectiveTerminal>();
+                smelter.Configure(
+                    "Smelter",
+                    null,
+                    null,
+                    System.Array.Empty<GameObject>(),
+                    System.Array.Empty<Light>(),
+                    System.Array.Empty<PlatformerUltra.Factory.Conveyors.ConveyorBelt>(),
+                    false);
+
+                EnemySpawnManager manager = managerObject.AddComponent<EnemySpawnManager>();
+                manager.Configure(
+                    null,
+                    null,
+                    null,
+                    System.Array.Empty<EnemySpawnPoint>(),
+                    null,
+                    null,
+                    null,
+                    smelter,
+                    null,
+                    6f,
+                    12f,
+                    18f,
+                    6,
+                    90f);
+
+                Assert.That(smelter.IsOperational, Is.False);
+                Assert.That(manager.SpawningUnlocked, Is.False);
+                smelter.Activate();
+                Assert.That(smelter.IsOperational, Is.True);
+                Assert.That(manager.SpawningUnlocked, Is.True);
+
+                manager.SetSpawningEnabled(false);
+                Assert.That(manager.SpawningEnabled, Is.False);
+                Assert.That(manager.SpawningUnlocked, Is.True);
+            }
+            finally
+            {
+                Object.DestroyImmediate(managerObject);
+                Object.DestroyImmediate(terminalObject);
+            }
+        }
+
+        [Test]
         public void EnemyRuntimeRegistry_DeduplicatesAndUnregistersImmediately()
         {
             GameObject registryObject = new GameObject("Registry");

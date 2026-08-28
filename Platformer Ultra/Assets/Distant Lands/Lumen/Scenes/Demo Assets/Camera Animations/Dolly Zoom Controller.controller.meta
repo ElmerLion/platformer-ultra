@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: cebd63324cdc9ba44838dc332da5d43a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220976
+  packageName: 'Lumen: Stylized Light FX'
+  packageVersion: 1.1
+  assetPath: Assets/Distant Lands/Lumen/Scenes/Demo Assets/Camera Animations/Dolly
+    Zoom Controller.controller
+  uploadId: 678378

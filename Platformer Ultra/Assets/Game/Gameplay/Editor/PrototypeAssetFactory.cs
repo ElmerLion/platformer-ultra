@@ -31,6 +31,7 @@ namespace PlatformerUltra.Gameplay.Editor
         private const string JumpReferencePath = InputFolder + "/IAR_Jump.asset";
         private const string SprintReferencePath = InputFolder + "/IAR_Sprint.asset";
         private const string InteractReferencePath = InputFolder + "/IAR_Interact.asset";
+        private const string PauseReferencePath = InputFolder + "/IAR_Pause.asset";
         private const string PanelSettingsPath = UiFolder + "/PS_PrototypeHUD.asset";
         private const string HudLayoutPath = UiFolder + "/PrototypeHUD.uxml";
         private const string HudStylePath = UiFolder + "/PrototypeHUD.uss";
@@ -48,6 +49,7 @@ namespace PlatformerUltra.Gameplay.Editor
         private const string RunningAnimationPath = "Assets/Animations/Paladin J Nordstrom@Standard Run.fbx";
         private const string JumpAnimationPath = "Assets/Animations/Paladin J Nordstrom@Jump 1.fbx";
         private const string FallingIdleAnimationPath = "Assets/Animations/Paladin J Nordstrom@Falling Idle.fbx";
+        private const string JumpAirborneClipName = "Jump Airborne";
 
         private const string ConveyorPrefabPath = "Assets/Game/Factory/Conveyors/Prefabs/PF_Conveyor_PointToPoint.prefab";
         private const string BuilderVisualPath = "Assets/Synty/PolygonConstruction/Prefabs/Characters/SM_Chr_Builder_Overalls_01.prefab";
@@ -63,6 +65,7 @@ namespace PlatformerUltra.Gameplay.Editor
             JumpReferencePath,
             SprintReferencePath,
             InteractReferencePath,
+            PauseReferencePath,
             InputActionsPath,
             LegacyInputActionsPath
         };
@@ -187,6 +190,10 @@ namespace PlatformerUltra.Gameplay.Editor
             interact.AddBinding("<Keyboard>/e");
             interact.AddBinding("<Gamepad>/buttonWest");
 
+            InputAction pause = gameplay.AddAction("Pause", InputActionType.Button);
+            pause.AddBinding("<Keyboard>/escape");
+            pause.AddBinding("<Gamepad>/start");
+
             AssetDatabase.CreateAsset(asset, InputActionsPath);
             return new PrototypeInputReferences
             {
@@ -194,7 +201,8 @@ namespace PlatformerUltra.Gameplay.Editor
                 Look = SaveActionReference(look, LookReferencePath),
                 Jump = SaveActionReference(jump, JumpReferencePath),
                 Sprint = SaveActionReference(sprint, SprintReferencePath),
-                Interact = SaveActionReference(interact, InteractReferencePath)
+                Interact = SaveActionReference(interact, InteractReferencePath),
+                Pause = SaveActionReference(pause, PauseReferencePath)
             };
         }
 
@@ -228,7 +236,7 @@ namespace PlatformerUltra.Gameplay.Editor
             ConfigureAnimationImport(IdleAnimationPath, true, false);
             ConfigureAnimationImport(WalkingAnimationPath, true, false);
             ConfigureAnimationImport(RunningAnimationPath, true, false);
-            ConfigureAnimationImport(JumpAnimationPath, false, false);
+            ConfigureJumpAnimationImport();
             ConfigureAnimationImport(FallingIdleAnimationPath, true, false);
         }
 
@@ -284,6 +292,52 @@ namespace PlatformerUltra.Gameplay.Editor
             importer.SaveAndReimport();
         }
 
+        private static void ConfigureJumpAnimationImport()
+        {
+            ModelImporter importer = AssetImporter.GetAtPath(JumpAnimationPath) as ModelImporter;
+            if (importer == null)
+            {
+                Debug.LogError($"Animation asset is missing or is not an FBX: {JumpAnimationPath}");
+                return;
+            }
+
+            importer.animationType = ModelImporterAnimationType.Human;
+            importer.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel;
+            importer.importAnimation = true;
+
+            ModelImporterClipAnimation sourceClip = importer.defaultClipAnimations[0];
+            ModelImporterClipAnimation jumpStartClip = CreateJumpClip(sourceClip, "Jump Start", 0f, 22f, false);
+            ModelImporterClipAnimation jumpAirborneClip = CreateJumpClip(sourceClip, JumpAirborneClipName, 30f, 50f, false);
+            ModelImporterClipAnimation fullJumpClip = CreateJumpClip(sourceClip, "Jump 1", 0f, 65f, false);
+            importer.clipAnimations = new[] { jumpStartClip, jumpAirborneClip, fullJumpClip };
+            importer.SaveAndReimport();
+        }
+
+        private static ModelImporterClipAnimation CreateJumpClip(
+            ModelImporterClipAnimation sourceClip,
+            string clipName,
+            float firstFrame,
+            float lastFrame,
+            bool loop)
+        {
+            return new ModelImporterClipAnimation
+            {
+                name = clipName,
+                takeName = sourceClip.takeName,
+                firstFrame = firstFrame,
+                lastFrame = lastFrame,
+                loopTime = loop,
+                loopPose = loop,
+                lockRootRotation = true,
+                keepOriginalOrientation = false,
+                lockRootHeightY = true,
+                keepOriginalPositionY = false,
+                heightFromFeet = true,
+                lockRootPositionXZ = true,
+                keepOriginalPositionXZ = false
+            };
+        }
+
         private static RuntimeAnimatorController BuildPlayerAnimatorController(PlayerMovementSettings movementSettings)
         {
             if (AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(PlayerAnimatorControllerPath) != null)
@@ -294,10 +348,11 @@ namespace PlatformerUltra.Gameplay.Editor
             AnimationClip idleClip = LoadAnimationClip(IdleAnimationPath);
             AnimationClip walkingClip = LoadAnimationClip(WalkingAnimationPath);
             AnimationClip runningClip = LoadAnimationClip(RunningAnimationPath);
-            AnimationClip jumpClip = LoadAnimationClip(JumpAnimationPath);
+            AnimationClip jumpClip = LoadAnimationClip(JumpAnimationPath, "Jump Start");
+            AnimationClip jumpAirborneClip = LoadAnimationClip(JumpAnimationPath, JumpAirborneClipName);
             AnimationClip fallingIdleClip = LoadAnimationClip(FallingIdleAnimationPath);
             if (idleClip == null || walkingClip == null || runningClip == null ||
-                jumpClip == null || fallingIdleClip == null)
+                jumpClip == null || jumpAirborneClip == null || fallingIdleClip == null)
             {
                 throw new System.InvalidOperationException("One or more required player animation clips could not be loaded.");
             }
@@ -314,6 +369,7 @@ namespace PlatformerUltra.Gameplay.Editor
             AnimatorState walkingState = stateMachine.AddState("Walking", new Vector3(430f, 40f));
             AnimatorState runningState = stateMachine.AddState("Running", new Vector3(680f, 40f));
             AnimatorState jumpState = stateMachine.AddState("Jump", new Vector3(180f, 180f));
+            AnimatorState jumpAirborneState = stateMachine.AddState("Jump Airborne", new Vector3(430f, 180f));
             AnimatorState fallingState = stateMachine.AddState("Falling Idle", new Vector3(430f, 180f));
             stateMachine.defaultState = idleState;
 
@@ -325,7 +381,9 @@ namespace PlatformerUltra.Gameplay.Editor
             runningState.speedParameterActive = true;
             runningState.speedParameter = PlayerAnimationDriver.LocomotionRateParameter;
             jumpState.motion = jumpClip;
-            jumpState.speed = CalculateJumpPlaybackSpeed(jumpClip, movementSettings);
+            jumpState.speed = CalculateJumpStartPlaybackSpeed(jumpClip, movementSettings);
+            jumpAirborneState.motion = jumpAirborneClip;
+            jumpAirborneState.speed = CalculateJumpAirbornePlaybackSpeed(jumpAirborneClip, movementSettings);
             fallingState.motion = fallingIdleClip;
 
             AnimatorStateTransition idleToWalking = AddImmediateTransition(idleState, walkingState, 0.12f);
@@ -355,20 +413,20 @@ namespace PlatformerUltra.Gameplay.Editor
             AddAirborneTransitions(walkingState, jumpState, fallingState);
             AddAirborneTransitions(runningState, jumpState, fallingState);
 
-            AnimatorStateTransition jumpToFalling = AddImmediateTransition(jumpState, fallingState, 0.1f);
-            jumpToFalling.AddCondition(AnimatorConditionMode.IfNot, 0f, PlayerAnimationDriver.IsGroundedParameter);
-            jumpToFalling.AddCondition(AnimatorConditionMode.Less, -0.05f, PlayerAnimationDriver.VerticalSpeedParameter);
-            jumpToFalling.hasExitTime = true;
-            jumpToFalling.exitTime = 1f;
+            AnimatorStateTransition jumpToAirborne = AddImmediateTransition(jumpState, jumpAirborneState, 0.1f);
+            jumpToAirborne.AddCondition(AnimatorConditionMode.IfNot, 0f, PlayerAnimationDriver.IsGroundedParameter);
+            jumpToAirborne.hasExitTime = true;
+            jumpToAirborne.exitTime = 0.9f;
 
-            AddLandingTransitions(jumpState, idleState, walkingState, runningState);
-            AddLandingTransitions(fallingState, idleState, walkingState, runningState);
+            AddLandingTransitions(jumpState, idleState, walkingState, runningState, 0.12f);
+            AddLandingTransitions(jumpAirborneState, idleState, walkingState, runningState, 0.16f);
+            AddLandingTransitions(fallingState, idleState, walkingState, runningState, 0.16f);
 
             EditorUtility.SetDirty(controller);
             return controller;
         }
 
-        private static float CalculateJumpPlaybackSpeed(
+        private static float CalculateJumpStartPlaybackSpeed(
             AnimationClip jumpClip,
             PlayerMovementSettings movementSettings)
         {
@@ -377,26 +435,40 @@ namespace PlatformerUltra.Gameplay.Editor
                 return 1f;
             }
 
-            float jumpDuration = 2f * Mathf.Sqrt(2f * movementSettings.JumpHeight / -movementSettings.Gravity);
-            return jumpDuration > 0.01f ? jumpClip.length / jumpDuration : 1f;
+            float ascentDuration = Mathf.Sqrt(2f * movementSettings.JumpHeight / -movementSettings.Gravity);
+            return ascentDuration > 0.01f ? jumpClip.length / ascentDuration : 1f;
+        }
+
+        private static float CalculateJumpAirbornePlaybackSpeed(
+            AnimationClip jumpClip,
+            PlayerMovementSettings movementSettings)
+        {
+            if (jumpClip == null || movementSettings == null || movementSettings.Gravity >= 0f)
+            {
+                return 1f;
+            }
+
+            float descentDuration = Mathf.Sqrt(2f * movementSettings.JumpHeight / -movementSettings.Gravity);
+            return descentDuration > 0.01f ? jumpClip.length / descentDuration : 1f;
         }
 
         private static void AddLandingTransitions(
             AnimatorState airborneState,
             AnimatorState idleState,
             AnimatorState walkingState,
-            AnimatorState runningState)
+            AnimatorState runningState,
+            float duration)
         {
-            AnimatorStateTransition toIdle = AddImmediateTransition(airborneState, idleState, 0.08f);
+            AnimatorStateTransition toIdle = AddImmediateTransition(airborneState, idleState, duration);
             toIdle.AddCondition(AnimatorConditionMode.If, 0f, PlayerAnimationDriver.IsGroundedParameter);
             toIdle.AddCondition(AnimatorConditionMode.Less, 0.05f, PlayerAnimationDriver.MoveSpeedParameter);
 
-            AnimatorStateTransition toWalking = AddImmediateTransition(airborneState, walkingState, 0.08f);
+            AnimatorStateTransition toWalking = AddImmediateTransition(airborneState, walkingState, duration);
             toWalking.AddCondition(AnimatorConditionMode.If, 0f, PlayerAnimationDriver.IsGroundedParameter);
             toWalking.AddCondition(AnimatorConditionMode.Greater, 0.05f, PlayerAnimationDriver.MoveSpeedParameter);
             toWalking.AddCondition(AnimatorConditionMode.IfNot, 0f, PlayerAnimationDriver.IsSprintingParameter);
 
-            AnimatorStateTransition toRunning = AddImmediateTransition(airborneState, runningState, 0.08f);
+            AnimatorStateTransition toRunning = AddImmediateTransition(airborneState, runningState, duration);
             toRunning.AddCondition(AnimatorConditionMode.If, 0f, PlayerAnimationDriver.IsGroundedParameter);
             toRunning.AddCondition(AnimatorConditionMode.Greater, 0.05f, PlayerAnimationDriver.MoveSpeedParameter);
             toRunning.AddCondition(AnimatorConditionMode.If, 0f, PlayerAnimationDriver.IsSprintingParameter);
@@ -416,13 +488,14 @@ namespace PlatformerUltra.Gameplay.Editor
             toFalling.AddCondition(AnimatorConditionMode.Less, -0.05f, PlayerAnimationDriver.VerticalSpeedParameter);
         }
 
-        private static AnimationClip LoadAnimationClip(string assetPath)
+        private static AnimationClip LoadAnimationClip(string assetPath, string clipName = null)
         {
             Object[] assets = AssetDatabase.LoadAllAssetsAtPath(assetPath);
             for (int index = 0; index < assets.Length; index++)
             {
                 AnimationClip clip = assets[index] as AnimationClip;
-                if (clip != null && !clip.name.StartsWith("__preview__"))
+                if (clip != null && !clip.name.StartsWith("__preview__") &&
+                    (clipName == null || clip.name == clipName))
                 {
                     return clip;
                 }
@@ -1019,6 +1092,7 @@ namespace PlatformerUltra.Gameplay.Editor
             public InputActionReference Jump;
             public InputActionReference Sprint;
             public InputActionReference Interact;
+            public InputActionReference Pause;
         }
 
         private sealed class PrototypeMaterials

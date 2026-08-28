@@ -9,6 +9,36 @@ namespace PlatformerUltra.FactoryDefense.Tests
     public sealed class FactoryDefenseTests
     {
         [Test]
+        public void TurretLaserTracer_InitializesVisibleWorldSpaceBeam()
+        {
+            GameObject root = new GameObject("Laser Tracer");
+            try
+            {
+                LineRenderer lineRenderer = root.AddComponent<LineRenderer>();
+                TurretLaserTracer tracer = root.AddComponent<TurretLaserTracer>();
+                tracer.Configure(lineRenderer, 0.12f, 0.075f, 0.02f);
+                Vector3 start = new Vector3(1f, 2f, 3f);
+                Vector3 end = new Vector3(4f, 5f, 6f);
+
+                tracer.Initialize(start, end);
+
+                Assert.That(tracer.IsInitialized, Is.True);
+                Assert.That(tracer.Lifetime, Is.EqualTo(0.12f));
+                Assert.That(lineRenderer.enabled, Is.True);
+                Assert.That(lineRenderer.useWorldSpace, Is.True);
+                Assert.That(lineRenderer.positionCount, Is.EqualTo(2));
+                Assert.That(lineRenderer.GetPosition(0), Is.EqualTo(start));
+                Assert.That(lineRenderer.GetPosition(1), Is.EqualTo(end));
+                Assert.That(lineRenderer.startWidth, Is.EqualTo(0.075f));
+                Assert.That(lineRenderer.endWidth, Is.EqualTo(0.02f));
+            }
+            finally
+            {
+                Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
         public void ConstructionCompletion_CreatesAndRegistersOneTurret()
         {
             DefenseFixture fixture = new DefenseFixture();

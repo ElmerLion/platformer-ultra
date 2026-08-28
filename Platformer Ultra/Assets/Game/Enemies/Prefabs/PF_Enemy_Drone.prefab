@@ -170,6 +170,7 @@ MonoBehaviour:
   _factionMember: {fileID: 5406010916788921498}
   _targetable: {fileID: 1982284757738810110}
   _brain: {fileID: 1685853412174083127}
+  _animatorDriver: {fileID: 0}
   _deathExplosion: {fileID: 645956223078808891}
 --- !u!114 &1685853412174083127
 MonoBehaviour:

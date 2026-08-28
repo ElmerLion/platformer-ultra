@@ -114,6 +114,129 @@ namespace PlatformerUltra.Gameplay.Tests
         }
 
         [Test]
+        public void PauseController_PausesAndResumesWithoutDisablingThePlayerPermanently()
+        {
+            GameObject root = new GameObject("Pause Controller");
+            float originalTimeScale = Time.timeScale;
+            bool originalAudioPause = AudioListener.pause;
+            try
+            {
+                FactoryPauseController pause = root.AddComponent<FactoryPauseController>();
+                pause.Configure(null, null, null, null, null, null, null);
+
+                pause.PauseGame();
+                Assert.That(pause.IsPaused, Is.True);
+                Assert.That(Time.timeScale, Is.Zero);
+                Assert.That(AudioListener.pause, Is.True);
+
+                pause.ResumeGame();
+                Assert.That(pause.IsPaused, Is.False);
+                Assert.That(Time.timeScale, Is.EqualTo(1f).Within(0.0001f));
+                Assert.That(AudioListener.pause, Is.False);
+            }
+            finally
+            {
+                Time.timeScale = originalTimeScale;
+                AudioListener.pause = originalAudioPause;
+                Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
+        public void VictoryController_CompletesPortalCinematicAndStopsSpawning()
+        {
+            GameObject root = new GameObject("Victory Fixture");
+            GameObject player = new GameObject("Player");
+            GameObject camera = new GameObject("Camera");
+            GameObject destination = new GameObject("Portal Destination");
+            GameObject cameraAnchor = new GameObject("Camera Anchor");
+            float originalTimeScale = Time.timeScale;
+            bool originalAudioPause = AudioListener.pause;
+            try
+            {
+                player.transform.position = new Vector3(0f, 0f, -4f);
+                destination.transform.position = new Vector3(0f, 3f, 0f);
+                destination.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+                camera.transform.position = new Vector3(0f, 3f, -8f);
+                cameraAnchor.transform.position = new Vector3(6f, 5f, -3f);
+                cameraAnchor.transform.rotation = Quaternion.LookRotation(destination.transform.position - cameraAnchor.transform.position);
+
+                TestEnemySpawningController spawner = root.AddComponent<TestEnemySpawningController>();
+                FactoryVictoryController victory = root.AddComponent<FactoryVictoryController>();
+                victory.Configure(
+                    player.transform,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    camera.transform,
+                    destination.transform,
+                    cameraAnchor.transform,
+                    null,
+                    spawner,
+                    System.Array.Empty<Renderer>(),
+                    2.6f);
+
+                Assert.That(victory.BeginVictory(), Is.True);
+                Assert.That(spawner.SpawningEnabled, Is.False);
+                victory.AdvanceCinematic(2.6f);
+                Assert.That(victory.IsCinematicComplete, Is.True);
+                Assert.That(Vector3.Distance(player.transform.position, destination.transform.position), Is.LessThan(0.0001f));
+                Assert.That(Time.timeScale, Is.Zero);
+                Assert.That(AudioListener.pause, Is.True);
+            }
+            finally
+            {
+                Time.timeScale = originalTimeScale;
+                AudioListener.pause = originalAudioPause;
+                Object.DestroyImmediate(cameraAnchor);
+                Object.DestroyImmediate(destination);
+                Object.DestroyImmediate(camera);
+                Object.DestroyImmediate(player);
+                Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
+        public void VictoryController_ResolvesSerializedSpawningControllerAfterSceneLoad()
+        {
+            GameObject root = new GameObject("Victory Serialization Fixture");
+            GameObject player = new GameObject("Player");
+            GameObject camera = new GameObject("Camera");
+            GameObject destination = new GameObject("Destination");
+            GameObject cameraAnchor = new GameObject("Camera Anchor");
+            float originalTimeScale = Time.timeScale;
+            bool originalAudioPause = AudioListener.pause;
+            try
+            {
+                TestEnemySpawningController spawner = root.AddComponent<TestEnemySpawningController>();
+                FactoryVictoryController victory = root.AddComponent<FactoryVictoryController>();
+                SerializedObject serializedVictory = new SerializedObject(victory);
+                serializedVictory.FindProperty("_playerRoot").objectReferenceValue = player.transform;
+                serializedVictory.FindProperty("_cameraTransform").objectReferenceValue = camera.transform;
+                serializedVictory.FindProperty("_portalDestination").objectReferenceValue = destination.transform;
+                serializedVictory.FindProperty("_cameraAnchor").objectReferenceValue = cameraAnchor.transform;
+                serializedVictory.FindProperty("_spawnManagerBehaviour").objectReferenceValue = spawner;
+                serializedVictory.ApplyModifiedPropertiesWithoutUndo();
+
+                InvokePrivate(victory, "Awake");
+                Assert.That(victory.BeginVictory(), Is.True);
+                Assert.That(spawner.SpawningEnabled, Is.False);
+            }
+            finally
+            {
+                Time.timeScale = originalTimeScale;
+                AudioListener.pause = originalAudioPause;
+                Object.DestroyImmediate(cameraAnchor);
+                Object.DestroyImmediate(destination);
+                Object.DestroyImmediate(camera);
+                Object.DestroyImmediate(player);
+                Object.DestroyImmediate(root);
+            }
+        }
+
+        [Test]
         public void AnimationCadence_ScalesWalkingCycleToPhysicalTravel()
         {
             float normalRate = PlayerAnimationDriver.CalculateLocomotionPlaybackRate(1f, 1f, 1f, 0.25f, 3f);
@@ -271,6 +394,16 @@ namespace PlatformerUltra.Gameplay.Tests
             Assert.That(landsInIdle, Is.True);
             Assert.That(landsInWalking, Is.True);
             Assert.That(landsInRunning, Is.True);
+        }
+
+        private sealed class TestEnemySpawningController : MonoBehaviour, IEnemySpawningController
+        {
+            public bool SpawningEnabled { get; private set; } = true;
+
+            public void SetSpawningEnabled(bool enabled)
+            {
+                SpawningEnabled = enabled;
+            }
         }
     }
 }
