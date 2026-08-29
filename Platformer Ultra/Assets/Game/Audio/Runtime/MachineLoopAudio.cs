@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace PlatformerUltra.Audio
 {
@@ -14,6 +15,7 @@ namespace PlatformerUltra.Audio
         [SerializeField, Min(0.01f)] private float _maxDistance = 14f;
         [SerializeField] private bool _playOnEnable = true;
         [SerializeField] private AudioSource _source;
+        [SerializeField] private AudioMixerGroup _outputGroup;
 
         private float _targetVolume;
         private float _intensity = 1f;
@@ -25,7 +27,8 @@ namespace PlatformerUltra.Audio
             float minDistance = 2.5f,
             float maxDistance = 14f,
             float fadeInDuration = 0.45f,
-            bool playOnEnable = true)
+            bool playOnEnable = true,
+            AudioMixerGroup outputGroup = null)
         {
             _clip = clip;
             _volume = Mathf.Clamp01(volume);
@@ -33,6 +36,7 @@ namespace PlatformerUltra.Audio
             _maxDistance = Mathf.Max(_minDistance, maxDistance);
             _fadeInDuration = Mathf.Max(0f, fadeInDuration);
             _playOnEnable = playOnEnable;
+            _outputGroup = outputGroup;
             CacheAndConfigureSource();
         }
 
@@ -164,6 +168,7 @@ namespace PlatformerUltra.Audio
             _source.dopplerLevel = 0f;
             _source.spread = 35f;
             _source.priority = 160;
+            _source.outputAudioMixerGroup = _outputGroup;
 
             if (!Application.isPlaying)
             {

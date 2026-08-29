@@ -48,6 +48,8 @@ namespace PlatformerUltra.FactoryDefense.Tests
             Assert.That(prefab, Is.Not.Null);
             FactoryTurret turret = prefab.GetComponent<FactoryTurret>();
             Assert.That(turret, Is.Not.Null);
+            Assert.That(turret.Damage, Is.EqualTo(8));
+            Assert.That(turret.ShotInterval, Is.EqualTo(1f).Within(0.0001f));
             Assert.That(turret.ShotClip, Is.Not.Null);
             Assert.That(AssetDatabase.GetAssetPath(turret.ShotClip),
                 Is.EqualTo("Assets/Audio/freesound_community-laser-45816.mp3"));
@@ -55,6 +57,13 @@ namespace PlatformerUltra.FactoryDefense.Tests
             Assert.That(source, Is.Not.Null);
             Assert.That(source.playOnAwake, Is.False);
             Assert.That(source.spatialBlend, Is.EqualTo(1f).Within(0.0001f));
+
+            GameObject buildSpotPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Game/FactoryDefense/Prefabs/PF_Factory_TurretBuildSpot.prefab");
+            Assert.That(buildSpotPrefab, Is.Not.Null);
+            TurretBuildSpot buildSpot = buildSpotPrefab.GetComponent<TurretBuildSpot>();
+            Assert.That(buildSpot, Is.Not.Null);
+            Assert.That(buildSpot.InteractionDuration, Is.EqualTo(6f).Within(0.0001f));
         }
 
         [Test]
@@ -87,7 +96,7 @@ namespace PlatformerUltra.FactoryDefense.Tests
             {
                 TimedInteractionSession session = new TimedInteractionSession();
                 Assert.That(session.TryBegin(fixture.Spot, interactor), Is.True);
-                session.Tick(6f, true);
+                session.Tick(3f, true);
                 Assert.That(session.Tick(0f, false), Is.EqualTo(TimedInteractionTickResult.Cancelled));
 
                 Assert.That(fixture.Spot.IsBuilt, Is.False);
@@ -146,7 +155,7 @@ namespace PlatformerUltra.FactoryDefense.Tests
         }
 
         [Test]
-        public void TurretFire_AppliesTenDamageAndRespectsCooldown()
+        public void TurretFire_AppliesEightDamageAndRespectsOneSecondCooldown()
         {
             DefenseFixture fixture = new DefenseFixture();
             EnemyFixture enemy = new EnemyFixture(fixture.EnemyRegistry, new Vector3(0f, 0f, 5f), 30);
@@ -156,11 +165,11 @@ namespace PlatformerUltra.FactoryDefense.Tests
                 Physics.SyncTransforms();
 
                 turret.Tick(1f, 0f);
-                Assert.That(enemy.Enemy.CurrentHealth, Is.EqualTo(20));
-                turret.Tick(0.1f, 0.1f);
-                Assert.That(enemy.Enemy.CurrentHealth, Is.EqualTo(20));
-                turret.Tick(1.1f, 1.2f);
-                Assert.That(enemy.Enemy.CurrentHealth, Is.EqualTo(10));
+                Assert.That(enemy.Enemy.CurrentHealth, Is.EqualTo(22));
+                turret.Tick(0.9f, 0.9f);
+                Assert.That(enemy.Enemy.CurrentHealth, Is.EqualTo(22));
+                turret.Tick(0.1f, 1f);
+                Assert.That(enemy.Enemy.CurrentHealth, Is.EqualTo(14));
             }
             finally
             {
@@ -243,7 +252,7 @@ namespace PlatformerUltra.FactoryDefense.Tests
                     Trigger,
                     EnemyRegistry,
                     FactoryRegistry,
-                    12f);
+                    6f);
             }
 
             public GameObject RegistryRoot { get; }
@@ -305,8 +314,8 @@ namespace PlatformerUltra.FactoryDefense.Tests
                     ~0,
                     80,
                     12f,
-                    10,
-                    1.2f,
+                    8,
+                    1f,
                     360f,
                     5f,
                     0.2f);

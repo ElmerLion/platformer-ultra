@@ -123,6 +123,7 @@ namespace PlatformerUltra.Gameplay
             }
 
             ApplyCrosshairVisibility();
+            _resumeButton?.Focus();
         }
 
         public void HidePause()

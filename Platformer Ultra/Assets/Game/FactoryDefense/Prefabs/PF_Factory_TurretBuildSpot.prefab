@@ -413,7 +413,7 @@ MonoBehaviour:
   _interactionTrigger: {fileID: 3227770389563722260}
   _enemyRegistry: {fileID: 0}
   _factoryRegistry: {fileID: 0}
-  _buildDuration: 12
+  _buildDuration: 6
 --- !u!114 &6623088291037914678
 MonoBehaviour:
   m_ObjectHideFlags: 0

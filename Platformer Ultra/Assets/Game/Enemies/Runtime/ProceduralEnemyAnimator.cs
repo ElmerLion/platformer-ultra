@@ -1,3 +1,4 @@
+using System;
 using PlatformerUltra.Combat;
 using PlatformerUltra.Gameplay;
 using UnityEngine;
@@ -91,6 +92,8 @@ namespace PlatformerUltra.Enemies
             _leftUpperArm != null && _rightUpperArm != null &&
             _leftThigh != null && _rightThigh != null;
 
+        public event Action Footstepped;
+
         private void Awake()
         {
             ResolveReferences();
@@ -154,7 +157,13 @@ namespace PlatformerUltra.Enemies
             _chaseWeight = Mathf.Lerp(_chaseWeight, chasing ? 1f : 0f, blend);
             if (!_dead && !_attacking && speed > 0.02f)
             {
+                int previousStep = Mathf.FloorToInt(_gaitPhase / Mathf.PI);
                 _gaitPhase += speed / Mathf.Max(0.1f, _strideDistance) * Mathf.PI * 2f * deltaTime;
+                int currentStep = Mathf.FloorToInt(_gaitPhase / Mathf.PI);
+                if (currentStep != previousStep && _speedWeight > 0.4f)
+                {
+                    Footstepped?.Invoke();
+                }
             }
 
             if (_rigKind == ProceduralEnemyRigKind.Saboteur)

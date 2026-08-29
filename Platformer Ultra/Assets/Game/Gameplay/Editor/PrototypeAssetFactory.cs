@@ -176,6 +176,24 @@ namespace PlatformerUltra.Gameplay.Editor
 
         private static PrototypeInputReferences BuildInputAssets()
         {
+            InputActionAsset existingAsset = AssetDatabase.LoadAssetAtPath<InputActionAsset>(InputActionsPath);
+            PrototypeInputReferences existing = new PrototypeInputReferences
+            {
+                Move = AssetDatabase.LoadAssetAtPath<InputActionReference>(MoveReferencePath),
+                Look = AssetDatabase.LoadAssetAtPath<InputActionReference>(LookReferencePath),
+                Jump = AssetDatabase.LoadAssetAtPath<InputActionReference>(JumpReferencePath),
+                Sprint = AssetDatabase.LoadAssetAtPath<InputActionReference>(SprintReferencePath),
+                Dash = AssetDatabase.LoadAssetAtPath<InputActionReference>(DashReferencePath),
+                Interact = AssetDatabase.LoadAssetAtPath<InputActionReference>(InteractReferencePath),
+                Pause = AssetDatabase.LoadAssetAtPath<InputActionReference>(PauseReferencePath)
+            };
+            if (existingAsset != null && existing.Move?.action != null && existing.Look?.action != null &&
+                existing.Jump?.action != null && existing.Sprint?.action != null && existing.Dash?.action != null &&
+                existing.Interact?.action != null && existing.Pause?.action != null)
+            {
+                return existing;
+            }
+
             foreach (string path in GeneratedInputAssetPaths)
             {
                 if (AssetDatabase.LoadMainAssetAtPath(path) != null)

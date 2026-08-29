@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace PlatformerUltra.Gameplay
@@ -72,6 +73,8 @@ namespace PlatformerUltra.Gameplay
             _leftUpperArm != null && _rightUpperArm != null &&
             _leftThigh != null && _rightThigh != null;
 
+        public event Action Footstepped;
+
         private void Awake()
         {
             if (_controller == null)
@@ -127,7 +130,13 @@ namespace PlatformerUltra.Gameplay
             float strideDistance = Mathf.Lerp(_walkStrideDistance, _runStrideDistance, _sprintWeight);
             if (grounded && planarSpeed > 0.02f)
             {
+                int previousStep = Mathf.FloorToInt(_gaitPhase / Mathf.PI);
                 _gaitPhase += planarSpeed / Mathf.Max(0.1f, strideDistance) * Mathf.PI * 2f * deltaTime;
+                int currentStep = Mathf.FloorToInt(_gaitPhase / Mathf.PI);
+                if (currentStep != previousStep && _moveWeight > 0.45f)
+                {
+                    Footstepped?.Invoke();
+                }
             }
 
             ApplyPose(planarSpeed, verticalSpeed);

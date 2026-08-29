@@ -273,6 +273,7 @@
 }
 
 .pause-card,
+.settings-card,
 .victory-card {
     width: 480px;
     padding: 30px 40px 34px 40px;
@@ -285,6 +286,115 @@
 
 .pause-card {
     border-top-color: rgb(99, 224, 255);
+}
+
+.settings-card {
+    width: 850px;
+    max-height: 92%;
+    padding: 26px 34px 30px 34px;
+    align-items: center;
+    background-color: rgba(9, 17, 23, 0.98);
+    border-top-width: 4px;
+    border-top-color: rgb(99, 224, 255);
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(80, 111, 123);
+    display: none;
+}
+
+.settings-content {
+    width: 100%;
+    flex-direction: row;
+    margin-bottom: 16px;
+}
+
+.settings-section {
+    flex-grow: 1;
+    padding: 16px 18px;
+    background-color: rgba(18, 31, 39, 0.88);
+}
+
+.audio-settings-section {
+    width: 43%;
+    margin-right: 10px;
+}
+
+.controls-section {
+    width: 57%;
+    margin-left: 10px;
+}
+
+.settings-section-title {
+    font-size: 13px;
+    letter-spacing: 2px;
+    -unity-font-style: bold;
+    color: rgb(99, 224, 255);
+    margin-bottom: 12px;
+}
+
+.volume-row {
+    min-height: 46px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.volume-label {
+    width: 74px;
+    font-size: 13px;
+    -unity-font-style: bold;
+    color: rgb(190, 215, 222);
+}
+
+.volume-slider {
+    flex-grow: 1;
+    margin-left: 6px;
+    margin-right: 10px;
+    --unity-colors-slider-groove-background: rgb(34, 53, 62);
+}
+
+.volume-value {
+    width: 46px;
+    font-size: 13px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+    color: rgb(99, 224, 255);
+}
+
+.controls-heading-row,
+.control-row {
+    flex-direction: row;
+    min-height: 30px;
+    align-items: center;
+}
+
+.controls-heading-row {
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(99, 224, 255, 0.45);
+    margin-bottom: 4px;
+}
+
+.control-row {
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(80, 111, 123, 0.28);
+}
+
+.control-heading {
+    font-size: 10px;
+    letter-spacing: 1px;
+    -unity-font-style: bold;
+    color: rgb(132, 177, 188);
+}
+
+.control-action {
+    width: 25%;
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: rgb(225, 238, 241);
+}
+
+.control-binding {
+    width: 37.5%;
+    font-size: 11px;
+    color: rgb(168, 199, 207);
 }
 
 .victory-card {

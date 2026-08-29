@@ -40,12 +40,52 @@
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="pause-panel" class="pause-panel">
-            <ui:VisualElement class="pause-card">
+            <ui:VisualElement name="pause-card" class="pause-card">
                 <ui:Label text="OPERATIONS SUSPENDED" class="pause-kicker" />
                 <ui:Label text="PAUSED" class="pause-title" />
                 <ui:Label text="Emergency operations suspended." class="pause-message" />
                 <ui:Button name="resume-button" text="RESUME" class="primary-menu-button" />
+                <ui:Button name="options-button" text="OPTIONS" class="secondary-menu-button" />
                 <ui:Button name="pause-retry-button" text="RETRY FACTORY" class="secondary-menu-button" />
+            </ui:VisualElement>
+            <ui:VisualElement name="settings-card" class="settings-card">
+                <ui:Label text="SYSTEM CONFIGURATION" class="pause-kicker" />
+                <ui:Label text="OPTIONS" class="pause-title" />
+                <ui:VisualElement class="settings-content">
+                    <ui:VisualElement class="settings-section audio-settings-section">
+                        <ui:Label text="AUDIO" class="settings-section-title" />
+                        <ui:VisualElement class="volume-row">
+                            <ui:Label text="MASTER" class="volume-label" />
+                            <ui:Slider name="master-volume-slider" low-value="0" high-value="100" value="100" class="volume-slider" />
+                            <ui:Label name="master-volume-value" text="100%" class="volume-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="volume-row">
+                            <ui:Label text="MUSIC" class="volume-label" />
+                            <ui:Slider name="music-volume-slider" low-value="0" high-value="100" value="100" class="volume-slider" />
+                            <ui:Label name="music-volume-value" text="100%" class="volume-value" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="volume-row">
+                            <ui:Label text="SFX" class="volume-label" />
+                            <ui:Slider name="sfx-volume-slider" low-value="0" high-value="100" value="100" class="volume-slider" />
+                            <ui:Label name="sfx-volume-value" text="100%" class="volume-value" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-section controls-section">
+                        <ui:Label text="CONTROLS" class="settings-section-title" />
+                        <ui:VisualElement class="controls-heading-row">
+                            <ui:Label text="ACTION" class="control-heading control-action" />
+                            <ui:Label text="KEYBOARD / MOUSE" class="control-heading control-binding" />
+                            <ui:Label text="GAMEPAD" class="control-heading control-binding" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="control-row"><ui:Label text="Move" class="control-action" /><ui:Label text="WASD" class="control-binding" /><ui:Label text="Left Stick" class="control-binding" /></ui:VisualElement>
+                        <ui:VisualElement class="control-row"><ui:Label text="Look" class="control-action" /><ui:Label text="Mouse" class="control-binding" /><ui:Label text="Right Stick" class="control-binding" /></ui:VisualElement>
+                        <ui:VisualElement class="control-row"><ui:Label text="Jump" class="control-action" /><ui:Label text="Space" class="control-binding" /><ui:Label text="South Button" class="control-binding" /></ui:VisualElement>
+                        <ui:VisualElement class="control-row"><ui:Label text="Dash" class="control-action" /><ui:Label text="Left Shift" class="control-binding" /><ui:Label text="Left Stick Press / East Button" class="control-binding" /></ui:VisualElement>
+                        <ui:VisualElement class="control-row"><ui:Label text="Interact" class="control-action" /><ui:Label text="E" class="control-binding" /><ui:Label text="West Button" class="control-binding" /></ui:VisualElement>
+                        <ui:VisualElement class="control-row"><ui:Label text="Pause" class="control-action" /><ui:Label text="Escape" class="control-binding" /><ui:Label text="Start" class="control-binding" /></ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Button name="settings-back-button" text="BACK" class="secondary-menu-button" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="victory-panel" class="victory-panel">

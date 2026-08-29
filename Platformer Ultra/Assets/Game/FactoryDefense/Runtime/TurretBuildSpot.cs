@@ -13,7 +13,7 @@ namespace PlatformerUltra.FactoryDefense
         [SerializeField] private Collider _interactionTrigger;
         [SerializeField] private EnemyRuntimeRegistry _enemyRegistry;
         [SerializeField] private MachineTargetRegistry _factoryRegistry;
-        [SerializeField, Range(10f, 15f)] private float _buildDuration = 12f;
+        [SerializeField, Range(3f, 15f)] private float _buildDuration = 6f;
 
         private FactoryTurret _builtTurret;
         private string _lastInteractionFeedback = string.Empty;
@@ -35,7 +35,7 @@ namespace PlatformerUltra.FactoryDefense
 
         private void OnValidate()
         {
-            _buildDuration = Mathf.Clamp(_buildDuration, 10f, 15f);
+            _buildDuration = Mathf.Clamp(_buildDuration, 3f, 15f);
             if (!Application.isPlaying)
             {
                 ApplyState();
@@ -49,7 +49,7 @@ namespace PlatformerUltra.FactoryDefense
             Collider interactionTrigger,
             EnemyRuntimeRegistry enemyRegistry,
             MachineTargetRegistry factoryRegistry,
-            float buildDuration = 12f)
+            float buildDuration = 6f)
         {
             _turretPrefab = turretPrefab;
             _turretMount = turretMount != null ? turretMount : transform;
@@ -57,7 +57,7 @@ namespace PlatformerUltra.FactoryDefense
             _interactionTrigger = interactionTrigger;
             _enemyRegistry = enemyRegistry;
             _factoryRegistry = factoryRegistry;
-            _buildDuration = Mathf.Clamp(buildDuration, 10f, 15f);
+            _buildDuration = Mathf.Clamp(buildDuration, 3f, 15f);
             ApplyState();
         }
 

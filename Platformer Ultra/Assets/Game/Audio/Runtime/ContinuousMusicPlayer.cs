@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace PlatformerUltra.Audio
 {
@@ -11,6 +12,7 @@ namespace PlatformerUltra.Audio
         [SerializeField, Min(0f)] private float _crossfadeDuration = 4f;
         [SerializeField] private AudioSource _sourceA;
         [SerializeField] private AudioSource _sourceB;
+        [SerializeField] private AudioMixerGroup _outputGroup;
 
         private AudioSource _activeSource;
         private AudioSource _incomingSource;
@@ -19,11 +21,16 @@ namespace PlatformerUltra.Audio
         private bool _isCrossfading;
         private bool _waitingForFirstTrack;
 
-        public void Configure(AudioClip[] tracks, float volume = 0.22f, float crossfadeDuration = 4f)
+        public void Configure(
+            AudioClip[] tracks,
+            float volume = 0.22f,
+            float crossfadeDuration = 4f,
+            AudioMixerGroup outputGroup = null)
         {
             _tracks = tracks ?? Array.Empty<AudioClip>();
             _volume = Mathf.Clamp01(volume);
             _crossfadeDuration = Mathf.Max(0f, crossfadeDuration);
+            _outputGroup = outputGroup;
             EnsureSources();
             ConfigureSources();
         }
@@ -229,7 +236,7 @@ namespace PlatformerUltra.Audio
             ConfigureSource(_sourceB);
         }
 
-        private static void ConfigureSource(AudioSource source)
+        private void ConfigureSource(AudioSource source)
         {
             if (source == null)
             {
@@ -241,6 +248,7 @@ namespace PlatformerUltra.Audio
             source.spatialBlend = 0f;
             source.dopplerLevel = 0f;
             source.priority = 0;
+            source.outputAudioMixerGroup = _outputGroup;
         }
     }
 }

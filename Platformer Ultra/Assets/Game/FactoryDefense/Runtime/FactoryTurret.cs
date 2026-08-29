@@ -28,8 +28,8 @@ namespace PlatformerUltra.FactoryDefense
         [Header("Balance")]
         [SerializeField, Min(1)] private int _maximumHealth = 80;
         [SerializeField, Min(1f)] private float _range = 15f;
-        [SerializeField, Min(1)] private int _damage = 10;
-        [SerializeField, Min(0.05f)] private float _shotInterval = 1.2f;
+        [SerializeField, Min(1)] private int _damage = 8;
+        [SerializeField, Min(0.05f)] private float _shotInterval = 1f;
         [SerializeField, Min(1f)] private float _turnSpeed = 90f;
         [SerializeField, Range(0.1f, 45f)] private float _firingTolerance = 5f;
         [SerializeField, Min(0.02f)] private float _targetRefreshInterval = 0.2f;
@@ -108,8 +108,8 @@ namespace PlatformerUltra.FactoryDefense
             LayerMask lineOfSightMask,
             int maximumHealth = 80,
             float range = 15f,
-            int damage = 10,
-            float shotInterval = 1.2f,
+            int damage = 8,
+            float shotInterval = 1f,
             float turnSpeed = 90f,
             float firingTolerance = 5f,
             float targetRefreshInterval = 0.2f,

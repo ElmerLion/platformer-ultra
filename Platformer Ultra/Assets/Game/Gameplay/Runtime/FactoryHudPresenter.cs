@@ -239,7 +239,9 @@ namespace PlatformerUltra.Gameplay
 
             if (_portalReceiver == null || _portalReceiver.DeliveredCount < _portalReceiver.RequiredCount)
             {
-                _objectiveLabel.text = "Produce the Portal Cores";
+                _objectiveLabel.text = _portalReceiver != null && _portalReceiver.RequiredCount == 1
+                    ? "Produce 1 Portal Core"
+                    : "Produce the Portal Cores";
                 return;
             }
 

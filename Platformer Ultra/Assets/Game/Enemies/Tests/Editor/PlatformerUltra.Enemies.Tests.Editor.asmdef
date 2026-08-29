@@ -3,6 +3,7 @@
   "rootNamespace": "PlatformerUltra.Enemies.Tests",
   "references": [
     "PlatformerUltra.Combat.Runtime",
+    "PlatformerUltra.Audio.Runtime",
     "PlatformerUltra.Conveyors.Runtime",
     "PlatformerUltra.Enemies.Runtime",
     "PlatformerUltra.Enemies.Editor",

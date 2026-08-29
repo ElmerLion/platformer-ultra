@@ -3,6 +3,8 @@
   "rootNamespace": "PlatformerUltra.Gameplay.Editor",
   "references": [
     "PlatformerUltra.CharacterArt.Editor",
+    "PlatformerUltra.Audio.Editor",
+    "PlatformerUltra.Audio.Runtime",
     "PlatformerUltra.Gameplay.Runtime",
     "PlatformerUltra.Combat.Runtime",
     "PlatformerUltra.Conveyors.Runtime",

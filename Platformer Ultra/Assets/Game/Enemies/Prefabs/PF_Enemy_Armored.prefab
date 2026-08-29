@@ -20,6 +20,8 @@ GameObject:
   - component: {fileID: 5690016580550946053}
   - component: {fileID: 3258788893876651645}
   - component: {fileID: 6367558292030384740}
+  - component: {fileID: 1683319792330064187}
+  - component: {fileID: 6500571308947380033}
   m_Layer: 8
   m_Name: PF_Enemy_Armored
   m_TagString: Untagged
@@ -244,6 +246,142 @@ MonoBehaviour:
   _normalShakeAmplitude: 0.12
   _specialShakeAmplitude: 0.38
   _shakeMaximumDistance: 26
+--- !u!114 &1683319792330064187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4419919679169521002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3d4eade6d453724394039d323451049, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PlatformerUltra.Enemies.Runtime::PlatformerUltra.Enemies.EnemyAudioPresentation
+  _definition: {fileID: 11400000, guid: c351fcb7f462f3d419b584769e1dc714, type: 2}
+  _motorBehaviour: {fileID: 3258788893876651645}
+  _proceduralAnimator: {fileID: 4020674671079193786}
+  _attackController: {fileID: 3641392186395870413}
+  _oneShotSource: {fileID: 6500571308947380033}
+  _loopSource: {fileID: 0}
+  _footstepClips:
+  - {fileID: 8300000, guid: 7b5612ba2a6d68343a5ffe61ebcca6fd, type: 3}
+  - {fileID: 8300000, guid: 70d54e4f2d96d6c45851a5bf409437ed, type: 3}
+  - {fileID: 8300000, guid: 1ebf1c44e0e2459428cfe68e90e32d03, type: 3}
+  - {fileID: 8300000, guid: 3a86b3e11985dc242b1c768181c89e87, type: 3}
+  _normalAttackStartClips:
+  - {fileID: 8300000, guid: af9f21d7354c54e4e96c918e2634b9de, type: 3}
+  - {fileID: 8300000, guid: 55d74572563a84542ba2883bfd666285, type: 3}
+  _normalAttackImpactClips:
+  - {fileID: 8300000, guid: 2889d80c40452f2459a57afa214c24d4, type: 3}
+  - {fileID: 8300000, guid: 6639770ba0d40454a84142dfba444a96, type: 3}
+  _specialAttackStartClips:
+  - {fileID: 8300000, guid: e691ee6a7a5d5d1439a33059fccd0739, type: 3}
+  - {fileID: 8300000, guid: 1547611954eb290459cf4c7f4e3a9b0a, type: 3}
+  _specialAttackImpactClips:
+  - {fileID: 8300000, guid: 2af0b656214d83c49acda2768cc7b206, type: 3}
+  - {fileID: 8300000, guid: 207ef1c25cce61c46b6d6a326d23bde3, type: 3}
+  _movementLoopClip: {fileID: 0}
+  _groundMinimumDistance: 5
+  _saboteurMaximumDistance: 36
+  _armoredMaximumDistance: 44
+--- !u!82 &6500571308947380033
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4419919679169521002}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: -1546488356029745506, guid: ba93fe5a8122b424787e7e2c32316b58, type: 2}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 64
+  DopplerLevel: 0
+  MinDistance: 5
+  MaxDistance: 44
+  Pan2D: 0
+  rolloffMode: 1
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.28
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &5219977821375553634
 GameObject:
   m_ObjectHideFlags: 0
@@ -749,6 +887,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b6ee6a7964ae370458847c9751611d58, type: 3}
+--- !u!114 &4020674671079193786 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4225924045145374407, guid: b6ee6a7964ae370458847c9751611d58, type: 3}
+  m_PrefabInstance: {fileID: 966358333898228349}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a919c5b6aa3e9d458249dbfcd15ccda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PlatformerUltra.Enemies.Runtime::PlatformerUltra.Enemies.ProceduralEnemyAnimator
 --- !u!4 &7048370057335560854 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7834546952925763819, guid: b6ee6a7964ae370458847c9751611d58, type: 3}

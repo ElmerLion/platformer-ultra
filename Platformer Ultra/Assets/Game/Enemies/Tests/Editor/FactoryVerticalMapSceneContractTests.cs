@@ -314,9 +314,24 @@ namespace PlatformerUltra.Enemies.Tests
                 Assert.That(managers[0].SpawnPoints.Count, Is.EqualTo(2));
                 Assert.That(managers[0].SpawnPoints.All(point => point != null), Is.True);
                 Assert.That(managers[0].SpawnPoints, Is.EquivalentTo(sceneSpawnPoints));
+                Assert.That(managers[0].MinimumBurstSize, Is.EqualTo(2));
+                Assert.That(managers[0].MaximumBurstSize, Is.EqualTo(3));
+                Assert.That(managers[0].BurstSpawnInterval, Is.EqualTo(0.8f).Within(0.0001f));
+                Assert.That(managers[0].ArmoredEscalationDelay, Is.EqualTo(60f).Within(0.0001f));
                 Assert.That(
                     managers[0].SpawnPoints.Select(point => point.transform.parent.name),
                     Is.EquivalentTo(new[] { MineEntranceName, GeneratorEntranceName }));
+
+                EnemySpawnPoint mineSpawn = managers[0].SpawnPoints.Single(
+                    point => point.transform.parent.name == MineEntranceName);
+                EnemySpawnPoint generatorSpawn = managers[0].SpawnPoints.Single(
+                    point => point.transform.parent.name == GeneratorEntranceName);
+                Assert.That(
+                    mineSpawn.Weights.Single(weight => weight.Archetype == EnemyArchetype.Armored).Weight,
+                    Is.EqualTo(0.25f).Within(0.0001f));
+                Assert.That(
+                    generatorSpawn.Weights.Single(weight => weight.Archetype == EnemyArchetype.Armored).Weight,
+                    Is.EqualTo(0.25f).Within(0.0001f));
             });
         }
 
@@ -399,10 +414,20 @@ namespace PlatformerUltra.Enemies.Tests
 
                 PlayerFeedbackEffects playerFeedback = player.GetComponent<PlayerFeedbackEffects>();
                 Assert.That(playerFeedback, Is.Not.Null);
+                PlayerMovementAudio movementAudio = player.GetComponent<PlayerMovementAudio>();
+                Assert.That(movementAudio, Is.Not.Null);
+                Assert.That(movementAudio.FootstepClips, Has.Length.EqualTo(4));
+                Assert.That(movementAudio.JumpClips, Has.Length.EqualTo(2));
+                Assert.That(movementAudio.DoubleJumpClips, Has.Length.EqualTo(2));
+                Assert.That(movementAudio.DashClips, Has.Length.EqualTo(2));
+                Assert.That(movementAudio.LightLandingClips, Has.Length.EqualTo(2));
+                Assert.That(movementAudio.HeavyLandingClips, Has.Length.EqualTo(2));
+                Assert.That(movementAudio.Source.outputAudioMixerGroup.name, Is.EqualTo("SFX"));
+                Assert.That(new SerializedObject(movementAudio).FindProperty("_dashVolumeScale").floatValue,
+                    Is.EqualTo(0.8f).Within(0.001f));
                 Assert.That(
-                    new SerializedObject(playerFeedback).FindProperty("_jumpClip"),
-                    Is.Null,
-                    "Jump feedback must remain visual-only.");
+                    typeof(ThirdPersonPlayerController).GetEvent("Landed"),
+                    Is.Not.Null);
                 AssertSerializedReference(
                     playerFeedback,
                     "_playerHitClip",
@@ -411,10 +436,6 @@ namespace PlatformerUltra.Enemies.Tests
                     playerFeedback,
                     "_repairLoopClip",
                     AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/Hammer Loop_1.wav"));
-                Assert.That(
-                    new SerializedObject(playerFeedback).FindProperty("_dashClip"),
-                    Is.Null,
-                    "Dash feedback must remain visual-only.");
                 AssertSerializedReference(
                     playerFeedback,
                     "_dashEffectPrefab",
@@ -454,42 +475,42 @@ namespace PlatformerUltra.Enemies.Tests
         }
 
         [Test]
-        public void UserAuthoredPlatformSupports_ArePersistedInAuthoritativeScene()
+        public void UserAuthoredPlatformSupportsAndHoverDecks_ArePersistedInAuthoritativeScene()
         {
             WithFactoryScene(scene =>
             {
                 Transform root = GetFactoryRoot(scene);
                 Transform feeder = RequirePath(root, "03 Middle Route - Double Jump/Assembler Feeder Conveyor Housing");
-                AssertSupportCount(feeder, 6);
-                AssertSupport(feeder, new Vector3(10.28f, 5.73f, 8.13f), 4.75f);
-                AssertSupport(feeder, new Vector3(12.72f, 5.73f, 8.13f), 4.75f);
-                AssertSupport(feeder, new Vector3(10.28f, 1.1f, 8.13f), 4.75f);
-                AssertSupport(feeder, new Vector3(12.72f, 1.1f, 8.13f), 4.75f);
-                Assert.That(FindSupport(feeder, new Vector3(10.28f, 10.375f, 9.87f)), Is.Null);
-                Assert.That(FindSupport(feeder, new Vector3(12.72f, 10.375f, 9.87f)), Is.Null);
+                AssertSupportCount(feeder, 0);
 
                 Transform northeast = RequirePath(root, "03 Middle Route - Double Jump/Northeast Assembler Deck");
-                AssertSupportCount(northeast, 10);
+                AssertSupportCount(northeast, 12);
                 AssertSupport(northeast, new Vector3(8.28f, 5.76f, 15.22f), 4.75f);
                 AssertSupport(northeast, new Vector3(8.28f, 1.22f, 15.22f), 4.75f);
                 AssertSupportTier(northeast, 5.73f, 4.75f, new[] { 8.28f, 16.72f }, new[] { 7.78f });
                 AssertSupportTier(northeast, 1.1f, 4.75f, new[] { 8.28f, 16.72f }, new[] { 7.78f });
+                AssertSupport(northeast, new Vector3(16.72f, 5.75f, 15.22f), 4.75f);
+                AssertSupport(northeast, new Vector3(16.72f, 2.03f, 15.22f), 4.75f);
 
                 Assert.That(root.Find("04 Upper Route and Recovery/Crane Transfer Plate"), Is.Null);
 
                 Transform eastCore = RequirePath(root, "04 Upper Route and Recovery/East Core Balcony");
-                AssertSupportCount(eastCore, 12);
-                AssertSupportTier(eastCore, 6.14f, 6.05f, new[] { 10.68f, 15.72f }, new[] { 12.53f, 15.47f });
-                AssertSupportTier(eastCore, 0.19f, 6.05f, new[] { 10.68f, 15.72f }, new[] { 12.53f, 15.47f });
+                AssertSupportCount(eastCore, 9);
+                AssertSupportTier(eastCore, 12.025f, 6.05f, new[] { 10.68f }, new[] { 15.47f });
+                AssertSupportTier(eastCore, 12.025f, 6.05f, new[] { 15.72f }, new[] { 12.53f, 15.47f });
+                AssertSupportTier(eastCore, 6.14f, 6.05f, new[] { 10.68f }, new[] { 15.47f });
+                AssertSupportTier(eastCore, 6.14f, 6.05f, new[] { 15.72f }, new[] { 12.53f, 15.47f });
+                AssertSupportTier(eastCore, 0.19f, 6.05f, new[] { 10.68f }, new[] { 15.47f });
+                AssertSupportTier(eastCore, 0.19f, 6.05f, new[] { 15.72f }, new[] { 12.53f, 15.47f });
+                Assert.That(FindSupport(eastCore, new Vector3(10.68f, 12.025f, 12.53f)), Is.Null);
+                Assert.That(FindSupport(eastCore, new Vector3(10.68f, 6.14f, 12.53f)), Is.Null);
+                Assert.That(FindSupport(eastCore, new Vector3(10.68f, 0.19f, 12.53f)), Is.Null);
 
                 Transform north = RequirePath(root, "04 Upper Route and Recovery/North Perimeter Catwalk");
-                AssertSupportCount(north, 10);
-                AssertSupport(north, new Vector3(-10.72f, 6.14f, 11.28f), 6.05f);
-                AssertSupport(north, new Vector3(-10.72f, 6.14f, 12.72f), 6.05f);
-                AssertSupport(north, new Vector3(10.72f, 6.14f, 12.72f), 6.05f);
-                AssertSupport(north, new Vector3(-10.72f, 0.19f, 11.28f), 6.05f);
-                AssertSupport(north, new Vector3(-10.72f, 0.19f, 12.72f), 6.05f);
-                AssertSupport(north, new Vector3(10.72f, 0.19f, 12.72f), 6.05f);
+                AssertSupportCount(north, 6);
+                AssertSupportTier(north, 12.025f, 6.05f, new[] { -10.72f }, new[] { 11.28f, 12.72f });
+                AssertSupportTier(north, 6.14f, 6.05f, new[] { -10.72f }, new[] { 11.28f, 12.72f });
+                AssertSupportTier(north, 0.19f, 6.05f, new[] { -10.72f }, new[] { 11.28f, 12.72f });
 
                 Transform portal = RequirePath(root, "04 Upper Route and Recovery/Portal Deck");
                 AssertSupportCount(portal, 12);
@@ -497,32 +518,112 @@ namespace PlatformerUltra.Enemies.Tests
                 AssertSupportTier(portal, -1.14f, 6.95f, new[] { -4.72f, 4.72f }, new[] { 16.68f, 20.12f });
 
                 Transform westRecovery = RequirePath(root, "04 Upper Route and Recovery/West Fall Recovery Balcony");
-                AssertSupportCount(westRecovery, 8);
-                AssertSupportTier(westRecovery, 1.55f, 4.75f, new[] { -14.72f, -7.28f }, new[] { 6.78f, 11.22f });
+                AssertSupportCount(westRecovery, 0);
+                AssertStructuralDeck(
+                    westRecovery,
+                    "Twin Cantilever Supports",
+                    2,
+                    new Vector3(-3.04f, 0f, -0.82f),
+                    new Vector3(-11f, 8.84f, 9f),
+                    new Vector3(8f, 0.32f, 5f));
+                RequirePath(westRecovery, "Twin Cantilever Supports/South Tower/Cantilever Arm");
+                RequirePath(westRecovery, "Twin Cantilever Supports/North Tower/Triangular Knee Brace");
 
                 Transform westGantry = RequirePath(root, "04 Upper Route and Recovery/West Gantry");
-                AssertSupportCount(westGantry, 12);
-                AssertSupportTier(westGantry, 6.14f, 6.05f, new[] { -9.22f, -0.78f }, new[] { 12.18f, 13.82f });
-                AssertSupportTier(westGantry, 0.19f, 6.05f, new[] { -9.22f, -0.78f }, new[] { 12.18f, 13.82f });
+                AssertSupportCount(westGantry, 0);
+
+                Transform doubleJumpStation = RequirePath(
+                    root,
+                    "02 Ground Route - Normal Jump/Double Jump Station Balcony");
+                AssertHoverDeck(
+                    doubleJumpStation,
+                    Vector3.zero,
+                    new Vector3(-5.5f, 5.04f, 5.1f),
+                    new Vector3(3.4f, 0.32f, 3.4f),
+                    new Vector3(-5.5f, 5.64f, 5.1f),
+                    new Vector3(3.24f, 0.92f, 3.24f));
+
+                Transform doubleJumpGate = RequirePath(
+                    root,
+                    "03 Middle Route - Double Jump/Double Jump Gate - Freight Lift Roof");
+                AssertHoverDeck(
+                    doubleJumpGate,
+                    Vector3.zero,
+                    new Vector3(-1.7f, 7.39f, 5.1f),
+                    new Vector3(2.6f, 0.32f, 3f),
+                    new Vector3(-1.7f, 7.99f, 5.1f),
+                    new Vector3(2.44f, 0.92f, 2.84f));
 
                 Transform crusherLedge = RequirePath(root, "03 Middle Route - Double Jump/Crusher Service Ledge");
-                AssertVector(crusherLedge.localPosition, new Vector3(-1.56f, 0f, 1.23f));
-                AssertSupportCount(crusherLedge, 4);
-                AssertSupportTier(crusherLedge, 3.54f, 8.402899f, new[] { 3.27999973f, 5.62f }, new[] { 2.03f, 3.97f });
+                AssertHoverDeck(
+                    crusherLedge,
+                    new Vector3(-1.56f, 0f, 1.23f),
+                    new Vector3(4.45f, 7.84f, 3f),
+                    new Vector3(2.9f, 0.32f, 2.5f),
+                    new Vector3(4.45f, 8.44f, 3f),
+                    new Vector3(2.74f, 0.92f, 2.34f));
 
                 Transform generatorCatwalk = RequirePath(root, "03 Middle Route - Double Jump/Generator Belt Catwalk");
                 AssertSupportCount(generatorCatwalk, 0);
 
+                Transform routerCatwalk = RequirePath(root, "02 Ground Route - Normal Jump/Router Catwalk");
+                AssertSupportCount(routerCatwalk, 0);
+
+                Transform mainDeck = RequirePath(root, "02 Ground Route - Normal Jump/West Smelter Mezzanine/Main Deck");
+                AssertSupportCount(mainDeck, 3);
+                Assert.That(FindSupport(mainDeck, new Vector3(-14.62f, 2.375f, -4.62f)), Is.Null);
+
                 Transform southwestSmelterWing = RequirePath(root, "02 Ground Route - Normal Jump/West Smelter Mezzanine/Southwest Access Wing");
-                AssertSupportCount(southwestSmelterWing, 2);
+                AssertSupportCount(southwestSmelterWing, 1);
                 AssertSupport(southwestSmelterWing, new Vector3(-17.72f, 2.375f, -4.62f), 4.75f);
-                AssertSupport(southwestSmelterWing, new Vector3(-17.72f, 2.375f, -2.48f), 4.75f);
                 Assert.That(FindSupport(southwestSmelterWing, new Vector3(-15.18f, 2.375f, -4.62f)), Is.Null);
                 Assert.That(FindSupport(southwestSmelterWing, new Vector3(-15.18f, 2.375f, -2.48f)), Is.Null);
+                Assert.That(FindSupport(southwestSmelterWing, new Vector3(-17.72f, 2.375f, -2.48f)), Is.Null);
+
+                Transform crusherDeck = RequirePath(root, "03 Middle Route - Double Jump/Crusher Machine Deck");
+                AssertStructuralDeck(
+                    crusherDeck,
+                    "Central Load Column",
+                    1,
+                    Vector3.zero,
+                    new Vector3(2.8f, 4.64f, -2.8f),
+                    new Vector3(7.2f, 0.32f, 6.3f));
+
+                Transform centralRecovery = RequirePath(root, "04 Upper Route and Recovery/Central Fall Recovery Deck");
+                AssertStructuralDeck(
+                    centralRecovery,
+                    "Central Load Column",
+                    1,
+                    new Vector3(-2.69f, 0f, 4.56f),
+                    new Vector3(0f, 3.64f, 9f),
+                    new Vector3(10f, 0.32f, 6f));
+
+                Transform eastRecovery = RequirePath(root, "04 Upper Route and Recovery/East Fall Recovery Balcony");
+                AssertStructuralDeck(
+                    eastRecovery,
+                    "Central Load Column",
+                    1,
+                    new Vector3(0f, -4.04f, 0f),
+                    new Vector3(11f, 8.84f, 9f),
+                    new Vector3(8f, 0.32f, 5f));
+
+                Transform generatorOverlook = RequirePath(root, "03 Middle Route - Double Jump/East Generator Overlook");
+                AssertStructuralDeck(
+                    generatorOverlook,
+                    "Twin Gantry Supports",
+                    2,
+                    Vector3.zero,
+                    new Vector3(13f, 7.84f, 0.5f),
+                    new Vector3(10f, 0.32f, 9f));
+                RequirePath(generatorOverlook, "Twin Gantry Supports/West Pylon/Deck Saddle");
+                RequirePath(generatorOverlook, "Twin Gantry Supports/East Pylon/Deck Saddle");
+                RequirePath(generatorOverlook, "Twin Gantry Supports/Connecting Header");
+
+                AssertSafetyRail(root, new Vector3(-13.70f, 9.80f, 10.38f), 7f);
 
                 int totalSupportCount = root.GetComponentsInChildren<Transform>(true)
                     .Count(transform => transform.name.StartsWith("Support Post", StringComparison.Ordinal));
-                Assert.That(totalSupportCount, Is.EqualTo(116));
+                Assert.That(totalSupportCount, Is.EqualTo(51));
             });
         }
 
@@ -634,7 +735,7 @@ namespace PlatformerUltra.Enemies.Tests
                 Assert.That(portalGate, Is.Not.Null);
                 Assert.That(
                     new SerializedObject(portalGate).FindProperty("_requiredCoreCount").intValue,
-                    Is.EqualTo(3));
+                    Is.EqualTo(1));
                 SerializedProperty installedCores = new SerializedObject(portalGate)
                     .FindProperty("_installedCoreVisuals");
                 Assert.That(installedCores, Is.Not.Null);
@@ -872,12 +973,150 @@ namespace PlatformerUltra.Enemies.Tests
             Assert.That(source.maxDistance, Is.EqualTo(expectedMaximumDistance).Within(0.0001f));
         }
 
+        private static void AssertStructuralDeck(
+            Transform deck,
+            string structureName,
+            int expectedPrimarySupports,
+            Vector3 expectedRootLocalPosition,
+            Vector3 expectedWalkableLocalPosition,
+            Vector3 expectedWalkableSize)
+        {
+            AssertVector(deck.localPosition, expectedRootLocalPosition);
+            AssertSupportCount(deck, 0);
+
+            Transform walkable = RequirePath(deck, "Walkable Grating");
+            AssertVector(walkable.localPosition, expectedWalkableLocalPosition);
+            AssertVector(walkable.localScale, expectedWalkableSize);
+            BoxCollider walkableCollider = walkable.GetComponent<BoxCollider>();
+            Assert.That(walkableCollider, Is.Not.Null, deck.name + " must retain its walkable collider.");
+            Assert.That(walkableCollider.isTrigger, Is.False);
+
+            Transform structure = RequirePath(deck, structureName);
+            Transform[] loadCores = structure.GetComponentsInChildren<Transform>(true)
+                .Where(transform => transform.name == "Load Core")
+                .ToArray();
+            Assert.That(loadCores, Has.Length.EqualTo(expectedPrimarySupports), deck.name);
+            foreach (Transform loadCore in loadCores)
+            {
+                BoxCollider collider = loadCore.GetComponent<BoxCollider>();
+                Assert.That(collider, Is.Not.Null, deck.name + "/" + structureName + "/" + loadCore.name);
+                Assert.That(collider.enabled, Is.True);
+                Assert.That(collider.isTrigger, Is.False);
+            }
+
+            Transform[] footings = structure.GetComponentsInChildren<Transform>(true)
+                .Where(transform => transform.name == "Footing")
+                .ToArray();
+            Assert.That(footings, Has.Length.EqualTo(expectedPrimarySupports), deck.name);
+            foreach (Transform footing in footings)
+            {
+                Renderer renderer = footing.GetComponent<Renderer>();
+                BoxCollider collider = footing.GetComponent<BoxCollider>();
+                Assert.That(renderer, Is.Not.Null);
+                Assert.That(renderer.bounds.min.y, Is.EqualTo(0f).Within(0.001f), deck.name + "/" + structureName + "/" + footing.name);
+                Assert.That(collider, Is.Not.Null);
+                Assert.That(collider.isTrigger, Is.False);
+            }
+
+            Collider[] structuralColliders = structure.GetComponentsInChildren<Collider>(true);
+            Assert.That(structuralColliders, Is.Not.Empty, deck.name);
+            Assert.That(structuralColliders.All(collider => collider.enabled && !collider.isTrigger), Is.True, deck.name);
+
+            Renderer underframe = RequirePath(deck, "Orange Underframe").GetComponent<Renderer>();
+            Renderer[] structuralRenderers = structure.GetComponentsInChildren<Renderer>(true);
+            float structureTop = structuralRenderers.Max(renderer => renderer.bounds.max.y);
+            Assert.That(structureTop, Is.EqualTo(underframe.bounds.min.y).Within(0.05f), deck.name);
+            Assert.That(structureTop, Is.LessThan(walkable.GetComponent<Renderer>().bounds.min.y), deck.name);
+        }
+
+        private static void AssertSafetyRail(Transform root, Vector3 center, float length)
+        {
+            Transform top = root.GetComponentsInChildren<Transform>(true)
+                .SingleOrDefault(transform =>
+                    transform.name == "Safety Rail Top" &&
+                    Vector3.Distance(transform.position, center) <= 0.0001f);
+            Assert.That(top, Is.Not.Null, "The moved west recovery rail was not found.");
+            AssertVector(top.localScale, new Vector3(length, 0.12f, 0.12f));
+
+            Vector3[] expectedPosts =
+            {
+                center + new Vector3(-3.5f, -0.38f, 0f),
+                center + new Vector3(-1.1666666f, -0.38f, 0f),
+                center + new Vector3(1.1666666f, -0.38f, 0f),
+                center + new Vector3(3.5f, -0.38f, 0f)
+            };
+            Transform[] allTransforms = root.GetComponentsInChildren<Transform>(true);
+            foreach (Vector3 expectedPosition in expectedPosts)
+            {
+                Assert.That(
+                    allTransforms.Any(transform =>
+                        transform.name == "Safety Rail Post" &&
+                        Vector3.Distance(transform.position, expectedPosition) <= 0.0001f),
+                    Is.True,
+                    "The moved rail is missing its post at " + expectedPosition.ToString("F3") + ".");
+            }
+        }
+
         private static void AssertSupportCount(Transform parent, int expectedCount)
         {
             int count = Enumerable.Range(0, parent.childCount)
                 .Select(parent.GetChild)
                 .Count(child => child.name.StartsWith("Support Post", StringComparison.Ordinal));
             Assert.That(count, Is.EqualTo(expectedCount), parent.name);
+        }
+
+        private static void AssertHoverDeck(
+            Transform deck,
+            Vector3 expectedRootLocalPosition,
+            Vector3 expectedWalkableLocalPosition,
+            Vector3 expectedWalkableSize,
+            Vector3 expectedTriggerCenter,
+            Vector3 expectedTriggerSize)
+        {
+            AssertVector(deck.localPosition, expectedRootLocalPosition);
+            AssertSupportCount(deck, 0);
+
+            HoverPlatformPresentation presentation = deck.GetComponent<HoverPlatformPresentation>();
+            Assert.That(presentation, Is.Not.Null, deck.name);
+            Assert.That(presentation.IdleAmplitude, Is.EqualTo(0.018f).Within(0.0001f));
+            Assert.That(presentation.IdleFrequency, Is.EqualTo(0.55f).Within(0.0001f));
+            Assert.That(presentation.MaximumLandingDip, Is.EqualTo(0.055f).Within(0.0001f));
+            Assert.That(presentation.MaximumTiltDegrees, Is.EqualTo(1.25f).Within(0.0001f));
+            Assert.That(presentation.SettleDuration, Is.EqualTo(0.5f).Within(0.0001f));
+
+            Transform visualRoot = RequirePath(deck, "Visual Body");
+            Assert.That(presentation.VisualRoot, Is.SameAs(visualRoot));
+            Assert.That(visualRoot.GetComponentInChildren<Collider>(true), Is.Null);
+            RequirePath(visualRoot, "Walkable Grating");
+            RequirePath(visualRoot, "Orange Underframe");
+            RequirePath(visualRoot, "Steel Center Spine");
+            Transform hoverAssembly = RequirePath(visualRoot, "Hover Assembly");
+            RequirePath(hoverAssembly, "Central Repulsor Housing");
+            RequirePath(hoverAssembly, "Steel Lift Coil");
+            RequirePath(hoverAssembly, "Cyan Lift Ring");
+            RequirePath(hoverAssembly, "Stabilizer Housing A");
+            RequirePath(hoverAssembly, "Stabilizer Housing B");
+
+            Transform walkableCollision = RequirePath(deck, "Walkable Collision");
+            AssertVector(walkableCollision.localPosition, expectedWalkableLocalPosition);
+            BoxCollider walkableCollider = walkableCollision.GetComponent<BoxCollider>();
+            Assert.That(walkableCollider, Is.Not.Null);
+            Assert.That(walkableCollider.isTrigger, Is.False);
+            AssertVector(walkableCollider.size, expectedWalkableSize);
+
+            BoxCollider landingTrigger = deck.GetComponents<BoxCollider>().Single(collider => collider.isTrigger);
+            Assert.That(presentation.LandingTrigger, Is.SameAs(landingTrigger));
+            AssertVector(landingTrigger.center, expectedTriggerCenter);
+            AssertVector(landingTrigger.size, expectedTriggerSize);
+
+            Assert.That(presentation.RepulsorRing, Is.SameAs(RequirePath(hoverAssembly, "Repulsor Ring Spinner")));
+            Assert.That(presentation.HoverLight, Is.SameAs(RequirePath(hoverAssembly, "Hover Underglow").GetComponent<Light>()));
+            Assert.That(presentation.HoverLight.shadows, Is.EqualTo(LightShadows.None));
+            Assert.That(presentation.HoverParticles, Is.SameAs(
+                RequirePath(hoverAssembly, "Hover Energy Plume").GetComponent<ParticleSystem>()));
+            Assert.That(presentation.HoverParticles.main.loop, Is.True);
+            Assert.That(presentation.HoverParticles.main.playOnAwake, Is.True);
+            Assert.That(presentation.HoverParticles.main.maxParticles, Is.EqualTo(24));
         }
 
         private static void AssertSupportTier(

@@ -27,16 +27,24 @@ namespace PlatformerUltra.Enemies
         [SerializeField, Min(0f)] private float _initialDelay = 6f;
         [SerializeField, Min(0.1f)] private float _minimumSpawnInterval = 12f;
         [SerializeField, Min(0.1f)] private float _maximumSpawnInterval = 18f;
+        [SerializeField, Min(1)] private int _minimumBurstSize = 2;
+        [SerializeField, Min(1)] private int _maximumBurstSize = 3;
+        [SerializeField, Min(0.05f)] private float _burstSpawnInterval = 0.8f;
         [SerializeField, Min(1)] private int _activeEnemyCap = 6;
-        [SerializeField, Min(0f)] private float _armoredEscalationDelay = 90f;
+        [SerializeField, Min(0f)] private float _armoredEscalationDelay = 60f;
 
         private float _nextSpawnTime;
         private float _spawningUnlockedAt = float.PositiveInfinity;
+        private int _remainingBurstSpawns;
         private bool _spawningUnlocked;
         private bool _spawningEnabled = true;
         private bool _subscribed;
 
         public int ActiveEnemyCap => _activeEnemyCap;
+        public int MinimumBurstSize => _minimumBurstSize;
+        public int MaximumBurstSize => _maximumBurstSize;
+        public float BurstSpawnInterval => _burstSpawnInterval;
+        public float ArmoredEscalationDelay => _armoredEscalationDelay;
         public IReadOnlyList<EnemySpawnPoint> SpawnPoints => _spawnPoints;
         public bool SpawningUnlocked => _spawningUnlocked;
         public bool SpawningEnabled => _spawningEnabled;
@@ -63,7 +71,12 @@ namespace PlatformerUltra.Enemies
 
         private void Update()
         {
-            TrySpawn(Time.time, UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+            TrySpawn(
+                Time.time,
+                UnityEngine.Random.value,
+                UnityEngine.Random.value,
+                UnityEngine.Random.value,
+                UnityEngine.Random.value);
         }
 
         public void Configure(
@@ -83,6 +96,47 @@ namespace PlatformerUltra.Enemies
             float armoredEscalationDelay,
             CameraShakeController cameraShake = null)
         {
+            Configure(
+                dronePrefab,
+                saboteurPrefab,
+                armoredPrefab,
+                spawnPoints,
+                player,
+                machineRegistry,
+                enemyRegistry,
+                spawnUnlockTerminal,
+                assemblerTerminal,
+                initialDelay,
+                minimumSpawnInterval,
+                maximumSpawnInterval,
+                activeEnemyCap,
+                armoredEscalationDelay,
+                2,
+                3,
+                0.8f,
+                cameraShake);
+        }
+
+        public void Configure(
+            GameObject dronePrefab,
+            GameObject saboteurPrefab,
+            GameObject armoredPrefab,
+            EnemySpawnPoint[] spawnPoints,
+            Targetable player,
+            MachineTargetRegistry machineRegistry,
+            EnemyRuntimeRegistry enemyRegistry,
+            FactoryObjectiveTerminal spawnUnlockTerminal,
+            FactoryObjectiveTerminal assemblerTerminal,
+            float initialDelay,
+            float minimumSpawnInterval,
+            float maximumSpawnInterval,
+            int activeEnemyCap,
+            float armoredEscalationDelay,
+            int minimumBurstSize,
+            int maximumBurstSize,
+            float burstSpawnInterval,
+            CameraShakeController cameraShake = null)
+        {
             Unsubscribe();
             _dronePrefab = dronePrefab;
             _saboteurPrefab = saboteurPrefab;
@@ -96,17 +150,31 @@ namespace PlatformerUltra.Enemies
             _initialDelay = Mathf.Max(0f, initialDelay);
             _minimumSpawnInterval = Mathf.Max(0.1f, minimumSpawnInterval);
             _maximumSpawnInterval = Mathf.Max(_minimumSpawnInterval, maximumSpawnInterval);
+            _minimumBurstSize = Mathf.Max(1, minimumBurstSize);
+            _maximumBurstSize = Mathf.Max(_minimumBurstSize, maximumBurstSize);
+            _burstSpawnInterval = Mathf.Max(0.05f, burstSpawnInterval);
             _activeEnemyCap = Mathf.Max(1, activeEnemyCap);
             _armoredEscalationDelay = Mathf.Max(0f, armoredEscalationDelay);
             _cameraShake = cameraShake;
             _spawningUnlocked = false;
             _spawningUnlockedAt = float.PositiveInfinity;
+            _remainingBurstSpawns = 0;
             _spawningEnabled = true;
             Subscribe();
             TryUnlockSpawning(Time.time);
         }
 
         public bool TrySpawn(float timestamp, float pointSample, float weightSample, float intervalSample)
+        {
+            return TrySpawn(timestamp, pointSample, weightSample, intervalSample, intervalSample);
+        }
+
+        public bool TrySpawn(
+            float timestamp,
+            float pointSample,
+            float weightSample,
+            float intervalSample,
+            float burstSizeSample)
         {
             if (!_spawningEnabled || timestamp < _nextSpawnTime || !SpawningUnlocked ||
                 _machineRegistry == null || !_machineRegistry.HasOperationalMachines ||
@@ -115,6 +183,14 @@ namespace PlatformerUltra.Enemies
                 _spawnPoints == null || _spawnPoints.Length == 0)
             {
                 return false;
+            }
+
+            if (_remainingBurstSpawns <= 0)
+            {
+                _remainingBurstSpawns = SampleBurstSize(
+                    _minimumBurstSize,
+                    _maximumBurstSize,
+                    burstSizeSample);
             }
 
             bool armoredAllowed = (_assemblerTerminal != null && _assemblerTerminal.IsActivated) ||
@@ -161,10 +237,13 @@ namespace PlatformerUltra.Enemies
 
                 brain.InitializeRuntime(_machineRegistry, _player, _enemyRegistry);
                 instance.GetComponent<EnemyAttackPresentation>()?.InitializeRuntime(_cameraShake);
-                _nextSpawnTime = timestamp + Mathf.Lerp(
-                    _minimumSpawnInterval,
-                    _maximumSpawnInterval,
-                    Mathf.Clamp01(intervalSample));
+                _remainingBurstSpawns = Mathf.Max(0, _remainingBurstSpawns - 1);
+                _nextSpawnTime = _remainingBurstSpawns > 0
+                    ? timestamp + _burstSpawnInterval
+                    : timestamp + Mathf.Lerp(
+                        _minimumSpawnInterval,
+                        _maximumSpawnInterval,
+                        Mathf.Clamp01(intervalSample));
                 EnemySpawned?.Invoke(health, spawnPoint);
                 return true;
             }
@@ -176,6 +255,15 @@ namespace PlatformerUltra.Enemies
         public static bool CanSpawnForCap(int activeEnemies, int activeEnemyCap)
         {
             return activeEnemyCap > 0 && activeEnemies < activeEnemyCap;
+        }
+
+        public static int SampleBurstSize(int minimumBurstSize, int maximumBurstSize, float sample)
+        {
+            int minimum = Mathf.Max(1, minimumBurstSize);
+            int maximum = Mathf.Max(minimum, maximumBurstSize);
+            int optionCount = maximum - minimum + 1;
+            int offset = Mathf.Min(optionCount - 1, Mathf.FloorToInt(Mathf.Clamp01(sample) * optionCount));
+            return minimum + offset;
         }
 
         private GameObject GetPrefab(EnemyArchetype archetype)

@@ -42,7 +42,7 @@ AudioSource:
   m_GameObject: {fileID: 3117766535614312587}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -1546488356029745506, guid: ba93fe5a8122b424787e7e2c32316b58, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
@@ -371,8 +371,8 @@ MonoBehaviour:
   _factoryRegistry: {fileID: 0}
   _maximumHealth: 80
   _range: 15
-  _damage: 10
-  _shotInterval: 1.2
+  _damage: 8
+  _shotInterval: 1
   _turnSpeed: 90
   _firingTolerance: 5
   _targetRefreshInterval: 0.2

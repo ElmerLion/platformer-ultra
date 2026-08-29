@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using PlatformerUltra.Audio;
+using PlatformerUltra.Audio.Editor;
 using PlatformerUltra.Combat;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -21,7 +23,7 @@ namespace PlatformerUltra.Gameplay.Editor
         public const string FactoryScenePath = "Assets/Game/Scenes/FactoryVerticalMap.unity";
         public const string TimelinePath = "Assets/Game/Cinematics/Timelines/TL_FactoryIntro.playable";
         public const string CameraClipPath = "Assets/Game/Cinematics/Timelines/AN_FactoryIntroCamera.anim";
-        public const string MixerPath = "Assets/Game/Audio/AM_FactoryIntro.mixer";
+        public const string MixerPath = GameAudioAssetFactory.MixerPath;
 
         private const string PanelSettingsPath = "Assets/Game/UI/PS_PrototypeHUD.asset";
         private const string IntroLayoutPath = "Assets/Game/UI/FactoryIntro.uxml";
@@ -155,12 +157,17 @@ namespace PlatformerUltra.Gameplay.Editor
             visualDirector.Configure(playableDirector, cinematicAttacker, sparks, warningLight, networkDisplay, hologramNodes);
 
             GameObject audioRoot = new GameObject("04 Cinematic Audio");
+            AudioMixer mixer = AssetDatabase.LoadAssetAtPath<AudioMixer>(MixerPath);
+            AudioMixerGroup sfxGroup = mixer.FindMatchingGroups(GameAudioAssetFactory.SfxGroupName).First();
+            AudioSettingsController audioSettings = audioRoot.AddComponent<AudioSettingsController>();
+            audioSettings.Configure(mixer);
             AudioSource alarmSource = audioRoot.AddComponent<AudioSource>();
             alarmSource.clip = RequireAsset<AudioClip>(AlarmClipPath);
             alarmSource.playOnAwake = true;
             alarmSource.loop = true;
             alarmSource.spatialBlend = 0f;
             alarmSource.volume = 0.28f;
+            alarmSource.outputAudioMixerGroup = sfxGroup;
 
             AudioSource primaryVoice = CreatePrimaryVoiceSource(audioRoot.transform, dialogueGroup);
             AudioSource metallicVoice = CreateMetallicVoiceSource(audioRoot.transform, dialogueGroup);
@@ -176,6 +183,7 @@ namespace PlatformerUltra.Gameplay.Editor
             transitionSource.playOnAwake = false;
             transitionSource.spatialBlend = 0f;
             transitionSource.volume = 0.7f;
+            transitionSource.outputAudioMixerGroup = sfxGroup;
             FactorySceneTransition transition = transitionRoot.AddComponent<FactorySceneTransition>();
             transition.Configure(presenter, transitionSource, RequireAsset<AudioClip>(TransitionClipPath));
 
@@ -320,79 +328,8 @@ namespace PlatformerUltra.Gameplay.Editor
 
         private static AudioMixerGroup BuildAudioMixer()
         {
-            // Rebuild this generated asset so interrupted editor runs cannot leave dangling mixer sub-assets.
-            AssetDatabase.DeleteAsset(MixerPath);
-            Type mixerControllerType = FindEditorType("UnityEditor.Audio.AudioMixerController");
-            MethodInfo createMixer = mixerControllerType?.GetMethod(
-                "CreateMixerControllerAtPath",
-                BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-            AudioMixer mixer = createMixer?.Invoke(null, new object[] { MixerPath }) as AudioMixer;
-            if (mixer == null)
-            {
-                throw new InvalidOperationException("Unity could not create the factory intro AudioMixer asset.");
-            }
-
-            AudioMixerGroup dialogue = mixer.FindMatchingGroups("Dialogue").FirstOrDefault();
-            if (dialogue == null)
-            {
-                object controller = mixer;
-                dialogue = InvokeInstance(controller, "CreateNewGroup", "Dialogue", false) as AudioMixerGroup;
-                object master = GetInstanceProperty(controller, "masterGroup");
-                Array oldChildren = GetInstanceProperty(master, "children") as Array;
-                if (dialogue == null || master == null || oldChildren == null)
-                {
-                    throw new InvalidOperationException("Unity could not create the Dialogue group in the factory intro mixer.");
-                }
-
-                Type childType = oldChildren.GetType().GetElementType();
-                Array newChildren = Array.CreateInstance(childType, oldChildren.Length + 1);
-                Array.Copy(oldChildren, newChildren, oldChildren.Length);
-                newChildren.SetValue(dialogue, oldChildren.Length);
-                SetInstanceProperty(master, "children", newChildren);
-            }
-
-            object effectsValue = GetInstanceProperty(dialogue, "effects");
-            Array effects = effectsValue as Array;
-            object compressor = null;
-            if (effects != null)
-            {
-                foreach (object effect in effects)
-                {
-                    if (effect != null && string.Equals(GetInstanceProperty(effect, "effectName") as string, "Compressor", StringComparison.Ordinal))
-                    {
-                        compressor = effect;
-                        break;
-                    }
-                }
-            }
-
-            if (compressor == null)
-            {
-                Type effectType = FindEditorType("UnityEditor.Audio.AudioMixerEffectController");
-                compressor = Activator.CreateInstance(
-                    effectType,
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                    null,
-                    new object[] { "Compressor" },
-                    null);
-                if (compressor is not UnityEngine.Object compressorAsset)
-                {
-                    throw new InvalidOperationException("Unity could not create the factory intro compressor effect.");
-                }
-
-                AssetDatabase.AddObjectToAsset(compressorAsset, mixer);
-                InvokeInstance(dialogue, "InsertEffect", compressor, effects?.Length ?? 0);
-                EditorUtility.SetDirty(compressorAsset);
-            }
-
-            object snapshot = GetInstanceProperty(mixer, "TargetSnapshot");
-            InvokeInstance(compressor, "SetValueForParameter", mixer, snapshot, "Threshold", -18f);
-            // Unity's built-in compressor has a fixed characteristic rather than an exposed ratio control.
-            InvokeInstance(compressor, "SetValueForParameter", mixer, snapshot, "Attack", 10f);
-            InvokeInstance(compressor, "SetValueForParameter", mixer, snapshot, "Release", 90f);
-            InvokeInstance(compressor, "SetValueForParameter", mixer, snapshot, "Makeup Gain", 2f);
-            EditorUtility.SetDirty(mixer);
-            return dialogue;
+            AudioMixer mixer = GameAudioAssetFactory.BuildOrUpdateMixer();
+            return mixer.FindMatchingGroups(GameAudioAssetFactory.DialogueGroupName).First();
         }
 
         private static Type FindEditorType(string fullName)

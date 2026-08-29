@@ -271,6 +271,20 @@ namespace PlatformerUltra.Enemies.Tests
             Assert.That(EnemySpawnManager.CanSpawnForCap(active, cap), Is.EqualTo(expected));
         }
 
+        [TestCase(2, 3, 0f, 2)]
+        [TestCase(2, 3, 0.49f, 2)]
+        [TestCase(2, 3, 0.5f, 3)]
+        [TestCase(2, 3, 1f, 3)]
+        [TestCase(0, 0, 0.5f, 1)]
+        public void BurstSizeSampling_UsesInclusiveConfiguredRange(
+            int minimum,
+            int maximum,
+            float sample,
+            int expected)
+        {
+            Assert.That(EnemySpawnManager.SampleBurstSize(minimum, maximum, sample), Is.EqualTo(expected));
+        }
+
         [Test]
         public void EnemySpawning_UnlocksPersistentlyWhenSmelterBecomesOperational()
         {

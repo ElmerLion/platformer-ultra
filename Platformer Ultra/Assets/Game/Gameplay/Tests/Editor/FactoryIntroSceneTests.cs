@@ -1,5 +1,6 @@
 using System.Linq;
 using NUnit.Framework;
+using PlatformerUltra.Audio;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -73,9 +74,15 @@ namespace PlatformerUltra.Gameplay.Tests
             Assert.That(voice.GetComponentsInChildren<AudioChorusFilter>(true), Has.Length.EqualTo(1));
             Assert.That(voice.GetComponentsInChildren<AudioEchoFilter>(true), Has.Length.EqualTo(1));
 
-            AudioMixer mixer = AssetDatabase.LoadAssetAtPath<AudioMixer>("Assets/Game/Audio/AM_FactoryIntro.mixer");
+            AudioMixer mixer = AssetDatabase.LoadAssetAtPath<AudioMixer>("Assets/Game/Audio/AM_Game.mixer");
             Assert.That(mixer, Is.Not.Null);
-            Assert.That(mixer.FindMatchingGroups("Dialogue"), Has.Length.EqualTo(1));
+            Assert.That(mixer.FindMatchingGroups("Master").Any(group => group.name == "Master"), Is.True);
+            Assert.That(mixer.FindMatchingGroups("Music").Count(group => group.name == "Music"), Is.EqualTo(1));
+            Assert.That(mixer.FindMatchingGroups("SFX").Count(group => group.name == "SFX"), Is.EqualTo(1));
+            Assert.That(mixer.FindMatchingGroups("Dialogue").Count(group => group.name == "Dialogue"), Is.EqualTo(1));
+            Assert.That(Object.FindFirstObjectByType<AudioSettingsController>(), Is.Not.Null);
+            Assert.That(Object.FindObjectsByType<AudioSource>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                .All(source => source.outputAudioMixerGroup != null), Is.True);
         }
 
         [Test]

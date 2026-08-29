@@ -51,6 +51,7 @@ namespace PlatformerUltra.Gameplay
 
         public event Action<bool> Jumped;
         public event Action<Vector3, bool> Dashed;
+        public event Action<float> Landed;
 
         private void Awake()
         {
@@ -409,6 +410,8 @@ namespace PlatformerUltra.Gameplay
 
         private void UpdateGroundedStateAfterMove(CollisionFlags collisionFlags, float deltaTime)
         {
+            bool wasGrounded = IsGrounded;
+            float impactSpeed = Mathf.Max(0f, -_verticalVelocity);
             bool groundedAfterMove = (collisionFlags & CollisionFlags.Below) != 0 ||
                                      _characterController.isGrounded;
             bool hitCeiling = (collisionFlags & CollisionFlags.Above) != 0;
@@ -428,6 +431,10 @@ namespace PlatformerUltra.Gameplay
 
                 _animationGroundedGraceTimer = _animationGroundedGraceTime;
                 IsAnimationGrounded = true;
+                if (!wasGrounded && impactSpeed >= 2.25f)
+                {
+                    Landed?.Invoke(impactSpeed);
+                }
                 return;
             }
 

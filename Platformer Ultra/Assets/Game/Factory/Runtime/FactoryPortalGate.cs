@@ -11,7 +11,7 @@ namespace PlatformerUltra.Factory
         [SerializeField] private GameObject _approachBridge;
         [SerializeField] private Renderer[] _socketIndicators = Array.Empty<Renderer>();
         [SerializeField] private GameObject[] _installedCoreVisuals = Array.Empty<GameObject>();
-        [SerializeField, Min(1)] private int _requiredCoreCount = 3;
+        [SerializeField, Min(1)] private int _requiredCoreCount = 1;
 
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         private static readonly int ColorId = Shader.PropertyToID("_Color");
@@ -38,7 +38,7 @@ namespace PlatformerUltra.Factory
             FactoryPortalVisual portalVisual,
             GameObject approachBridge,
             Renderer[] socketIndicators,
-            int requiredCoreCount = 3)
+            int requiredCoreCount = 1)
         {
             Configure(portalVisual, approachBridge, socketIndicators, null, requiredCoreCount);
         }
@@ -48,7 +48,7 @@ namespace PlatformerUltra.Factory
             GameObject approachBridge,
             Renderer[] socketIndicators,
             GameObject[] installedCoreVisuals,
-            int requiredCoreCount = 3)
+            int requiredCoreCount = 1)
         {
             _portalVisual = portalVisual;
             _approachBridge = approachBridge;

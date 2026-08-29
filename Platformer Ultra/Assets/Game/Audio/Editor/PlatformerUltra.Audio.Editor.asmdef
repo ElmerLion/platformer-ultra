@@ -1,0 +1,20 @@
+{
+  "name": "PlatformerUltra.Audio.Editor",
+  "rootNamespace": "PlatformerUltra.Audio.Editor",
+  "references": [
+    "PlatformerUltra.Audio.Runtime",
+    "PlatformerUltra.Gameplay.Runtime",
+    "PlatformerUltra.Enemies.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

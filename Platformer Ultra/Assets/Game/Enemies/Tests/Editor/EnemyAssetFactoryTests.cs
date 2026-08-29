@@ -53,6 +53,9 @@ namespace PlatformerUltra.Enemies.Tests
             Assert.That(prefab.GetComponent<EnemyBrain>(), Is.Not.Null);
             Assert.That(prefab.GetComponent<EnemyAttackController>(), Is.Not.Null);
             Assert.That(prefab.GetComponent<EnemyAttackPresentation>(), Is.Not.Null);
+            EnemyAudioPresentation audio = prefab.GetComponent<EnemyAudioPresentation>();
+            Assert.That(audio, Is.Not.Null);
+            Assert.That(audio.OneShotSource.outputAudioMixerGroup?.name, Is.EqualTo("SFX"));
             Assert.That(prefab.transform.Find("Target Point")?.GetComponent<TargetPoint>(), Is.Not.Null);
 
             GameObject visual = prefab.transform.Find("Visual")?.gameObject;
@@ -80,6 +83,15 @@ namespace PlatformerUltra.Enemies.Tests
                 Assert.That(prefab.GetComponent<NavMeshAgent>(), Is.Null);
                 Assert.That(visual.GetComponentsInChildren<Animator>(true), Is.Empty);
                 Assert.That(prefab.transform.Find("Muzzle/Electrical Shot Telegraph"), Is.Not.Null);
+                Assert.That(audio.FootstepClips, Is.Empty);
+                Assert.That(audio.MovementLoopClip, Is.Not.Null);
+                Assert.That(audio.LoopSource, Is.Not.Null);
+                Assert.That(audio.LoopSource.loop, Is.True);
+                Assert.That(audio.LoopSource.spatialBlend, Is.EqualTo(1f));
+                Assert.That(audio.OneShotSource.rolloffMode, Is.EqualTo(AudioRolloffMode.Logarithmic));
+                Assert.That(audio.OneShotSource.minDistance, Is.EqualTo(1.5f));
+                Assert.That(audio.OneShotSource.maxDistance, Is.EqualTo(18f));
+                Assert.That(audio.OneShotSource.priority, Is.EqualTo(84));
             }
             else
             {
@@ -96,6 +108,14 @@ namespace PlatformerUltra.Enemies.Tests
                     .FindProperty("_animatorDriver");
                 Assert.That(animatorReference, Is.Not.Null);
                 Assert.That(animatorReference.objectReferenceValue, Is.Null);
+                Assert.That(audio.FootstepClips, Has.Length.EqualTo(4));
+                Assert.That(audio.MovementLoopClip, Is.Null);
+                Assert.That(audio.OneShotSource.spatialBlend, Is.EqualTo(1f));
+                Assert.That(audio.OneShotSource.rolloffMode, Is.EqualTo(AudioRolloffMode.Linear));
+                Assert.That(audio.OneShotSource.minDistance, Is.EqualTo(5f));
+                Assert.That(audio.OneShotSource.maxDistance,
+                    Is.EqualTo(archetype == EnemyArchetype.Armored ? 44f : 36f));
+                Assert.That(audio.OneShotSource.priority, Is.EqualTo(64));
             }
 
             if (archetype == EnemyArchetype.Armored)

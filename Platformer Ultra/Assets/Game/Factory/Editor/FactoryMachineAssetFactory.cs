@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using PlatformerUltra.Audio;
+using PlatformerUltra.Audio.Editor;
 using PlatformerUltra.Combat;
 using PlatformerUltra.Gameplay;
 using UnityEditor;
@@ -216,7 +217,8 @@ namespace PlatformerUltra.Factory.Editor
                 Renderer statusRenderer = CreateBox("Mine Status Beacon", root.transform, new Vector3(0f, 3.25f, 0.7f), new Vector3(0.85f, 0.16f, 0.28f), materials.Energy).GetComponent<Renderer>();
 
                 MachineLoopAudio minerAudio = drillAssembly.AddComponent<MachineLoopAudio>();
-                minerAudio.Configure(AssetDatabase.LoadAssetAtPath<AudioClip>(MinerAudioPath), 0.1f, 2.5f, 15f, 0.45f, false);
+                minerAudio.Configure(AssetDatabase.LoadAssetAtPath<AudioClip>(MinerAudioPath), 0.1f, 2.5f, 15f, 0.45f, false,
+                    GameAudioAssetFactory.GetGroup(GameAudioAssetFactory.SfxGroupName));
                 ParticleSystem startupFlash = CreateBurstParticleSystem("Mine Startup Flash", root.transform, new Vector3(0f, 2.15f, -1.45f), materials.EnergyParticle, new Color(0.18f, 0.9f, 1f, 0.9f), 20, 2.2f, 0.24f, 0.55f, ParticleSystemShapeType.Sphere, 0.45f, false);
                 ParticleSystem startupDust = CreateBurstParticleSystem("Mine Startup Dust", root.transform, new Vector3(0f, 0.45f, -1.75f), materials.Dust, new Color(0.32f, 0.38f, 0.4f, 0.55f), 16, 1.25f, 0.42f, 1.05f, ParticleSystemShapeType.Cone, 0.55f, false);
                 ParticleSystem workingDust = CreateLoopParticleSystem("Mine Working Dust", root.transform, new Vector3(0f, 0.5f, -1.78f), materials.Dust, new Color(0.34f, 0.4f, 0.42f, 0.48f), 10f, 0.75f, 0.34f, 0.8f, ParticleSystemShapeType.Cone, 0.6f, false);
@@ -425,7 +427,8 @@ namespace PlatformerUltra.Factory.Editor
                     3f,
                     16f,
                     0.45f,
-                    false);
+                    false,
+                    GameAudioAssetFactory.GetGroup(GameAudioAssetFactory.SfxGroupName));
                 ParticleSystem ignitionFlash = CreateBurstParticleSystem("Smelter Ignition Flash", root.transform, new Vector3(0f, 1.72f, -1.3f), materials.Embers, new Color(1f, 0.3f, 0.025f, 0.92f), 24, 2.6f, 0.22f, 0.55f, ParticleSystemShapeType.Box, 0.75f, true);
                 ParticleSystem ignitionSmoke = CreateBurstParticleSystem("Smelter Ignition Smoke", root.transform, new Vector3(0f, 2.35f, -1.1f), materials.Smoke, new Color(0.25f, 0.27f, 0.28f, 0.55f), 12, 0.85f, 0.5f, 1.3f, ParticleSystemShapeType.Cone, 0.5f, false);
                 ParticleSystem workingEmbers = CreateLoopParticleSystem("Smelter Working Embers", root.transform, new Vector3(0f, 1.65f, -1.35f), materials.Embers, new Color(1f, 0.26f, 0.025f, 0.88f), 14f, 1.4f, 0.1f, 0.65f, ParticleSystemShapeType.Box, 0.75f, true);
@@ -608,7 +611,9 @@ namespace PlatformerUltra.Factory.Editor
                     0.11f,
                     2.5f,
                     13f,
-                    0.2f);
+                    0.2f,
+                    true,
+                    GameAudioAssetFactory.GetGroup(GameAudioAssetFactory.SfxGroupName));
                 AddBoxCollider(root, new Vector3(0f, 0.3f, 0f), new Vector3(4.5f, 0.6f, 3.7f));
                 foreach (float x in xs)
                 {

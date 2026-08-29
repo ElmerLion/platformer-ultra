@@ -1,4 +1,5 @@
 using System;
+using PlatformerUltra.Audio.Editor;
 using PlatformerUltra.Combat;
 using PlatformerUltra.FactoryDefense;
 using PlatformerUltra.Gameplay;
@@ -96,6 +97,8 @@ namespace PlatformerUltra.Factory.Editor
                 shotAudioSource.minDistance = 2f;
                 shotAudioSource.maxDistance = 22f;
                 shotAudioSource.volume = 0.18f;
+                shotAudioSource.outputAudioMixerGroup =
+                    GameAudioAssetFactory.GetGroup(GameAudioAssetFactory.SfxGroupName);
                 AudioClip shotClip = AssetDatabase.LoadAssetAtPath<AudioClip>(LaserAudioPath);
                 if (shotClip == null)
                 {
@@ -128,8 +131,8 @@ namespace PlatformerUltra.Factory.Editor
                     ~0,
                     80,
                     15f,
-                    10,
-                    1.2f,
+                    8,
+                    1f,
                     90f,
                     5f,
                     0.2f,
@@ -205,7 +208,7 @@ namespace PlatformerUltra.Factory.Editor
                     trigger,
                     null,
                     null,
-                    12f);
+                    6f);
                 root.AddComponent<InteractionTarget>().Configure(spot);
                 PrefabUtility.SaveAsPrefabAsset(root, BuildSpotPrefabPath);
             }

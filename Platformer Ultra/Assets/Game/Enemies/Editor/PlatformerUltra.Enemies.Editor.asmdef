@@ -3,6 +3,7 @@
   "rootNamespace": "PlatformerUltra.Enemies.Editor",
   "references": [
     "PlatformerUltra.CharacterArt.Editor",
+    "PlatformerUltra.Audio.Editor",
     "PlatformerUltra.Combat.Runtime",
     "PlatformerUltra.Enemies.Runtime"
   ],

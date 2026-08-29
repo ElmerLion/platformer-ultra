@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using PlatformerUltra.Audio.Editor;
 using PlatformerUltra.CharacterArt.Editor;
 using PlatformerUltra.Combat;
 using UnityEditor;
@@ -827,6 +828,13 @@ namespace PlatformerUltra.Enemies.Editor
                         attackController,
                         enemyHealth);
                 }
+
+                GameAudioAssetFactory.ConfigureEnemyAudio(
+                    root,
+                    spec.Definition,
+                    motorBehaviour,
+                    proceduralAnimator,
+                    attackController);
 
                 SetLayerRecursively(root, spec.EnemyLayer);
                 gameplayCollider.enabled = true;

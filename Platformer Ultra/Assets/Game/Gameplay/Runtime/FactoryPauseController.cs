@@ -14,6 +14,7 @@ namespace PlatformerUltra.Gameplay
         [SerializeField] private ThirdPersonOrbitCamera _orbitCamera;
         [SerializeField] private FactoryGameOverController _gameOverController;
         [SerializeField] private FactoryVictoryController _victoryController;
+        [SerializeField] private FactorySettingsPresenter _settingsPresenter;
 
         private float _resumeTimeScale = 1f;
         private bool _presenterBound;
@@ -54,7 +55,8 @@ namespace PlatformerUltra.Gameplay
             PlayerInteractor playerInteractor,
             ThirdPersonOrbitCamera orbitCamera,
             FactoryGameOverController gameOverController,
-            FactoryVictoryController victoryController)
+            FactoryVictoryController victoryController,
+            FactorySettingsPresenter settingsPresenter = null)
         {
             UnbindPresenter();
             _pauseAction = pauseAction;
@@ -64,6 +66,7 @@ namespace PlatformerUltra.Gameplay
             _orbitCamera = orbitCamera;
             _gameOverController = gameOverController;
             _victoryController = victoryController;
+            _settingsPresenter = settingsPresenter;
             BindPresenter();
         }
 
@@ -76,6 +79,12 @@ namespace PlatformerUltra.Gameplay
 
             if (IsPaused)
             {
+                if (_settingsPresenter != null && _settingsPresenter.IsOpen)
+                {
+                    _settingsPresenter.ShowPauseMenu();
+                    return true;
+                }
+
                 ResumeGame();
                 return true;
             }
@@ -120,6 +129,7 @@ namespace PlatformerUltra.Gameplay
             AudioListener.pause = true;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            _settingsPresenter?.ShowPauseMenu(false);
             _statusPresenter?.ShowPause();
         }
 
@@ -145,6 +155,7 @@ namespace PlatformerUltra.Gameplay
             }
 
             _statusPresenter?.HidePause();
+            _settingsPresenter?.ShowPauseMenu(false);
         }
 
         private void HandleResumeRequested()
